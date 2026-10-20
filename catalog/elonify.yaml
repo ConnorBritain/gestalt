@@ -35,5 +35,4 @@ cost: { skills: 1, agents: 1, commands: 0, listing_tokens: 258, session_start_li
 feeds:
   - { on: REFRAME, to: cairn.capture, as: choice, status: proposed }
 worker: { tier: critic, mechanism: agent-file }
-exclusive_of: [verification-gate.critics]
 notes: Refuses findings owned by verification-critic and architecture-reviewer, so it runs beside them, not instead of them.
