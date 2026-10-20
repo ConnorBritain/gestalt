@@ -1,0 +1,118 @@
+// write: the only command that touches files outside Gestalt's build directory, and only
+// two kinds: the text between Gestalt's own markers in CLAUDE.md / AGENTS.md, and agent files
+// Gestalt generated. Dry-run unless --yes. Refuses settings.json, config.toml and anything it
+// did not generate; idempotent; keeps the file's line endings.
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
+import { gestaltHome } from "./way.mjs";
+import { GENERATED } from "./agents-emit.mjs";
+
+export const INSTRUCTION_FILES = ["CLAUDE.md", "AGENTS.md", "CLAUDE.local.md"];
+const MARKER_RE = /^<!--\s*gestalt:(begin|end)\s+([a-z0-9][a-z0-9._-]*)\s*-->\s*$/;
+
+export class WriteError extends Error {}
+
+/** Find the begin/end lines for `name`; reject nesting, strays and duplicates of any name. */
+export function findBlock(lines, name) {
+  let open = null;
+  let found = null;
+  const seen = new Set();
+  for (let i = 0; i < lines.length; i += 1) {
+    const m = MARKER_RE.exec(lines[i]);
+    if (!m) continue;
+    const [, kind, n] = m;
+    if (kind === "begin") {
+      if (open) throw new WriteError(`line ${i + 1}: gestalt:begin ${n} opens inside gestalt:begin ${open.name} (line ${open.line + 1}); fix the markers by hand`);
+      if (seen.has(n)) throw new WriteError(`line ${i + 1}: a second gestalt:begin ${n}; remove the duplicate by hand`);
+      open = { name: n, line: i };
+    } else {
+      if (!open || open.name !== n) throw new WriteError(`line ${i + 1}: gestalt:end ${n} without a matching begin`);
+      seen.add(n);
+      if (n === name) found = { begin: open.line, end: i };
+      open = null;
+    }
+  }
+  if (open) throw new WriteError(`gestalt:begin ${open.name} (line ${open.line + 1}) is never closed`);
+  return found;
+}
+
+/** Pure: the new file text with `block` (which carries its own markers) inserted or replaced. */
+export function applyBlock(original, block, name) {
+  const eol = original.includes("\r\n") ? "\r\n" : "\n";
+  const lines = original.length ? original.split(/\r?\n/) : [];
+  const trailing = original.length === 0 || /\r?\n$/.test(original);
+  if (trailing && lines.length && lines[lines.length - 1] === "") lines.pop();
+  const blockLines = block.replace(/\r?\n$/, "").split(/\r?\n/);
+  const at = findBlock(lines, name);
+  let next;
+  if (at) next = [...lines.slice(0, at.begin), ...blockLines, ...lines.slice(at.end + 1)];
+  else next = lines.length ? [...lines, ...(lines[lines.length - 1] === "" ? [] : [""]), ...blockLines] : blockLines;
+  return `${next.join(eol)}${eol}`;
+}
+
+function blockName(text) {
+  const m = /^<!--\s*gestalt:begin\s+([a-z0-9][a-z0-9._-]*)\s*-->/.exec(text);
+  if (!m) throw new WriteError("the build's block file has no gestalt:begin marker; recompile");
+  return m[1];
+}
+
+export function writeBlock(target, buildDir, { context = null, yes = false } = {}) {
+  const file = resolve(target);
+  if (!INSTRUCTION_FILES.includes(basename(file))) {
+    throw new WriteError(`refusing ${basename(file)}: gestalt write only edits ${INSTRUCTION_FILES.join(", ")}. Native config (settings.json, config.toml) belongs to kitctl or to you.`);
+  }
+  const source = join(buildDir, context ? `block.${context}.md` : "block.md");
+  if (!existsSync(source)) throw new WriteError(`no ${basename(source)} in ${buildDir}; run gestalt compile${context ? ` (does context "${context}" add any lines?)` : ""}`);
+  const block = readFileSync(source, "utf8");
+  const name = blockName(block);
+  const original = existsSync(file) ? readFileSync(file, "utf8") : "";
+  if (basename(file) === "CLAUDE.md" && /^@AGENTS\.md\s*$/.test(original)) {
+    throw new WriteError(`${file} is a pointer to AGENTS.md; write the block into AGENTS.md instead so the two never drift`);
+  }
+  const next = applyBlock(original, block, name);
+  if (next === original) return { changed: false, file, name, message: `${file}: block ${name} already up to date` };
+  if (yes) writeFileSync(file, next);
+  const verb = original.includes(`gestalt:begin ${name}`) ? "replace" : "add";
+  return { changed: true, written: yes, file, name, message: `${yes ? "wrote" : "would " + verb}: block ${name} in ${file}`, preview: block };
+}
+
+export function writeAgents(targetDir, buildDir, { harness = "claude", yes = false } = {}) {
+  const src = join(buildDir, "agents", harness);
+  const ext = harness === "codex" ? ".toml" : ".md";
+  if (!existsSync(src)) return [{ changed: false, message: `no ${harness} agents in this build` }];
+  const out = [];
+  const dir = resolve(targetDir);
+  for (const f of readdirSync(src).filter(x => x.endsWith(ext)).sort()) {
+    const text = readFileSync(join(src, f), "utf8");
+    const dest = join(dir, f);
+    if (existsSync(dest)) {
+      const current = readFileSync(dest, "utf8");
+      if (!current.includes(GENERATED)) throw new WriteError(`${dest} exists and was not generated by gestalt; rename the worker in your way or move that file`);
+      if (current === text) { out.push({ changed: false, message: `${dest}: up to date` }); continue; }
+    }
+    if (yes) { mkdirSync(dir, { recursive: true }); writeFileSync(dest, text); }
+    out.push({ changed: true, message: `${yes ? "wrote" : "would write"}: ${dest}` });
+  }
+  return out;
+}
+
+export function runWrite(argv, { parseArgs }) {
+  const a = parseArgs(argv, { block: "value", agents: "value", context: "value", from: "value", harness: "value", yes: "flag" });
+  if (!a.block === !a.agents) throw Object.assign(new Error("give exactly one of --block FILE or --agents DIR"), { name: "UsageError" });
+  const buildDir = resolve(a.from ?? join(gestaltHome(), "build"));
+  try {
+    if (a.block) {
+      const r = writeBlock(a.block, buildDir, { context: a.context ?? null, yes: a.yes });
+      console.log(r.message);
+      if (r.changed && !a.yes) console.log(`\n${r.preview}\nDry run. Add --yes to write.`);
+    } else {
+      const results = writeAgents(a.agents, buildDir, { harness: a.harness ?? "claude", yes: a.yes });
+      for (const r of results) console.log(r.message);
+      if (results.some(r => r.changed) && !a.yes) console.log("\nDry run. Add --yes to write.");
+    }
+    return 0;
+  } catch (e) {
+    if (e instanceof WriteError) { console.error(`gestalt write: ${e.message}`); return 1; }
+    throw e;
+  }
+}

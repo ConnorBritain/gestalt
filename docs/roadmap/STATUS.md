@@ -13,7 +13,7 @@ and when `Last version:` above disagrees with `package.json`.
 - [x] 05 lint — `tools/lib/lint.mjs`, `tests/fixtures/lint/`, `tests/lint.mjs`
 - [x] 06 survey — `tools/lib/survey.mjs`, `toml-scan.mjs`, `tokens.mjs`, `usage.mjs`, fixture homes, tests
 - [x] 07 compile — WAY.md, block, kit loadouts, worker agents, SETUP.md, TASTE-TEST.md, `--check`
-- [ ] 08 write — `tools/lib/write.mjs`, `tests/write.mjs`
+- [x] 08 write — `tools/lib/write.mjs`, `tests/write.mjs`
 - [ ] 09 skills — `skills/{way,trim,taste}/`
 - [ ] 10 connor — `examples/connor/` measured from the real plugin checkouts
 - [ ] 11 personas — `examples/personas/*` (four tabula-rasa people), golden tests
