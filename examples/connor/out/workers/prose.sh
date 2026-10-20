@@ -10,4 +10,4 @@ HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 PROMPT="$(cat "$HERE/prose.prompt.md")
 ${1:?pass the task}"
 exec claude -p --model sonnet --strict-mcp-config --plugin-dir "${GESTALT_PLUGIN_PROSE_AUTHOR:?set GESTALT_PLUGIN_PROSE_AUTHOR to the prose-author plugin directory}" "$PROMPT"
-# Codex alternative (unverified flags): codex exec "$PROMPT"
+# Codex alternative: codex exec "$PROMPT"

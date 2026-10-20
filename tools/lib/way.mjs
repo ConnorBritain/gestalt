@@ -13,7 +13,9 @@ import {
 
 export const WAY_SCHEMA = "gestalt-way/1";
 export const CONNECTOR_ROLES = ["tracker", "docs", "mail", "calendar", "chat", "publish", "code", "data", "files"];
-export const CADENCES = ["daily", "weekly", "monthly"];
+// on_enter runs once per repo, in the order listed (set the repo up before working in it);
+// the others are calendar rituals.
+export const CADENCES = ["on_enter", "daily", "weekly", "monthly"];
 export const DEFAULT_BUDGETS = {
   block_tokens: 450,
   protocol_rules: 3,

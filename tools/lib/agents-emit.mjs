@@ -1,7 +1,9 @@
 // Worker definitions. A subagent becomes a non-plugin agent file (plugin agents ignore
-// mcpServers), a headless worker becomes a launch script plus its MCP config (with a
-// `codex exec` line for Codex), and every worker carries the hand-off contract. Codex
-// custom-agent files are not emitted until their fields are verified against a real CLI.
+// mcpServers) and, for Codex, a custom agent in ~/.codex/agents/; a headless worker becomes
+// a launch script plus its MCP config (with a `codex exec` line for Codex), and every worker
+// carries the hand-off contract. Codex agent fields were checked against Codex 0.163.0
+// (2026-10-20): name, description and developer_instructions are required, an unknown key
+// rejects the file, model and [mcp_servers.<id>] are accepted.
 import { command } from "./block.mjs";
 import { emitYaml } from "./yaml-emit.mjs";
 
@@ -21,6 +23,32 @@ function stepsText(worker, catalog) {
     const cmd = s ? command(s) : null;
     return `- ${u}: ${s?.invoke ?? "(unknown step)"}${cmd ? ` (\`${cmd}\`)` : ""}`;
   });
+}
+
+const toml = v => JSON.stringify(v); // a JSON string is a valid TOML basic string
+
+function codexAgent(w, way, body, inline, shared) {
+  const model = way.topology.tiers.codex?.[w.tier];
+  const L = [
+    `# ${GENERATED}; edit the way, not this file. Codex custom agent for worker "${w.id}".`,
+    `name = ${toml(w.id)}`,
+    `description = ${toml(`Use for ${w.route}.`)}`,
+    `developer_instructions = ${toml(body)}`,
+  ];
+  if (model) L.push(`model = ${toml(model)}`);
+  if (shared.length) L.push(`# Uses ${shared.join(", ")} from your own Codex config.`);
+  for (const [id, s] of Object.entries(inline)) {
+    const c = way.connectors.find(x => x.id === id);
+    L.push("", `[mcp_servers.${id}]`);
+    if (s.url) {
+      L.push(`url = ${toml(s.url)}`);
+      if (c?.auth) L.push(`bearer_token_env_var = ${toml(c.auth)}`);
+    } else {
+      L.push(`command = ${toml(s.command)}`);
+      if (s.args?.length) L.push(`args = [${s.args.map(toml).join(", ")}]`);
+    }
+  }
+  return `${L.join("\n")}\n`;
 }
 
 function mcpServersFor(worker, way) {
@@ -47,6 +75,7 @@ export function emitAgents(way, catalog) {
       if (servers.length) fm.mcpServers = servers;
       files[`agents/claude/${w.id}.md`] = `---\n${emitYaml(fm)}---\n\n${body}\n`;
     }
+    if (w.mechanism === "subagent" && way.harnesses.includes("codex")) files[`agents/codex/${w.id}.toml`] = codexAgent(w, way, body, inline, shared);
     if (w.mechanism === "headless") {
       const mcpFile = Object.keys(inline).length ? `${w.id}.mcp.json` : null;
       if (mcpFile) files[`workers/${mcpFile}`] = `${JSON.stringify({ mcpServers: inline }, null, 2)}\n`;
@@ -67,7 +96,7 @@ export function emitAgents(way, catalog) {
         `exec claude -p${model ? ` --model ${model}` : ""} --strict-mcp-config${mcpFile ? ` --mcp-config "$HERE/${mcpFile}"` : ""}${pluginVars.map(id => ` --plugin-dir "\${${env(id)}:?set ${env(id)} to the ${id} plugin directory}"`).join("")} "$PROMPT"`,
       ];
       const codexModel = way.topology.tiers.codex?.[w.tier];
-      if (way.harnesses.includes("codex")) lines.push(`# Codex alternative (unverified flags): codex exec${codexModel ? ` -m ${codexModel}` : ""} "$PROMPT"`);
+      if (way.harnesses.includes("codex")) lines.push(`# Codex alternative: codex exec${codexModel ? ` -m ${codexModel}` : ""} "$PROMPT"`);
       files[`workers/${w.id}.sh`] = `${lines.join("\n")}\n`;
       files[`workers/${w.id}.prompt.md`] = `<!-- ${GENERATED}; edit the way, not this file. -->\n${body}\n\n## Task\n`;
     }

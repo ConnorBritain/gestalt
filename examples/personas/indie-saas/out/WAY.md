@@ -20,12 +20,12 @@ Control moves left to right. Checkers report and never fix; recorders never bloc
 
 | Stage | Step | Kind | Mode | Contexts | claude | cursor |
 |---|---|---|---|---|---|---|
-| orient | compounder brief | orienter | ambient | all | enforced | none |
-| intend | compounder guard | guard | ambient | all | enforced | none |
+| orient | compounder brief | orienter | ambient | all | enforced | partial |
+| intend | compounder guard | guard | ambient | all | enforced | partial |
 | check | verification-gate gates | gate | ambient | app | enforced | partial |
 | check | verification-gate critics | reviewer | protocol → critics | app | enforced | partial |
-| record | compounder stop-lines | recorder | ambient | all | enforced | none |
-| record | compounder ship | recorder | explicit | all | enforced | none |
+| record | compounder stop-lines | recorder | ambient | all | enforced | partial |
+| record | compounder ship | recorder | explicit | all | enforced | partial |
 
 Harness columns are enforcement: **enforced** (the harness makes it happen), **partial**, **advisory** (written down, nothing makes it happen), **none**.
 
@@ -36,16 +36,16 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** compounder brief → **intend** compounder guard → **record** compounder stop-lines, compounder ship
 
 - Stop gates: compounder stop-lines.
-- Lead always-on ≈732 tokens (budget 3000), 8 skills (budget 8).
-- Session-start lines 13 (budget 13); always-on protocol rules 0 (budget 3).
+- Lead always-on ≈341 tokens (budget 3000), 4 skills (budget 8).
+- Session-start lines 3 (budget 13); always-on protocol rules 0 (budget 3).
 
 ### app (file-exists:package.json)
 
 **orient** compounder brief → **intend** compounder guard → **check** verification-gate gates, verification-gate critics → **record** compounder stop-lines, compounder ship
 
 - Stop gates: verification-gate gates → compounder stop-lines.
-- Lead always-on ≈918 tokens (budget 3000), 8 skills (budget 8).
-- Session-start lines 13 (budget 13); always-on protocol rules 2 (budget 3).
+- Lead always-on ≈527 tokens (budget 3000), 4 skills (budget 8).
+- Session-start lines 3 (budget 13); always-on protocol rules 2 (budget 3).
 
 ## Lead and workers
 

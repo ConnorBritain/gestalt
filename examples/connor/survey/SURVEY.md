@@ -4,8 +4,8 @@ Generated 2026-10-20. Token figures are an estimate: ceil(chars / 4), good for r
 
 ## Headline
 
-- **Always-on (Claude Code lead): ≈7266 tokens**: instructions 0, skill listings 4770, agent listings 2476, commands 20.
-- 11 plugins live, 49 skills, 24 agents, 1 commands, 1 MCP servers.
+- **Always-on (Claude Code lead): ≈6528 tokens**: instructions 0, skill listings 4032, agent listings 2476, commands 20.
+- 11 plugins live, 41 listed skills (and 8 that run by name only), 24 agents, 1 commands, 1 MCP servers.
 - Stop hooks that can block a turn: 3 (elonify, compounder, verification-gate).
 - Harnesses found: none.
 
@@ -17,9 +17,9 @@ Generated 2026-10-20. Token figures are an estimate: ceil(chars / 4), good for r
 | ui-magic | checkout | yes | 7 | 2 | 0 | 1090 | PostToolUse | — | ui-magic |
 | prose-review | checkout | yes | 0 | 6 | 0 | 872 | — | — | prose-review |
 | brand-builder | checkout | yes | 6 | 2 | 0 | 851 | PostToolUse | — | brand-builder |
-| cairn | checkout | yes | 6 | 3 | 0 | 769 | SessionStart Stop | — | cairn |
 | prose-author | checkout | yes | 4 | 4 | 0 | 741 | — | — | prose-author |
-| compounder | checkout | yes | 8 | 0 | 0 | 732 | SessionStart UserPromptSubmit! PreToolUse! PostToolUse Stop! SessionEnd | — | compounder |
+| cairn | checkout | yes | 2 | 3 | 0 | 422 | SessionStart Stop | — | cairn |
+| compounder | checkout | yes | 4 | 0 | 0 | 341 | SessionStart UserPromptSubmit! PreToolUse! PostToolUse Stop! SessionEnd | — | compounder |
 | gestalt | checkout | yes | 3 | 0 | 0 | 280 | — | — | gestalt |
 | elonify | checkout | yes | 1 | 1 | 0 | 258 | PostToolUse SubagentStop Stop! | — | elonify |
 | verification-gate | checkout | yes | 0 | 2 | 0 | 186 | Stop! | — | verification-gate |

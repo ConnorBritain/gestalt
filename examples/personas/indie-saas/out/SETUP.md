@@ -14,7 +14,7 @@ When it passes, roll out the rest below. When it fails, run /gestalt:taste on th
 
 ## 1. Install everything
 
-- [ ] **compounder** (plugin:compounder): claude: /plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview. _Not available on cursor._
+- [ ] **compounder** (plugin:compounder): claude: /plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview; cursor: add ConnorBritain/compounder as a plugin marketplace and install compounder (reads .cursor-plugin)
 - [ ] **verification-gate (agent-primitives)** (plugin:verification-gate): claude: Install the verification-gate bundle from agent-primitives; paste wiring/claude-md.md; add .claude/gates.json per repo
 - [ ] **linear** connector (mcp:linear, tracker): set `LINEAR_API_KEY` in your environment, never in a file
 - [ ] **github** connector (mcp:github, code)
@@ -46,7 +46,8 @@ No kitctl: Gestalt writes its marked block itself, dry-run first.
 
 ## 6. Harnesses kitctl does not reach
 
-- [ ] Cursor: paste the block into `.cursor/rules/gestalt.mdc` with `alwaysApply: true`. No Stop hooks there: every gate is a rule, not a block.
+- [ ] Cursor: paste the block into `.cursor/rules/gestalt.mdc` with `alwaysApply: true`.
+- [ ] Cursor has no SessionStart or blocking Stop hook for these tools: every gate is a rule there, not a block.
 
 ## Then
 

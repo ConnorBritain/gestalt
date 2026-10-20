@@ -152,10 +152,30 @@ check("a headless worker script parses and isolates its plugin", "the lead must 
   assert.match(files["workers/prose.sh"], /claude -p --model sonnet --strict-mcp-config --plugin-dir "\$\{GESTALT_PLUGIN_PROSE_AUTHOR/);
   assert.match(files["workers/prose.prompt.md"], /original request, verbatim/);
 });
-check("no Codex agent files until their fields are verified", "config that may not load must not look finished", () => {
+check("a subagent worker gets a Codex agent with only the fields Codex 0.163 accepts", "Codex ignores an agent file with an unknown key or without developer_instructions", () => {
   const { files } = compile(fullPath);
-  assert.ok(!Object.keys(files).some(f => f.startsWith("agents/codex/")));
-  assert.match(files["workers/prose.sh"], /# Codex alternative \(unverified flags\): codex exec -m gpt-worker/);
+  const toml = files["agents/codex/tracker.toml"];
+  assert.match(toml, /^name = "tracker"$/m);
+  assert.match(toml, /^developer_instructions = "You are a worker\./m);
+  assert.match(toml, /^model = "gpt-worker"$/m);
+  assert.match(toml, /^\[mcp_servers\.linear\]\nurl = "https:\/\/mcp\.linear\.app\/mcp"\nbearer_token_env_var = "LINEAR_API_KEY"$/m);
+  assert.ok(!Object.keys(files).some(f => f.startsWith("agents/codex/prose")), "headless workers stay scripts");
+  assert.match(files["workers/prose.sh"], /# Codex alternative: codex exec -m gpt-worker/);
+});
+
+check("on_enter renders numbered in WAY.md and as an ordered checklist in SETUP.md", "the per-repo setup only works in its order", () => {
+  const raw = parseYaml(readFileSync(fullPath, "utf8"));
+  raw.reflect = { ...(raw.reflect ?? {}), on_enter: ["kitctl.use", "gestalt.block"] };
+  const { problems } = readWay(fullPath);
+  const dir = tempDir();
+  const path = join(dir, "way.yaml");
+  writeFileSync(path, JSON.stringify(raw));
+  const r = readWay(path);
+  assert.deepEqual(r.problems, problems);
+  const { files } = compileWay(r.way, r.catalog);
+  assert.match(files["WAY.md"], /\*\*on entering a repo, in order\*\*: 1\. kitctl use .* 2\. gestalt block/);
+  const setup = files["SETUP.md"];
+  assert.ok(setup.indexOf("- [ ] kitctl use:") < setup.indexOf("- [ ] gestalt block:") && setup.includes("### Then, in each repo you start working in, in order"));
 });
 
 group("bootstrap");

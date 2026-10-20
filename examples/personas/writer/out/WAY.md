@@ -37,7 +37,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt → **make** prose-research research, humanizer strip, prose-author draft → **check** prose-tell-scan scan, prose-review review → **record** cairn capture
 
-- Lead always-on ≈2622 tokens (budget 5000), 12 skills (budget 12).
+- Lead always-on ≈2275 tokens (budget 5000), 8 skills (budget 12).
 - Session-start lines 2 (budget 8); always-on protocol rules 1 (budget 3).
 - Disabled here: plugin:quickwrite.
 
@@ -45,7 +45,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt → **plan** prose-outline outline → **make** prose-research research, humanizer strip, prose-author draft → **check** prose-tell-scan scan, prose-review review → **record** cairn capture
 
-- Lead always-on ≈2757 tokens (budget 5000), 13 skills (budget 12).
+- Lead always-on ≈2410 tokens (budget 5000), 9 skills (budget 12).
 - Session-start lines 2 (budget 8); always-on protocol rules 1 (budget 3).
 
 ## Lead and workers
@@ -86,5 +86,5 @@ Order: orient → intend → plan → make → check → record. Checkers report
 
 ## Lint
 
-- warn **GST-LEAD** context book: lead sees 13 skills (budget 12)
+Clean: no warnings, no waivers.
 

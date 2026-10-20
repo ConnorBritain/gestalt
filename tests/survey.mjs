@@ -77,6 +77,19 @@ check("managed-block markers: duplicates found, prose mentions ignored", "a seco
   assert.ok(s.collisions.some(c => c.code === "GST-C-MARKER" && /elonify/.test(c.message)));
   assert.ok(!s.instructions.some(i => i.markers.some(m => m.startsWith("gestalt"))));
 });
+check("a skill that runs by name is counted apart and costs no listing", "the skills budget counts what the model is shown; a hidden ritual is not shown", () => {
+  const roadmap = connor().plugins.find(p => p.name === "roadmap");
+  assert.equal(roadmap.hidden_skills, 1);
+  assert.equal(roadmap.skills, 4);
+  assert.equal(roadmap.units.find(u => u.name === "retro").listing_tokens, 0);
+  const t = connor().totals;
+  assert.equal(t.hidden_skills, 1);
+  assert.match(renderSurvey(connor()), / listed skills \(and 1 that run by name only\)/);
+});
+check("Trail's AGENTS.md section is recognised as a marker", "the survey must show which tool wrote which block", () => {
+  const codex = connor().instructions.find(i => i.harness === "codex" && /\.codex/.test(i.path));
+  assert.deepEqual(codex.markers.filter(m => m.startsWith("trail")), ["trail:start", "trail:end"]);
+});
 check("CLAUDE.md = @AGENTS.md is costed once, through the import", "double-counting would overstate the lead's load", () => {
   const s = connor();
   assert.equal(s.instructions.filter(i => i.path === "<repo>/AGENTS.md").length, 1);

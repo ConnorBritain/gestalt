@@ -9,13 +9,19 @@ source: https://github.com/ConnorBritain/kitctl
 install:
   claude: "uv tool install kitctl (or npx kitctl)"
   codex: "uv tool install kitctl (or npx kitctl)"
+  cursor: "uv tool install kitctl (or npx kitctl); add cursor to kit.yaml harnesses"
 steps:
+  - id: kitctl.use
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: "put the repo's kit.yaml in place (or `kitctl use <loadouts>`), then `kitctl plan` and `kitctl apply`; the loadouts carry the Gestalt context block"
   - id: kitctl.doctor
     stage: reflect
     kind: ritual
     mode: explicit
     invoke: "`kitctl doctor`: stale disables, pin drift, pending trust, hooks that never fired"
-harness: { claude: enforced, codex: enforced, cursor: none, agents-md: none }
+harness: { claude: enforced, codex: enforced, cursor: partial, agents-md: none }
 cost: { skills: 0, agents: 0, commands: 0, listing_tokens: 0, session_start_lines: 0 }
 worker: { tier: script, mechanism: script }
-notes: Live apply is not yet authorised; writes only inside $KITCTL_SANDBOX. Claude Code and Codex only.
+notes: "Live apply is not yet authorised; writes only inside $KITCTL_SANDBOX. Cursor (kitctl PR #8): .cursor/mcp.json, .cursor/hooks.json (Stop and edit-tool PostToolUse only) and the block as .cursor/rules/kit-<loadout>.mdc, all documented and unverified; plugins and disables are manual steps there."

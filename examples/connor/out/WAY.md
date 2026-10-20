@@ -22,29 +22,29 @@ Control moves left to right. Checkers report and never fix; recorders never bloc
 
 | Stage | Step | Kind | Mode | Contexts | claude | codex | cursor |
 |---|---|---|---|---|---|---|---|
-| orient | cairn debt | orienter | ambient | all | enforced | partial | none |
-| orient | compounder brief | orienter | ambient | all | enforced | none | none |
-| orient | roadmap ready-wave | orienter | ambient | roadmap | enforced | partial | none |
-| intend | compounder guard | guard | ambient | all | enforced | none | none |
-| intend | roadmap slice | planner | explicit | roadmap | enforced | partial | none |
+| orient | cairn debt | orienter | ambient | all | enforced | partial | advisory |
+| orient | compounder brief | orienter | ambient | all | enforced | partial | partial |
+| orient | roadmap ready-wave | orienter | ambient | roadmap | enforced | partial | advisory |
+| intend | compounder guard | guard | ambient | all | enforced | partial | partial |
+| intend | roadmap slice | planner | explicit | roadmap | enforced | partial | advisory |
 | plan | elonify plan-review | reviewer | protocol → critics | plugin, roadmap, app, site | enforced | advisory | partial |
-| plan | ui-magic foundation | planner | explicit | app | enforced | partial | none |
-| plan | brand-builder foundation | planner | explicit | site | enforced | partial | none |
-| make | ui-magic build | author | dispatcher | app | enforced | partial | none |
-| make | brand-builder build | author | dispatcher | site | enforced | partial | none |
+| plan | ui-magic foundation | planner | explicit | app | enforced | partial | advisory |
+| plan | brand-builder foundation | planner | explicit | site | enforced | partial | advisory |
+| make | ui-magic build | author | dispatcher | app | enforced | partial | advisory |
+| make | brand-builder build | author | dispatcher | site | enforced | partial | advisory |
 | make | humanizer strip | transformer | explicit | all | partial | partial | partial |
 | make | prose-author draft | author | dispatcher → prose | all | partial | advisory | partial |
 | check | verification-gate gates | gate | ambient | plugin, roadmap, app, site | enforced | advisory | partial |
 | check | elonify diff-review | reviewer | protocol + hook → critics | plugin, roadmap, app, site | enforced | advisory | partial |
 | check | verification-gate critics | reviewer | protocol → critics | plugin, roadmap, app, site | enforced | advisory | partial |
-| check | ui-magic audit | reviewer | explicit | app | enforced | partial | none |
-| check | brand-builder audit | reviewer | explicit | site | enforced | partial | none |
+| check | ui-magic audit | reviewer | explicit | app | enforced | partial | advisory |
+| check | brand-builder audit | reviewer | explicit | site | enforced | partial | advisory |
 | check | prose-tell-scan scan | gate | explicit | writing | enforced | partial | partial |
 | check | prose-review review | reviewer | protocol → critics | writing | enforced | advisory | partial |
-| record | compounder stop-lines | recorder | ambient | all | enforced | none | none |
-| record | compounder ship | recorder | explicit | all | enforced | none | none |
-| record | cairn capture | recorder | explicit | all | enforced | partial | none |
-| record | roadmap journal | recorder | ambient | roadmap | enforced | partial | none |
+| record | compounder stop-lines | recorder | ambient | all | enforced | partial | partial |
+| record | compounder ship | recorder | explicit | all | enforced | partial | partial |
+| record | cairn capture | recorder | explicit | all | enforced | partial | advisory |
+| record | roadmap journal | recorder | ambient | roadmap | enforced | partial | advisory |
 
 Harness columns are enforcement: **enforced** (the harness makes it happen), **partial**, **advisory** (written down, nothing makes it happen), **none**.
 
@@ -55,32 +55,32 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief → **intend** compounder guard → **make** humanizer strip, prose-author draft → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: compounder stop-lines.
-- Lead always-on ≈1841 tokens (budget 12000), 18 skills (budget 12).
-- Session-start lines 15 (budget 8); always-on protocol rules 1 (budget 5).
+- Lead always-on ≈1103 tokens (budget 12000), 10 skills (budget 12).
+- Session-start lines 5 (budget 8); always-on protocol rules 1 (budget 5).
 
 ### plugin (file-exists:.claude-plugin/plugin.json)
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈2285 tokens (budget 12000), 19 skills (budget 12).
-- Session-start lines 15 (budget 8); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈1547 tokens (budget 12000), 11 skills (budget 12).
+- Session-start lines 5 (budget 8); always-on protocol rules 5 (budget 5).
 
 ### roadmap (file-exists:docs/roadmap/roadmap.yaml)
 
 **orient** cairn debt, compounder brief, roadmap ready-wave → **intend** compounder guard, roadmap slice → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture, roadmap journal
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈3593 tokens (budget 12000), 32 skills (budget 12).
-- Session-start lines 18 (budget 8); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈2855 tokens (budget 12000), 24 skills (budget 12).
+- Session-start lines 8 (budget 8); always-on protocol rules 5 (budget 5).
 
 ### app (file-exists:.ui-magic.json)
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review, ui-magic foundation → **make** ui-magic build, humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics, ui-magic audit → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈3375 tokens (budget 12000), 26 skills (budget 12).
-- Session-start lines 15 (budget 8); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈2637 tokens (budget 12000), 18 skills (budget 12).
+- Session-start lines 5 (budget 8); always-on protocol rules 5 (budget 5).
 - kitctl loadouts: app-studio.
 - Disabled here: plugin:anthropic/frontend-design.
 
@@ -89,8 +89,8 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review, brand-builder foundation → **make** brand-builder build, humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics, brand-builder audit → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈3136 tokens (budget 12000), 25 skills (budget 12).
-- Session-start lines 15 (budget 8); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈2398 tokens (budget 12000), 17 skills (budget 12).
+- Session-start lines 5 (budget 8); always-on protocol rules 5 (budget 5).
 - kitctl loadouts: brand-studio.
 - Disabled here: plugin:anthropic/frontend-design.
 
@@ -99,8 +99,8 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief → **intend** compounder guard → **make** humanizer strip, prose-author draft → **check** prose-tell-scan scan, prose-review review → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: compounder stop-lines.
-- Lead always-on ≈2892 tokens (budget 12000), 19 skills (budget 12).
-- Session-start lines 15 (budget 8); always-on protocol rules 2 (budget 5).
+- Lead always-on ≈2154 tokens (budget 12000), 11 skills (budget 12).
+- Session-start lines 5 (budget 8); always-on protocol rules 2 (budget 5).
 
 ## Lead and workers
 
@@ -122,6 +122,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 ## Reflect
 
+- **on entering a repo, in order**: 1. kitctl use (put the repo's kit.yaml in place (or `kitctl use <loadouts>`), then `kitctl plan` and `kitctl apply`; the loadouts carry the Gestalt context block)
 - **daily**: compounder checkin (/compounder:checkin, daily; one move in a real free block)
 - **weekly**: cairn review (/cairn-review, the weekly forced-choice review); compounder review (/compounder:review, weekly; sets next week's mode); roadmap cycle (/roadmap:cycle, sprint planning against the graph) [in roadmap repos]; kitctl doctor (`kitctl doctor`: stale disables, pin drift, pending trust, hooks that never fired)
 - **monthly**: gestalt trim (/gestalt:trim, monthly or when the harness feels noisy); gestalt taste (/gestalt:taste after any change to the way); prose-author style-tune (prose-style-tune, turning accepted edits into profile changes)
@@ -192,16 +193,7 @@ Order: orient → intend → plan → make → check → record. Checkers report
 - warn **GST-HARNESS** flow.check[2]: verification-gate.critics is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-HARNESS** flow.check[6]: prose-review.review is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-RECORDER-BLOCKS** flow.record[0]: compounder.stop-lines records, yet its Stop hook blocks the turn (ordered last in stop_order, so tolerated)
-- info **GST-BUDGET** context everywhere: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes.)_
-- info **GST-LEAD** context everywhere: lead sees 18 skills (budget 12) _(waived: 18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
-- info **GST-BUDGET** context plugin: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes.)_
-- info **GST-LEAD** context plugin: lead sees 19 skills (budget 12) _(waived: 18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
-- info **GST-BUDGET** context roadmap: 18 session-start lines (budget 8): cairn 2, compounder 13, roadmap 3 _(waived: Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes.)_
-- info **GST-LEAD** context roadmap: lead sees 32 skills (budget 12) _(waived: 18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
-- info **GST-BUDGET** context app: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes.)_
-- info **GST-LEAD** context app: lead sees 26 skills (budget 12) _(waived: 18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
-- info **GST-BUDGET** context site: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes.)_
-- info **GST-LEAD** context site: lead sees 25 skills (budget 12) _(waived: 18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
-- info **GST-BUDGET** context writing: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes.)_
-- info **GST-LEAD** context writing: lead sees 19 skills (budget 12) _(waived: 18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
+- warn **GST-LEAD** context roadmap: lead sees 24 skills (budget 12)
+- warn **GST-LEAD** context app: lead sees 18 skills (budget 12)
+- warn **GST-LEAD** context site: lead sees 17 skills (budget 12)
 

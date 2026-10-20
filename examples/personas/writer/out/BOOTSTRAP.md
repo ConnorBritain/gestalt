@@ -146,7 +146,7 @@ Order: orient → intend → plan → make → check → record. Checkers report
 
 ### 3. Workers
 
-Subagent files go in `~/.claude/agents/`; worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).
+Subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`); worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).
 
 `~/.gestalt/build/workers/research.prompt.md`
 

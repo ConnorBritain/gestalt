@@ -97,6 +97,7 @@ and SETUP.md lists the switches to flip by hand. Either way there is one writer 
   isolate.
 - [catalog/](catalog/): what Gestalt knows about each primitive. Add your own.
 - [docs/upstream.md](docs/upstream.md): what composing these tools turned up in each of them.
+- [docs/harness-facts.md](docs/harness-facts.md): what Codex, Cursor and Trail actually do, dated, with evidence.
 - [docs/eval.md](docs/eval.md): how to check that a lean way actually helps.
 
 MIT © Connor England

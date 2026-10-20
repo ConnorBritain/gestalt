@@ -57,13 +57,15 @@ code, not its README) and measured from the real plugin checkouts.
   fresh `codex exec`.
 - compounder's Stop lines are a recorder that blocks (`GST-RECORDER-BLOCKS`). It is
   tolerated because it is ordered after the critics; the upstream ask is a non-blocking mode.
-- **Budgets per measure** (Connor's decision). Five always-on rules by choice: each is a
-  gate the model would otherwise skip, and that sequencing is the point. Session-start lines
-  (8) and listed skills (12) are limits the way exceeds today: compounder's focus brief is
-  about 13 lines, and cairn and compounder list their ritual skills every turn. Two
-  way-level waivers record that with the reason and point at the trims the portability
-  session makes ([docs/followups](../../docs/followups/portability-session.md)). WAY.md prints
-  every waived finding.
+- **Budgets per measure** (Connor's decision), with no waivers. Five always-on rules by
+  choice: each is a gate the model would otherwise skip. Session-start lines fit (5, or 8 in
+  roadmap repos) since compounder's brief went to three lines, and listed skills fit (10–11)
+  everywhere except roadmap (24), app (18) and site (17) repos, where the overrun is those
+  tools' own skills. Connor chose to keep that a visible warning in WAY.md (2026-10-20).
+- **On entering a repo**: `kitctl use` the repo's loadouts, which carry the context block.
+  Trail (`trail init`) would follow, but it adds 29 session-start lines and a blocking
+  Stop hook ([catalog/trail.yaml](../../catalog/trail.yaml)). Connor chose to pilot it first:
+  [trail-pilot.md](trail-pilot.md).
 
 ## Regenerating the survey
 

@@ -6,6 +6,7 @@
     "TASTE-TEST.md",
     "WAY.md",
     "agents/claude/reporter.md",
+    "agents/codex/reporter.toml",
     "block.md",
     "block.rfc.md",
     "block.service.md",

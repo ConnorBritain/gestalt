@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- **Portability session** ([docs/followups/portability-session.md](docs/followups/portability-session.md)):
+  dated Codex, Cursor and Trail facts in [docs/harness-facts.md](docs/harness-facts.md).
+- **Codex worker agents are back**: a subagent worker also compiles to
+  `agents/codex/<id>.toml` with the fields Codex 0.163 accepts, and `gestalt write --agents
+  ~/.codex/agents` places it.
+- **`on_enter`**, a reflect cadence that runs once per repo, in order (`kitctl.use` →
+  `gestalt.block`), rendered in WAY.md and SETUP.md.
+- **Survey**: `skills` (per plugin and in the totals) counts listed skills only;
+  `hidden_skills` counts those that run by name. Trail's AGENTS.md marker is recognised.
+- **Catalog**: compounder 0.2.0 (three-line brief, rituals hidden, Codex and Cursor), cairn
+  0.3.0, Codex and Cursor coverage for roadmap, ui-magic and brand-builder, kitctl's Cursor
+  harness, `kitctl.use`, `gestalt.block`, and a measured `trail` entry.
+- **Connor's way** lints with no waivers. Listed skills in roadmap, app and site repos stay
+  over 12, kept as warnings by his choice. Trail is piloted first (his choice); the first run
+  is in `examples/connor/trail-pilot.md`. Catalog costs are measured from the sibling repos'
+  open portability PRs; if one closes unmerged, its entry goes back.
+
 ## 0.1.0 — 2026-10-20
 
 First vertical slice.

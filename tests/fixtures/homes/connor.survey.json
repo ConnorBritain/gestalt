@@ -17,6 +17,7 @@
     },
     "plugins": 4,
     "skills": 11,
+    "hidden_skills": 1,
     "agents": 2,
     "commands": 0,
     "mcp_servers": 2
@@ -30,6 +31,7 @@
       "path": "~/.claude/plugins/cache/acme/acme-guard/1.2.0",
       "catalog": null,
       "skills": 1,
+      "hidden_skills": 0,
       "agents": 0,
       "commands": 0,
       "listing_tokens": 15,
@@ -63,6 +65,7 @@
       "path": "~/.claude/plugins/cache/compounder/compounder/0.1.0",
       "catalog": "compounder",
       "skills": 4,
+      "hidden_skills": 0,
       "agents": 0,
       "commands": 0,
       "listing_tokens": 67,
@@ -138,6 +141,7 @@
       "path": "~/.claude/plugins/cache/elonify/elonify/0.1.0",
       "catalog": "elonify",
       "skills": 1,
+      "hidden_skills": 0,
       "agents": 1,
       "commands": 0,
       "listing_tokens": 35,
@@ -196,6 +200,7 @@
       "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2",
       "catalog": "roadmap",
       "skills": 4,
+      "hidden_skills": 1,
       "agents": 0,
       "commands": 0,
       "listing_tokens": 25,
@@ -245,6 +250,14 @@
         },
         {
           "kind": "skill",
+          "name": "retro",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/retro/SKILL.md",
+          "listing_tokens": 0,
+          "hidden": true
+        },
+        {
+          "kind": "skill",
           "name": "slice",
           "scope": "user",
           "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/slice/SKILL.md",
@@ -289,8 +302,11 @@
       "path": "~/.codex/AGENTS.md",
       "harness": "codex",
       "scope": "user",
-      "tokens": 11,
-      "markers": []
+      "tokens": 32,
+      "markers": [
+        "trail:start",
+        "trail:end"
+      ]
     },
     {
       "path": "<repo>/CLAUDE.md",

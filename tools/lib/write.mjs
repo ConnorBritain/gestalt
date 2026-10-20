@@ -3,7 +3,7 @@
 // Gestalt generated. Dry-run unless --yes. Refuses settings.json, config.toml and anything it
 // did not generate; idempotent; keeps the file's line endings.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { basename, join, resolve, sep } from "node:path";
 import { gestaltHome } from "./way.mjs";
 import { GENERATED } from "./agents-emit.mjs";
 
@@ -77,11 +77,15 @@ export function writeBlock(target, buildDir, { context = null, yes = false } = {
 }
 
 export function writeAgents(targetDir, buildDir, { yes = false } = {}) {
-  const src = join(buildDir, "agents", "claude");
-  const ext = ".md";
-  if (!existsSync(src)) return [{ changed: false, message: "no subagent workers in this build" }];
-  const out = [];
   const dir = resolve(targetDir);
+  // A directory under .codex or $CODEX_HOME gets the Codex custom agents; anything else gets
+  // Claude Code's.
+  const codexHome = process.env.CODEX_HOME ? resolve(process.env.CODEX_HOME) : null;
+  const codex = dir.split(/[\\/]/).includes(".codex") || Boolean(codexHome && (dir === codexHome || dir.startsWith(codexHome + sep)));
+  const src = join(buildDir, "agents", codex ? "codex" : "claude");
+  const ext = codex ? ".toml" : ".md";
+  if (!existsSync(src)) return [{ changed: false, message: `no ${codex ? "Codex" : "subagent"} workers in this build` }];
+  const out = [];
   for (const f of readdirSync(src).filter(x => x.endsWith(ext)).sort()) {
     const text = readFileSync(join(src, f), "utf8");
     const dest = join(dir, f);

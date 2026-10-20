@@ -4,11 +4,12 @@ ref: plugin:cairn
 kind: plugin
 title: cairn
 summary: Append-only decision and prediction ledger; scripts compute calibration, roles never recommend.
-version_seen: 0.2.0
+version_seen: 0.3.0
 source: https://github.com/ConnorBritain/cairn
 install:
   claude: "/plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn"
-  codex: "node install-cairn-codex.mjs (verify with --check)"
+  codex: "node install-cairn-codex.mjs (verify with --check); trust the plugin's hooks (/hooks)"
+  cursor: "add ConnorBritain/cairn as a plugin marketplace and install cairn (reads .cursor-plugin; debt is a rule)"
 steps:
   - id: cairn.debt
     stage: orient
@@ -37,7 +38,7 @@ hooks:
 knobs:
   - { file: ~/.cairn/settings, scope: user, key: capture_hook, default: false, change_with: /cairn-tune }
   - { file: ~/.cairn/settings, scope: user, key: overdue_gate, default: full, change_with: /cairn-tune }
-harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
-cost: { skills: 6, agents: 3, commands: 0, listing_tokens: 769, session_start_lines: 2, measured_from: cairn@d354916 }
+harness: { claude: enforced, codex: partial, cursor: advisory, agents-md: advisory }
+cost: { skills: 2, agents: 3, commands: 0, listing_tokens: 422, session_start_lines: 2, measured_from: cairn@25a1a7f }
 worker: { tier: script, mechanism: script }
 notes: "`cairn score --summary --json`, `debt --json` and `digest --json` are the machine interfaces."

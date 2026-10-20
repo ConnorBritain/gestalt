@@ -88,6 +88,14 @@ check("a ritual scoped to a context loads its plugin only there", "a weekly road
   assert.ok(activeEntries(way, code).some(e => e.id === "roadmap"));
   assert.ok(activeEntries(way, everywhere).some(e => e.id === "cairn"));
 });
+check("on_enter keeps its order and takes only reflect-stage steps", "setting a repo up runs in sequence (config, then map, then block); an in-session step there would never run", () => {
+  const raw = base(); raw.reflect = { on_enter: ["gestalt.block", "kitctl.use"] };
+  const { way, problems } = normaliseWay(raw);
+  assert.deepEqual(problems, []);
+  assert.deepEqual(way.reflect.on_enter.map(r => r.use), ["gestalt.block", "kitctl.use"]);
+  const bad = base(); bad.reflect = { on_enter: ["cairn.debt"] };
+  assert.ok(codes(bad).includes("GST-ORDER"));
+});
 check("disable removes an entry from a context", "trim's disable-in-context must change what lint and compile count", () => {
   const raw = base(); raw.disable = { code: ["plugin:verification-gate"] };
   const { way } = normaliseWay(raw);

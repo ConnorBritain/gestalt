@@ -129,7 +129,9 @@ export function scanPlugin(dir, { scope, paths, catalogByName }) {
     scope,
     path: paths.show(dir),
     catalog: cat?.id ?? null,
-    skills: units.filter(u => u.kind === "skill").length,
+    // Listed skills only: one with disable-model-invocation runs by name and costs no listing.
+    skills: units.filter(u => u.kind === "skill" && !u.hidden).length,
+    hidden_skills: units.filter(u => u.kind === "skill" && u.hidden).length,
     agents: units.filter(u => u.kind === "agent").length,
     commands: units.filter(u => u.kind === "command").length,
     listing_tokens: units.reduce((n, u) => n + u.listing_tokens, 0),
@@ -159,7 +161,7 @@ function markers(text) {
   const found = [];
   for (const line of text.split(/\r?\n/)) {
     if (!/^(?:<!--|#)/.test(line)) continue;
-    for (const m of line.matchAll(/<!--\s*((?:kit|gestalt):(?:begin|end)\s+[\w./-]+|elonify|vonnegut:\s*[\w-]+)\s*-->/g)) found.push(m[1].replace(/\s+/g, " "));
+    for (const m of line.matchAll(/<!--\s*((?:kit|gestalt):(?:begin|end)\s+[\w./-]+|trail:(?:start|end)|elonify|vonnegut:\s*[\w-]+)\s*-->/g)) found.push(m[1].replace(/\s+/g, " "));
   }
   if (/^## Self-verification gate/m.test(text)) found.push("verification-gate");
   return found;
@@ -410,7 +412,8 @@ export function survey({ home, repos = [], plugins: pluginDirs = [], usageDays =
     always_on_tokens: instructionsTokens + byKind("skill") + byKind("agent") + byKind("command"),
     by_kind: { instructions: instructionsTokens, skills: byKind("skill"), agents: byKind("agent"), commands: byKind("command") },
     plugins: live.length,
-    skills: claudeUnits.filter(u => u.kind === "skill").length,
+    skills: claudeUnits.filter(u => u.kind === "skill" && !u.hidden).length,
+    hidden_skills: claudeUnits.filter(u => u.kind === "skill" && u.hidden).length,
     agents: claudeUnits.filter(u => u.kind === "agent").length,
     commands: claudeUnits.filter(u => u.kind === "command").length,
     mcp_servers: new Set(mcp.filter(s => s.harness === "claude").map(s => s.name)).size + live.reduce((n, p) => n + p.mcp_servers.length, 0),
@@ -450,7 +453,7 @@ export function renderSurvey(s) {
   L.push(`Generated ${s.generated_at.slice(0, 10)}. Token figures are an ${s.token_method}, good for ranking and budgets, not a tokenizer count.`, "");
   L.push("## Headline", "");
   L.push(`- **Always-on (Claude Code lead): ≈${t.always_on_tokens} tokens**: instructions ${t.by_kind.instructions}, skill listings ${t.by_kind.skills}, agent listings ${t.by_kind.agents}, commands ${t.by_kind.commands}.`);
-  L.push(`- ${t.plugins} plugins live, ${t.skills} skills, ${t.agents} agents, ${t.commands} commands, ${t.mcp_servers} MCP servers.`);
+  L.push(`- ${t.plugins} plugins live, ${t.skills} listed skills${t.hidden_skills ? ` (and ${t.hidden_skills} that run by name only)` : ""}, ${t.agents} agents, ${t.commands} commands, ${t.mcp_servers} MCP servers.`);
   L.push(`- Stop hooks that can block a turn: ${s.stop_blockers.length}${s.stop_blockers.length ? ` (${s.stop_blockers.join(", ")})` : ""}.`);
   L.push(`- Harnesses found: ${Object.entries(s.harnesses).filter(([, v]) => v).map(([k]) => k).join(", ") || "none"}.`, "");
   if (s.plugins.length) {

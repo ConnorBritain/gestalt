@@ -84,10 +84,10 @@ export function renderBootstrap(way, catalog, files, { wayText = null } = {}) {
   const workers = Object.keys(files).filter(f => f.startsWith("agents/") || f.startsWith("workers/")).sort();
   if (workers.length) {
     L.push(`### ${way.writer === "kitctl" && kit.length ? 4 : 3}. Workers`, "");
-    L.push("Subagent files go in `~/.claude/agents/`; worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).", "");
+    L.push("Subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`); worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).", "");
     for (const f of workers) {
-      const target = f.startsWith("agents/claude/") ? `~/.claude/agents/${f.split("/").pop()}` : `~/.gestalt/build/${f}`;
-      const lang = f.endsWith(".sh") ? "sh" : f.endsWith(".json") ? "json" : "markdown";
+      const target = f.startsWith("agents/claude/") ? `~/.claude/agents/${f.split("/").pop()}` : f.startsWith("agents/codex/") ? `~/.codex/agents/${f.split("/").pop()}` : `~/.gestalt/build/${f}`;
+      const lang = f.endsWith(".sh") ? "sh" : f.endsWith(".json") ? "json" : f.endsWith(".toml") ? "toml" : "markdown";
       L.push(`\`${target}\``, "", fence(lang, files[f]), "");
     }
   }

@@ -15,6 +15,11 @@ steps:
     kind: planner
     mode: explicit
     invoke: /gestalt:way, when goals, tools or contexts change
+  - id: gestalt.block
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: "place the repo's context block (`kitctl use gestalt-<context>`, or `gestalt write --block AGENTS.md --context <context>`)"
   - id: gestalt.trim
     stage: reflect
     kind: ritual

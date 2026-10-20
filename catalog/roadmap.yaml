@@ -8,7 +8,8 @@ version_seen: 0.7.2
 source: https://github.com/ConnorBritain/roadmap
 install:
   claude: "claude plugin marketplace add ConnorBritain/roadmap && claude plugin install roadmap@roadmap; npm i -D @connorbritain/roadmap"
-  codex: "Register the graph MCP server through kitctl (an mcp: primitive), not `roadmap init --client codex --apply`."
+  codex: "codex plugin marketplace add ConnorBritain/roadmap and install roadmap; register the MCP server with `roadmap init --client codex --apply` (runs codex mcp add) or a kitctl mcp: primitive"
+  cursor: "add ConnorBritain/roadmap as a plugin marketplace and install roadmap (skills, agents); add the MCP server to .cursor/mcp.json"
 steps:
   - id: roadmap.ready-wave
     stage: orient
@@ -43,8 +44,8 @@ steps:
 hooks:
   - { event: SessionStart, blocking: false, mechanism: context, serves: roadmap.ready-wave, lines: 3, quiet_unless: "file-exists:docs/roadmap/roadmap.yaml" }
   - { event: Stop, blocking: false, mechanism: none, serves: roadmap.journal, quiet_unless: "file-exists:docs/roadmap/roadmap.yaml", note: "engineering profile with LINEAR_API_KEY only" }
-harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
-cost: { skills: 13, agents: 4, commands: 0, listing_tokens: 1308, session_start_lines: 3, measured_from: roadmap@70978c3 }
+harness: { claude: enforced, codex: partial, cursor: advisory, agents-md: advisory }
+cost: { skills: 13, agents: 4, commands: 0, listing_tokens: 1308, session_start_lines: 3, measured_from: roadmap@a5299d6 }
 mcp: { servers: 1, tools: 40, note: "graph server, mcp__plugin_roadmap_graph__*; deferred by default in Claude Code" }
 worker: { tier: worker, mechanism: headless }
 notes: Linear through GraphQL with LINEAR_API_KEY (optional), not the Linear MCP.

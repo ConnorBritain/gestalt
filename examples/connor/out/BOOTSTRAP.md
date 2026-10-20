@@ -97,6 +97,12 @@ links:
   - { from: compounder.stop-lines, on: shareable, to: compounder.ship, as: receipt, via: manual }
   - { from: humanizer.strip, on: done, to: prose-author.draft, as: neutral draft, via: manual }
 reflect:
+  # Once per repo: the repo's native config. kitctl writes here, so the loadouts already carry
+  # the context block (gestalt.block is for ways without kitctl). Trail (trail.init, after
+  # kitctl.use) waits on a pilot (Connor, 2026-10-20): its SessionStart
+  # hook adds 29 lines against the 8-line budget and its Stop hook is another blocking gate
+  # (catalog/trail.yaml). The first run is in trail-pilot.md.
+  on_enter: [kitctl.use]
   daily: [compounder.checkin]
   weekly:
     - cairn.review
@@ -104,8 +110,10 @@ reflect:
     - { use: roadmap.cycle, in: [roadmap] }
     - kitctl.doctor
   monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
-# Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason;
-# what exceeds one today is waived below, visibly, until the trims land.
+# Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason.
+# No waivers: compounder's brief is three lines and the ritual skills run by name (portability
+# session, 2026-10-20). Listed skills in roadmap (24), app (18) and site (17) repos stay over
+# 12, from those tools' own skills; Connor chose to keep that visible as a warning (2026-10-20).
 budgets:
   block_tokens: 450
   # Five always-on rules in code repos, each a gate the model would otherwise skip: elonify's
@@ -118,11 +126,6 @@ budgets:
   # Model-routable skills per repo. Ritual skills called by name should not list at all.
   skills_per_context: 12
   index: false
-waive:
-  - code: GST-BUDGET
-    reason: "Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes."
-  - code: GST-LEAD
-    reason: "18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes."
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]
@@ -193,8 +196,8 @@ taste:
 **Codex**
 
 - brand-builder (partial): Codex marketplace; install-codex-hook.mjs only where plugin hooks are unavailable
-- cairn (partial): node install-cairn-codex.mjs (verify with --check)
-- compounder: not available on this harness; skip it.
+- cairn (partial): node install-cairn-codex.mjs (verify with --check); trust the plugin's hooks (/hooks)
+- compounder (partial): codex plugin marketplace add ConnorBritain/compounder, install compounder from /plugins, then trust its hooks (/hooks)
 - elonify (advisory): Paste wiring/agents-md.md into AGENTS.md; run the critic as a fresh `codex exec`.
 - gestalt (partial): Codex marketplace .agents/plugins/marketplace.json
 - humanizer (blader) (partial): Copy SKILL.md into a Codex skills directory.
@@ -202,24 +205,24 @@ taste:
 - prose-author (vonnegut) (advisory): node install-prose-codex.mjs
 - prose-review (vonnegut) (advisory): node install-prose-codex.mjs; paste wiring/agents-md.md
 - prose-tell-scan (vonnegut) (partial): no install recorded; ask the person
-- roadmap (partial): Register the graph MCP server through kitctl (an mcp: primitive), not `roadmap init --client codex --apply`.
+- roadmap (partial): codex plugin marketplace add ConnorBritain/roadmap and install roadmap; register the MCP server with `roadmap init --client codex --apply` (runs codex mcp add) or a kitctl mcp: primitive
 - ui-magic (partial): Codex marketplace .agents/plugins/marketplace.json; plugin hooks need trust
 - verification-gate (agent-primitives) (advisory): Paste wiring/agents-md.md; run each reviewer as a fresh `codex exec`.
 
 **Cursor**
 
-- brand-builder: not available on this harness; skip it.
-- cairn: not available on this harness; skip it.
-- compounder: not available on this harness; skip it.
+- brand-builder (advisory): add ConnorBritain/brand-builder as a plugin marketplace and install brand-builder (skills, agents; the edit-time scan is not ported)
+- cairn (advisory): add ConnorBritain/cairn as a plugin marketplace and install cairn (reads .cursor-plugin; debt is a rule)
+- compounder (partial): add ConnorBritain/compounder as a plugin marketplace and install compounder (reads .cursor-plugin)
 - elonify (partial): Install the .cursor-plugin; no Stop hook, so the gate is a rule, not a block.
 - gestalt (partial): no install recorded; ask the person
 - humanizer (blader) (partial): no install recorded; ask the person
-- kitctl: not available on this harness; skip it.
+- kitctl (partial): uv tool install kitctl (or npx kitctl); add cursor to kit.yaml harnesses
 - prose-author (vonnegut) (partial): no install recorded; ask the person
 - prose-review (vonnegut) (partial): no install recorded; ask the person
 - prose-tell-scan (vonnegut) (partial): no install recorded; ask the person
-- roadmap: not available on this harness; skip it.
-- ui-magic: not available on this harness; skip it.
+- roadmap (advisory): add ConnorBritain/roadmap as a plugin marketplace and install roadmap (skills, agents); add the MCP server to .cursor/mcp.json
+- ui-magic (advisory): add ConnorBritain/ui-magic as a plugin marketplace and install ui-magic (skills, agents; the edit-time scan is not ported)
 - verification-gate (agent-primitives) (partial): no install recorded; ask the person
 
 Connectors (the person sets these; never write their values):
@@ -411,7 +414,7 @@ instructions: |
 
 ### 4. Workers
 
-Subagent files go in `~/.claude/agents/`; worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).
+Subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`); worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).
 
 `~/.claude/agents/linear.md`
 
@@ -439,6 +442,19 @@ You are a worker. The lead has handed you one job.
 ## Returns
 
 Open issues for the focus project, scope added since the focus began, and done/total.
+```
+
+`~/.codex/agents/linear.toml`
+
+```toml
+# Generated by gestalt compile; edit the way, not this file. Codex custom agent for worker "linear".
+name = "linear"
+description = "Use for the daily check-in, or anything that reads or updates Linear."
+developer_instructions = "You are a worker. The lead has handed you one job.\n\n- Work only from what the lead passed you: the user's original request, verbatim, and every decision the user has made since. If either is missing, say so in one line and stop; do not guess the intent.\n- Do the job with the steps below and nothing else. Do not widen it.\n- Return only what is asked for under Returns. The lead decides what happens next.\n\n## Steps\n\n- compounder.checkin: /compounder:checkin, daily; one move in a real free block (`/compounder:checkin`)\n\n## Returns\n\nOpen issues for the focus project, scope added since the focus began, and done/total."
+
+[mcp_servers.linear]
+url = "https://mcp.linear.app/mcp"
+bearer_token_env_var = "LINEAR_API_KEY"
 ```
 
 `~/.gestalt/build/workers/prose.prompt.md`
@@ -478,7 +494,7 @@ HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 PROMPT="$(cat "$HERE/prose.prompt.md")
 ${1:?pass the task}"
 exec claude -p --model sonnet --strict-mcp-config --plugin-dir "${GESTALT_PLUGIN_PROSE_AUTHOR:?set GESTALT_PLUGIN_PROSE_AUTHOR to the prose-author plugin directory}" "$PROMPT"
-# Codex alternative (unverified flags): codex exec "$PROMPT"
+# Codex alternative: codex exec "$PROMPT"
 ```
 
 ## Verify

@@ -10,6 +10,7 @@ slot: design.generator
 install:
   claude: "/plugin marketplace add ConnorBritain/brand-builder && /plugin install brand-builder@brand-builder"
   codex: "Codex marketplace; install-codex-hook.mjs only where plugin hooks are unavailable"
+  cursor: "add ConnorBritain/brand-builder as a plugin marketplace and install brand-builder (skills, agents; the edit-time scan is not ported)"
 steps:
   - id: brand-builder.foundation
     stage: plan
@@ -28,7 +29,7 @@ steps:
     invoke: slop-audit and the design-critic agent
 hooks:
   - { event: PostToolUse, blocking: false, mechanism: context, matcher: "Edit|Write|MultiEdit|apply_patch", opt_in: .brand-builder.json, note: "path-scoped slop scan; heartbeat in $TMPDIR" }
-harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
-cost: { skills: 6, agents: 2, commands: 0, listing_tokens: 851, session_start_lines: 0, measured_from: brand-builder@aa4d814 }
+harness: { claude: enforced, codex: partial, cursor: advisory, agents-md: advisory }
+cost: { skills: 6, agents: 2, commands: 0, listing_tokens: 851, session_start_lines: 0, measured_from: brand-builder@74a1ab2 }
 worker: { tier: worker, mechanism: subagent }
 exclusive_of: [ui-magic.build]

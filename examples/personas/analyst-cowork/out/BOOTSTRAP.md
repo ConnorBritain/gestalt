@@ -197,7 +197,7 @@ Context blocks go into the repo's own AGENTS.md (CLAUDE.md should be `@AGENTS.md
 
 ### 3. Workers
 
-Subagent files go in `~/.claude/agents/`; worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).
+Subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`); worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).
 
 `~/.claude/agents/library.md`
 

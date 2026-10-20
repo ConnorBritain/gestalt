@@ -1,0 +1,50 @@
+schema: gestalt-catalog/1
+id: trail
+ref: tool:trail
+kind: tool
+title: Trail-code
+summary: A local code map plus team learnings in .trail/, fetched on demand; formerly Graft.
+version_seen: 0.23.0
+source: https://github.com/trailhq/Trail-Code
+install:
+  claude: "DO_NOT_TRACK=1 npm i -g @trailhq/trail-code && trail telemetry disable, then per repo: trail init --no-global --no-statusline --agents claude agents cursor"
+  codex: "same install; `--agents agents` writes only a fenced AGENTS.md section (there is no codex id, and --no-global skips ~/.codex)"
+  cursor: "same install; `--agents cursor` writes .cursor/rules/trail.mdc, .cursor/mcp.json and .cursor/hooks.json"
+steps:
+  - id: trail.map
+    stage: orient
+    kind: orienter
+    mode: ambient
+    invoke: "SessionStart: how to use the map, plus the repo map (Claude Code)"
+  - id: trail.find
+    stage: make
+    kind: investigator
+    mode: ambient
+    invoke: "`trail ask`, `grep`, `skeleton`, `callers` before opening source; a per-prompt hook suggests starting points"
+  - id: trail.check
+    stage: check
+    kind: reviewer
+    mode: explicit
+    invoke: "`trail check`: the diff against what the team has learned"
+  - id: trail.note
+    stage: record
+    kind: recorder
+    mode: ambient
+    invoke: "once per session, after a long turn with no learning saved, the Stop hook asks for `trail note`"
+  - id: trail.init
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: "`trail init --no-global --no-statusline --agents <harness ids>` with DO_NOT_TRACK=1 set; agent config in the repo only (its own bookkeeping goes to ~/.trail and ~/.graft)"
+hooks:
+  - { event: SessionStart, blocking: false, mechanism: context, serves: trail.map, lines: 29, note: "29 lines in a one-file repo (the usage guide, still worded as graft, plus the map index); written to the shared .claude/settings.json" }
+  - { event: UserPromptSubmit, blocking: false, mechanism: context, serves: trail.find, note: "about 4 lines per prompt: starting points for the task; in .claude/settings.local.json under --no-global" }
+  - { event: PostToolUse, blocking: false, mechanism: none, note: "edit tracking and a tokens-saved tally" }
+  - { event: Stop, blocking: true, mechanism: decision-block, honours_stop_hook_active: true, once_per_session: true, serves: trail.note, note: "blocks once per session to ask for a learning (dist/claude/hooks.js askForNote)" }
+  - { event: SessionEnd, blocking: false, mechanism: none }
+mcp: { servers: [trail], note: "Cursor only: .cursor/mcp.json runs `npx -y @trailhq/trail-code mcp`, unpinned. Claude Code gets no MCP server under --no-global." }
+harness: { claude: enforced, codex: advisory, cursor: partial, agents-md: advisory }
+cost: { skills: 0, agents: 0, commands: 0, listing_tokens: 0, session_start_lines: 29, wiring_lines: 41, measured_from: trail-code@0.23.0 }
+worker: { tier: script, mechanism: script }
+confidence: verified
+notes: "Measured 2026-10-20 by running `trail init` in a sandbox repo with a temp HOME and DO_NOT_TRACK=1. `--dry-run` ignores --no-global, --no-statusline and --no-hooks and overstates the writes; the real run honours them. It writes .claude/settings.json and .claude/settings.local.json itself, outside kitctl. The AGENTS.md section and the Cursor rule are 41 lines (about 580 tokens) of always-on text. Learnings of kind decision overlap cairn's choice: link them, don't merge them."

@@ -100,12 +100,18 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
   }
   L.push("");
 
+  if (way.reflect.on_enter?.length) {
+    L.push("### Then, in each repo you start working in, in order", "");
+    for (const r of way.reflect.on_enter) L.push(`- [ ] ${label(r.use, catalog)}: ${r.step.invoke}${r.in.length < Object.keys(way.contexts).length ? ` (in ${r.in.join(", ")} repos)` : ""}`);
+    L.push("");
+  }
+
   // 5. Workers
   const workerFiles = Object.keys(agentFiles).sort();
   L.push("## 5. Workers", "");
   if (!way.topology.workers.length) L.push("- No workers.");
   for (const w of way.topology.workers) {
-    if (w.mechanism === "subagent") L.push(`- [ ] \`${w.id}\`: \`gestalt write --agents ~/.claude/agents\` places \`agents/claude/${w.id}.md\` (a user agent, not a plugin agent, so its mcpServers apply).`);
+    if (w.mechanism === "subagent") L.push(`- [ ] \`${w.id}\`: \`gestalt write --agents ~/.claude/agents\` places \`agents/claude/${w.id}.md\` (a user agent, not a plugin agent, so its mcpServers apply).${way.harnesses.includes("codex") ? ` For Codex, \`gestalt write --agents ~/.codex/agents\` places \`agents/codex/${w.id}.toml\`.` : ""}`);
     if (w.mechanism === "headless") {
       const plugins = [...new Set(w.uses.map(u => catalog.steps.get(u)?.entry).filter(e => e?.ref.startsWith("plugin:")).map(e => e.id))];
       L.push(`- [ ] \`${w.id}\`: keep \`workers/${w.id}.sh\` at \`~/.gestalt/build/workers/\`${plugins.length ? ` and export ${plugins.map(id => `\`GESTALT_PLUGIN_${id.toUpperCase().replace(/[^A-Z0-9]/g, "_")}\``).join(", ")} (the plugin directory). The lead's loadout disables the plugin so only the worker loads it. Check once that the worker still sees it (\`sh workers/${w.id}.sh "list your skills"\`); if it does not, run the worker from a directory outside the repo` : ""}.`);
@@ -113,14 +119,18 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
     if (w.mechanism === "agent-file") L.push(`- [ ] \`${w.id}\`: uses the plugin's own agent; nothing to place.`);
     if (w.mechanism === "script") L.push(`- [ ] \`${w.id}\`: a script; no model.`);
   }
-  if (way.harnesses.includes("codex") && way.topology.workers.length) L.push("- [ ] Codex: headless workers carry a `codex exec` line in their script. Codex custom-agent files are not generated until their fields are verified.");
+  if (way.harnesses.includes("codex") && way.topology.workers.some(w => w.mechanism === "headless")) L.push("- [ ] Codex: headless workers carry a `codex exec` line in their script.");
   L.push("");
 
   // 6. Other harnesses
   const manual = way.harnesses.filter(h => h === "cursor" || h === "agents-md");
   if (manual.length) {
-    L.push("## 6. Harnesses kitctl does not reach", "");
-    if (manual.includes("cursor")) L.push("- [ ] Cursor: paste the block into `.cursor/rules/gestalt.mdc` with `alwaysApply: true`. No Stop hooks there: every gate is a rule, not a block.");
+    L.push(`## 6. ${way.writer === "kitctl" && manual.includes("cursor") ? "Cursor and harnesses kitctl does not reach" : "Harnesses kitctl does not reach"}`, "");
+    if (manual.includes("cursor")) {
+      if (way.writer === "kitctl") L.push("- [ ] Cursor: add `cursor` to each repo's `kit.yaml` harnesses; kitctl writes the block as `.cursor/rules/kit-<loadout>.mdc` (its Cursor facts are unverified, so check the first repo by hand). Plugins are installed from Cursor's marketplace, not by kitctl.");
+      else L.push("- [ ] Cursor: paste the block into `.cursor/rules/gestalt.mdc` with `alwaysApply: true`.");
+      L.push("- [ ] Cursor has no SessionStart or blocking Stop hook for these tools: every gate is a rule there, not a block.");
+    }
     if (manual.includes("agents-md")) L.push("- [ ] Other AGENTS.md agents: `gestalt write --block AGENTS.md`. Reviewers run as fresh processes, not in the writer's context.");
     L.push("");
   }

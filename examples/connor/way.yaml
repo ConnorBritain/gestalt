@@ -65,6 +65,12 @@ links:
   - { from: compounder.stop-lines, on: shareable, to: compounder.ship, as: receipt, via: manual }
   - { from: humanizer.strip, on: done, to: prose-author.draft, as: neutral draft, via: manual }
 reflect:
+  # Once per repo: the repo's native config. kitctl writes here, so the loadouts already carry
+  # the context block (gestalt.block is for ways without kitctl). Trail (trail.init, after
+  # kitctl.use) waits on a pilot (Connor, 2026-10-20): its SessionStart
+  # hook adds 29 lines against the 8-line budget and its Stop hook is another blocking gate
+  # (catalog/trail.yaml). The first run is in trail-pilot.md.
+  on_enter: [kitctl.use]
   daily: [compounder.checkin]
   weekly:
     - cairn.review
@@ -72,8 +78,10 @@ reflect:
     - { use: roadmap.cycle, in: [roadmap] }
     - kitctl.doctor
   monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
-# Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason;
-# what exceeds one today is waived below, visibly, until the trims land.
+# Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason.
+# No waivers: compounder's brief is three lines and the ritual skills run by name (portability
+# session, 2026-10-20). Listed skills in roadmap (24), app (18) and site (17) repos stay over
+# 12, from those tools' own skills; Connor chose to keep that visible as a warning (2026-10-20).
 budgets:
   block_tokens: 450
   # Five always-on rules in code repos, each a gate the model would otherwise skip: elonify's
@@ -86,11 +94,6 @@ budgets:
   # Model-routable skills per repo. Ritual skills called by name should not list at all.
   skills_per_context: 12
   index: false
-waive:
-  - code: GST-BUDGET
-    reason: "Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes."
-  - code: GST-LEAD
-    reason: "18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes."
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]

@@ -14,7 +14,7 @@ When it passes, roll out the rest below. When it fails, run /gestalt:taste on th
 
 ## 1. Install everything
 
-- [ ] **cairn** (plugin:cairn): claude: /plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn; codex: node install-cairn-codex.mjs (verify with --check)
+- [ ] **cairn** (plugin:cairn): claude: /plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn; codex: node install-cairn-codex.mjs (verify with --check); trust the plugin's hooks (/hooks)
 - [ ] **elonify** (plugin:elonify): claude: /plugin marketplace add ConnorBritain/elonify && /plugin install elonify@elonify; codex: Paste wiring/agents-md.md into AGENTS.md; run the critic as a fresh `codex exec`
 - [ ] **gestalt** (plugin:gestalt): claude: /plugin marketplace add ConnorBritain/gestalt && /plugin install gestalt@gestalt; codex: Codex marketplace .agents/plugins/marketplace.json
 - [ ] **team-update (Morgan's own skill)** (skill:team-update)
@@ -49,8 +49,7 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 ## 5. Workers
 
 - [ ] `critics`: uses the plugin's own agent; nothing to place.
-- [ ] `reporter`: `gestalt write --agents ~/.claude/agents` places `agents/claude/reporter.md` (a user agent, not a plugin agent, so its mcpServers apply).
-- [ ] Codex: headless workers carry a `codex exec` line in their script. Codex custom-agent files are not generated until their fields are verified.
+- [ ] `reporter`: `gestalt write --agents ~/.claude/agents` places `agents/claude/reporter.md` (a user agent, not a plugin agent, so its mcpServers apply). For Codex, `gestalt write --agents ~/.codex/agents` places `agents/codex/reporter.toml`.
 
 ## Then
 

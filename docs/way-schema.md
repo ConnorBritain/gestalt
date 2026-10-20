@@ -20,7 +20,7 @@ the [persona folders](../examples/personas/) start from nothing.
 | `flow` | `{stage: [step]}` for `orient, intend, plan, make, check, record` | step: `{use, in?, mode?, enforce?, after?, parallel_with?, waive?}`. `use` is a catalog step id; `in` limits it to contexts (default: all); `mode` overrides the catalog's; `enforce: hook` says a hook backs it |
 | `stop_order` | `[step id \| platform:<name>]` | the order the model answers simultaneous Stop gates in. Required when several blocking Stop hooks share a context |
 | `links` | `[{from, on, to, as, via}]` | hand-offs, e.g. `{from: elonify.diff-review, on: REFRAME, to: cairn.capture, as: choice, via: instruction}`. `to` may be `user`. `via: instruction` costs one block line |
-| `reflect` | `{daily[], weekly[], monthly[]}` | rituals (catalog steps at the `reflect` stage), each a step id or `{use, in}` when it belongs to one kind of repo. Rendered in WAY.md only, never in the always-on block |
+| `reflect` | `{on_enter[], daily[], weekly[], monthly[]}` | rituals (catalog steps at the `reflect` stage), each a step id or `{use, in}` when it belongs to one kind of repo. `on_enter` runs once when you start working in a repo, in the order listed (e.g. `kitctl.use` → `trail.init` → `gestalt.block`); the others are calendar rituals. Rendered in WAY.md and SETUP.md only, never in the always-on block |
 | `budgets` | see below | the leanness contract |
 | `disable` | `{context: [ref]}` | primitives to switch off in a context; becomes kitctl `disable:` |
 | `topology` | `{tiers, lead, workers}` | see below |

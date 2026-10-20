@@ -27,9 +27,9 @@ check("blocking hooks name a mechanism and what they serve", "GST-GATE counts bl
     if (h.blocking) { assert.ok(h.mechanism, `${e.id} ${h.event}`); if (h.event === "Stop") assert.ok(h.serves, `${e.id} Stop`); }
   }
 });
-check("known Stop blockers are recorded", "the elonify / compounder / gate-runner collision is the first thing Gestalt resolves", () => {
+check("known Stop blockers are recorded", "the elonify / compounder / gate-runner / trail collision is the first thing Gestalt resolves", () => {
   const stopBlockers = [...cat.entries.values()].filter(e => (e.hooks ?? []).some(h => h.event === "Stop" && h.blocking)).map(e => e.id).sort();
-  assert.deepEqual(stopBlockers, ["compounder", "elonify", "verification-gate"]);
+  assert.deepEqual(stopBlockers, ["compounder", "elonify", "trail", "verification-gate"]);
 });
 check("validator rejects planted defects", "a validator that accepts anything protects nothing", () => {
   const bad = { id: "x", ref: "plugin:X!", kind: "plugin", harness: { claude: "sometimes" }, steps: [{ id: "x.a", stage: "check", kind: "author", mode: "loud" }], hooks: [{ event: "Stop", blocking: true }] };
@@ -68,6 +68,7 @@ for (const [id, rel] of Object.entries(SIBLINGS)) {
         const f = isSkill ? join(p, e, "SKILL.md") : join(p, e);
         if (!existsSync(f) || (!isSkill && !e.endsWith(".md"))) continue;
         const { data } = frontmatter(readFileSync(f, "utf8"));
+        if (data["disable-model-invocation"] === true) continue; // runs by name; not listed
         tok += listingCost(data.name ?? e, data.description);
         count[sub] += 1;
       }

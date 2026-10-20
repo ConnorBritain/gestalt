@@ -6,6 +6,7 @@
     "TASTE-TEST.md",
     "WAY.md",
     "agents/claude/linear.md",
+    "agents/codex/linear.toml",
     "block.app.md",
     "block.md",
     "block.plugin.md",

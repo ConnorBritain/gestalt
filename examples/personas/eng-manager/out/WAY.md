@@ -36,7 +36,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt → **record** cairn capture
 
-- Lead always-on ≈1089 tokens (budget 12000), 10 skills (budget 12).
+- Lead always-on ≈742 tokens (budget 12000), 6 skills (budget 12).
 - Session-start lines 2 (budget 8); always-on protocol rules 1 (budget 5).
 
 ### service (file-exists:Makefile)
@@ -44,7 +44,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt → **plan** elonify plan-review → **check** verification-gate gates, verification-gate critics, elonify diff-review → **record** cairn capture
 
 - Stop gates: verification-gate gates.
-- Lead always-on ≈1533 tokens (budget 12000), 11 skills (budget 12).
+- Lead always-on ≈1186 tokens (budget 12000), 7 skills (budget 12).
 - Session-start lines 2 (budget 8); always-on protocol rules 5 (budget 5).
 - Disabled here: plugin:code-review-extra.
 
@@ -52,7 +52,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt → **plan** elonify plan-review → **record** cairn capture
 
-- Lead always-on ≈1347 tokens (budget 12000), 11 skills (budget 12).
+- Lead always-on ≈1000 tokens (budget 12000), 7 skills (budget 12).
 - Session-start lines 2 (budget 8); always-on protocol rules 3 (budget 5).
 
 ## Lead and workers

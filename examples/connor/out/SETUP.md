@@ -14,18 +14,18 @@ When it passes, roll out the rest below. When it fails, run /gestalt:taste on th
 
 ## 1. Install everything
 
-- [ ] **brand-builder** (plugin:brand-builder): claude: /plugin marketplace add ConnorBritain/brand-builder && /plugin install brand-builder@brand-builder; codex: Codex marketplace; install-codex-hook.mjs only where plugin hooks are unavailable. _Not available on cursor._
-- [ ] **cairn** (plugin:cairn): claude: /plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn; codex: node install-cairn-codex.mjs (verify with --check). _Not available on cursor._
-- [ ] **compounder** (plugin:compounder): claude: /plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview. _Not available on codex, cursor._
+- [ ] **brand-builder** (plugin:brand-builder): claude: /plugin marketplace add ConnorBritain/brand-builder && /plugin install brand-builder@brand-builder; codex: Codex marketplace; install-codex-hook.mjs only where plugin hooks are unavailable; cursor: add ConnorBritain/brand-builder as a plugin marketplace and install brand-builder (skills, agents; the edit-time scan is not ported)
+- [ ] **cairn** (plugin:cairn): claude: /plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn; codex: node install-cairn-codex.mjs (verify with --check); trust the plugin's hooks (/hooks); cursor: add ConnorBritain/cairn as a plugin marketplace and install cairn (reads .cursor-plugin; debt is a rule)
+- [ ] **compounder** (plugin:compounder): claude: /plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview; codex: codex plugin marketplace add ConnorBritain/compounder, install compounder from /plugins, then trust its hooks (/hooks); cursor: add ConnorBritain/compounder as a plugin marketplace and install compounder (reads .cursor-plugin)
 - [ ] **elonify** (plugin:elonify): claude: /plugin marketplace add ConnorBritain/elonify && /plugin install elonify@elonify; codex: Paste wiring/agents-md.md into AGENTS.md; run the critic as a fresh `codex exec`; cursor: Install the .cursor-plugin; no Stop hook, so the gate is a rule, not a block
 - [ ] **gestalt** (plugin:gestalt): claude: /plugin marketplace add ConnorBritain/gestalt && /plugin install gestalt@gestalt; codex: Codex marketplace .agents/plugins/marketplace.json
 - [ ] **humanizer (blader)** (skill:blader/humanizer): claude: Install the humanizer skill from github.com/blader/humanizer into ~/.claude/skills (MIT); codex: Copy SKILL.md into a Codex skills directory
-- [ ] **kitctl** (tool:kitctl): claude: uv tool install kitctl (or npx kitctl); codex: uv tool install kitctl (or npx kitctl). _Not available on cursor._
+- [ ] **kitctl** (tool:kitctl): claude: uv tool install kitctl (or npx kitctl); codex: uv tool install kitctl (or npx kitctl); cursor: uv tool install kitctl (or npx kitctl); add cursor to kit.yaml harnesses
 - [ ] **prose-author (vonnegut)** (plugin:prose-author): claude: /plugin marketplace add ConnorBritain/vonnegut && /plugin install prose-author@vonnegut; codex: node install-prose-codex.mjs
 - [ ] **prose-review (vonnegut)** (plugin:prose-review): claude: /plugin install prose-review@vonnegut; paste wiring/claude-md.md; codex: node install-prose-codex.mjs; paste wiring/agents-md.md
 - [ ] **prose-tell-scan (vonnegut)** (plugin:prose-tell-scan): claude: /plugin install prose-tell-scan@vonnegut
-- [ ] **roadmap** (plugin:roadmap): claude: claude plugin marketplace add ConnorBritain/roadmap && claude plugin install roadmap@roadmap; npm i -D @connorbritain/roadmap; codex: Register the graph MCP server through kitctl (an mcp: primitive), not `roadmap init --client codex --apply`. _Not available on cursor._
-- [ ] **ui-magic** (plugin:ui-magic): claude: /plugin marketplace add ConnorBritain/ui-magic && /plugin install ui-magic@ui-magic; codex: Codex marketplace .agents/plugins/marketplace.json; plugin hooks need trust. _Not available on cursor._
+- [ ] **roadmap** (plugin:roadmap): claude: claude plugin marketplace add ConnorBritain/roadmap && claude plugin install roadmap@roadmap; npm i -D @connorbritain/roadmap; codex: codex plugin marketplace add ConnorBritain/roadmap and install roadmap; register the MCP server with `roadmap init --client codex --apply` (runs codex mcp add) or a kitctl mcp: primitive; cursor: add ConnorBritain/roadmap as a plugin marketplace and install roadmap (skills, agents); add the MCP server to .cursor/mcp.json
+- [ ] **ui-magic** (plugin:ui-magic): claude: /plugin marketplace add ConnorBritain/ui-magic && /plugin install ui-magic@ui-magic; codex: Codex marketplace .agents/plugins/marketplace.json; plugin hooks need trust; cursor: add ConnorBritain/ui-magic as a plugin marketplace and install ui-magic (skills, agents; the edit-time scan is not ported)
 - [ ] **verification-gate (agent-primitives)** (plugin:verification-gate): claude: Install the verification-gate bundle from agent-primitives; paste wiring/claude-md.md; add .claude/gates.json per repo; codex: Paste wiring/agents-md.md; run each reviewer as a fresh `codex exec`
 - [ ] **linear** connector (mcp:linear, tracker): set `LINEAR_API_KEY` in your environment, never in a file
 - [ ] **github** connector (mcp:github, code)
@@ -60,16 +60,21 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 - [ ] In each matching repo: copy `kit/kit.writing.yaml` to `kit.yaml`, then `kitctl plan` and `kitctl apply`.
 - [ ] For repos with no other context: `kitctl use gestalt-flow`.
 
+### Then, in each repo you start working in, in order
+
+- [ ] kitctl use: put the repo's kit.yaml in place (or `kitctl use <loadouts>`), then `kitctl plan` and `kitctl apply`; the loadouts carry the Gestalt context block
+
 ## 5. Workers
 
 - [ ] `critics`: uses the plugin's own agent; nothing to place.
 - [ ] `prose`: keep `workers/prose.sh` at `~/.gestalt/build/workers/` and export `GESTALT_PLUGIN_PROSE_AUTHOR` (the plugin directory). The lead's loadout disables the plugin so only the worker loads it. Check once that the worker still sees it (`sh workers/prose.sh "list your skills"`); if it does not, run the worker from a directory outside the repo.
-- [ ] `linear`: `gestalt write --agents ~/.claude/agents` places `agents/claude/linear.md` (a user agent, not a plugin agent, so its mcpServers apply).
-- [ ] Codex: headless workers carry a `codex exec` line in their script. Codex custom-agent files are not generated until their fields are verified.
+- [ ] `linear`: `gestalt write --agents ~/.claude/agents` places `agents/claude/linear.md` (a user agent, not a plugin agent, so its mcpServers apply). For Codex, `gestalt write --agents ~/.codex/agents` places `agents/codex/linear.toml`.
+- [ ] Codex: headless workers carry a `codex exec` line in their script.
 
-## 6. Harnesses kitctl does not reach
+## 6. Cursor and harnesses kitctl does not reach
 
-- [ ] Cursor: paste the block into `.cursor/rules/gestalt.mdc` with `alwaysApply: true`. No Stop hooks there: every gate is a rule, not a block.
+- [ ] Cursor: add `cursor` to each repo's `kit.yaml` harnesses; kitctl writes the block as `.cursor/rules/kit-<loadout>.mdc` (its Cursor facts are unverified, so check the first repo by hand). Plugins are installed from Cursor's marketplace, not by kitctl.
+- [ ] Cursor has no SessionStart or blocking Stop hook for these tools: every gate is a rule there, not a block.
 
 ## Found by the survey
 
