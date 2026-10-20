@@ -123,7 +123,7 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
        the code is the way it is, for agents; cairn records a judgment with a confidence, for
        calibration. Link them, don't merge them.
    - **Telemetry** is anonymous and opt-out, and includes an install ping from npm
-     postinstall. **Connor decided (2026-10-20): off.** Set `DO_NOT_TRACK=1` in his environment (way connectors/SETUP), run `trail telemetry disable`, and uncheck telemetry in `trail init`. Note the npm postinstall still sends one install event before any setting applies; say so in SETUP.
+     postinstall. **Connor decided (2026-10-20): off.** Set `DO_NOT_TRACK=1` in his environment (way connectors/SETUP), run `trail telemetry disable`, and uncheck telemetry in `trail init`. Set `DO_NOT_TRACK=1` *before* `npm i -g @trailhq/trail-code`: its postinstall honours it (TELEMETRY.md "Opting out"; scripts/postinstall.mjs), so not even the install event is sent.
    - **Its numbers are its own.** The README reports 46% fewer tool calls and 33/50 vs 27/50 on
      SWE-bench Verified. Treat them as vendor claims; Gestalt's eval would test them on
      Connor's repos.
