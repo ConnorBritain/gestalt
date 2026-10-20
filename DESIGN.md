@@ -97,4 +97,42 @@ kitctl, the rest becomes a checklist in SETUP.md. One writer per file, always.
 
 ## Research
 
-Filled in at release (roadmap item 12), each claim quoted from its source.
+Why the budgets exist. **These are paraphrases, not quotations.** The session that wrote
+them could not reach arxiv.org or vercel.com (the network policy blocked both), and
+search-engine summaries are not a primary source. So no figure from these studies appears
+here. Open each link and quote the source itself before citing a number.
+
+- **More tools, worse selection.** Gan and Sun, *RAG-MCP: Mitigating Prompt Bloat in LLM
+  Tool Selection via Retrieval-Augmented Generation* (2025),
+  <https://arxiv.org/abs/2505.03275>. As tool catalogs grow, the model picks the right tool
+  less often. Retrieving only the relevant tools cuts prompt tokens and raises selection
+  accuracy substantially. This is the case for scoping by context and for workers that
+  hold connections the lead does not need.
+- **Skills the model must remember to call often go uncalled.** Vercel, *AGENTS.md
+  outperforms skills in our agent evals* (2026),
+  <https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals>. In their
+  Next.js evals, a compressed docs index kept in AGENTS.md outperformed skills. The skills
+  frequently went uninvoked, and helped only when the agent was told to use them. This is
+  the case for the routing index in the block and for the `indexed` eval condition, which
+  tests it for each person instead of assuming it.
+- **Curated, focused skills help; self-written and sprawling ones do not.** Li et al.,
+  *SkillsBench: Benchmarking How Well Agent Skills Work Across Diverse Tasks* (2026),
+  <https://arxiv.org/abs/2602.12670>. Curated skills raised average pass rates, by very
+  different amounts per domain, and some tasks got worse. Skills the model wrote for itself
+  gave no average benefit. Focused skills beat comprehensive ones. This is the case for
+  trim, for one generator per slot, and for Gestalt shipping three skills.
+- **Instruction files can hurt.** Gloaguen, Mündler, Müller, Raychev and Vechev, *Evaluating
+  AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?* (2026),
+  <https://arxiv.org/abs/2602.11988>. Context files did not reliably improve task success
+  and raised inference cost. Unnecessary requirements made tasks harder, and the authors
+  advise that human-written files should state only minimal requirements. The abstract's
+  wording reportedly differs between versions; check the version you cite. This is the
+  case for the block's token budget, the skip clause, and never restating a tool's own
+  snippet.
+- **Position matters in long contexts.** Liu et al., *Lost in the Middle: How Language Models
+  Use Long Contexts* (2023), <https://arxiv.org/abs/2307.03172>. Models use information best
+  near the start or end of a long context. This is a reason to keep always-on text short,
+  rather than trust that a long CLAUDE.md is read evenly.
+
+None of these studies measured this person's harness. The eval in
+[docs/eval.md](docs/eval.md) does, on their own taste prompts.
