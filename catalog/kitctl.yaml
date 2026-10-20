@@ -1,0 +1,21 @@
+schema: gestalt-catalog/1
+id: kitctl
+ref: tool:kitctl
+kind: manager
+title: kitctl
+summary: Compiles per-repo loadouts into each harness's native config; plans, previews, ledgers and ejects.
+version_seen: 0.0.1
+source: https://github.com/ConnorBritain/kitctl
+install:
+  claude: "uv tool install kitctl (or npx kitctl)"
+  codex: "uv tool install kitctl (or npx kitctl)"
+steps:
+  - id: kitctl.doctor
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: "`kitctl doctor`: stale disables, pin drift, pending trust, hooks that never fired"
+harness: { claude: enforced, codex: enforced, cursor: none, agents-md: none }
+cost: { skills: 0, agents: 0, commands: 0, listing_tokens: 0, session_start_lines: 0 }
+worker: { tier: script, mechanism: script }
+notes: Live apply is not yet authorised; writes only inside $KITCTL_SANDBOX. Claude Code and Codex only.

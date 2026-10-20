@@ -1,0 +1,43 @@
+schema: gestalt-catalog/1
+id: cairn
+ref: plugin:cairn
+kind: plugin
+title: cairn
+summary: Append-only decision and prediction ledger; scripts compute calibration, roles never recommend.
+version_seen: 0.2.0
+source: https://github.com/ConnorBritain/cairn
+install:
+  claude: "/plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn"
+  codex: "node install-cairn-codex.mjs (verify with --check)"
+steps:
+  - id: cairn.debt
+    stage: orient
+    kind: orienter
+    mode: ambient
+    invoke: at most two lines of overdue predictions and review debt; silent when nothing is due
+    fallback: { codex: "At session start run `cairn debt`; it prints nothing when nothing is due." }
+  - id: cairn.capture
+    stage: record
+    kind: recorder
+    mode: explicit
+    invoke: /cairn to log a decision or prediction with a confidence and a checkable criterion
+  - id: cairn.resolve
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /cairn-resolve when a prediction comes due
+  - id: cairn.review
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /cairn-review, the weekly forced-choice review
+hooks:
+  - { event: SessionStart, blocking: false, mechanism: context, serves: cairn.debt, lines: 2 }
+  - { event: Stop, blocking: false, mechanism: none, opt_in: "settings capture_hook=true", honours_stop_hook_active: true, serves: cairn.capture, note: "scans user turns for candidates into pending.jsonl; never writes the ledger" }
+knobs:
+  - { file: ~/.cairn/settings, scope: user, key: capture_hook, default: false, change_with: /cairn-tune }
+  - { file: ~/.cairn/settings, scope: user, key: overdue_gate, default: full, change_with: /cairn-tune }
+harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
+cost: { skills: 6, agents: 3, commands: 0, listing_tokens: 769, session_start_lines: 2, measured_from: cairn@d354916 }
+worker: { tier: script, mechanism: script }
+notes: "`cairn score --summary --json`, `debt --json` and `digest --json` are the machine interfaces."

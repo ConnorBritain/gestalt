@@ -1,0 +1,34 @@
+schema: gestalt-catalog/1
+id: ui-magic
+ref: plugin:ui-magic
+kind: plugin
+title: ui-magic
+summary: Builds and repairs web apps that work in every state, from an object model and a screen manifest.
+version_seen: 0.8.0
+source: https://github.com/ConnorBritain/ui-magic
+slot: ui.generator
+install:
+  claude: "/plugin marketplace add ConnorBritain/ui-magic && /plugin install ui-magic@ui-magic"
+  codex: "Codex marketplace .agents/plugins/marketplace.json; plugin hooks need trust"
+steps:
+  - id: ui-magic.foundation
+    stage: plan
+    kind: planner
+    mode: explicit
+    invoke: app-foundation, PRODUCT.md and the screen manifest
+  - id: ui-magic.build
+    stage: make
+    kind: author
+    mode: dispatcher
+    invoke: app-build, screens in layer order
+  - id: ui-magic.audit
+    stage: check
+    kind: reviewer
+    mode: explicit
+    invoke: app-audit and the app-critic agent (read-only)
+hooks:
+  - { event: PostToolUse, blocking: false, mechanism: context, matcher: "Edit|Write|MultiEdit|apply_patch", opt_in: .ui-magic.json, note: "path-scoped scan; skips files claimed by .brand-builder.json; heartbeat in $TMPDIR" }
+harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
+cost: { skills: 7, agents: 2, commands: 0, listing_tokens: 1090, session_start_lines: 0, measured_from: ui-magic@73fbf65 }
+worker: { tier: worker, mechanism: subagent }
+exclusive_of: [brand-builder.build]

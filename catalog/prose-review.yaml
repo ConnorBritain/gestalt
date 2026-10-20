@@ -1,0 +1,27 @@
+schema: gestalt-catalog/1
+id: prose-review
+ref: plugin:prose-review
+kind: plugin
+title: prose-review (vonnegut)
+summary: Clean-context prose critics (voice, fidelity, structure, medium, reader) and a bounded reviser.
+version_seen: 0.7.0
+source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-review
+install:
+  claude: "/plugin install prose-review@vonnegut; paste wiring/claude-md.md"
+  codex: "node install-prose-codex.mjs; paste wiring/agents-md.md"
+steps:
+  - id: prose-review.review
+    stage: check
+    kind: reviewer
+    mode: protocol
+    invoke: "per PROTOCOL.md: scan, critics in parallel in clean context, consolidate"
+    wiring_marker: "<!-- vonnegut: prose-review -->"
+  - id: prose-review.revise
+    stage: make
+    kind: transformer
+    mode: explicit
+    invoke: prose-reviser on the consolidated findings, then a fidelity check
+harness: { claude: enforced, codex: advisory, cursor: partial, agents-md: advisory }
+cost: { skills: 0, agents: 6, commands: 0, listing_tokens: 872, session_start_lines: 0, wiring_lines: 10, measured_from: vonnegut@402bb35 }
+worker: { tier: critic, mechanism: agent-file }
+notes: The author decides; critics never rewrite.

@@ -8,7 +8,7 @@ and when `Last version:` above disagrees with `package.json`.
 
 - [x] 01 scaffold — manifests, marketplaces, package.json, AGENTS/CLAUDE, LICENSE, check gate, test harness
 - [x] 02 yaml — `tools/lib/yaml.mjs` (pinned copy), `tools/lib/yaml-emit.mjs`, `tests/yaml.mjs`
-- [ ] 03 catalog — `catalog/*.yaml`, `tools/lib/catalog.mjs`, `tests/catalog.mjs`
+- [x] 03 catalog — `catalog/*.yaml`, `tools/lib/catalog.mjs`, `tests/catalog.mjs`
 - [ ] 04 way — `tools/lib/way.mjs` (incl. topology), `docs/way-schema.md`, `tests/way.mjs`
 - [ ] 05 lint — `tools/lib/lint.mjs`, `tests/fixtures/lint/`, `tests/lint.mjs`
 - [ ] 06 survey — `tools/lib/survey.mjs`, `toml-scan.mjs`, `tokens.mjs`, `usage.mjs`, fixture homes, tests

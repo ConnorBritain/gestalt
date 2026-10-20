@@ -1,0 +1,50 @@
+schema: gestalt-catalog/1
+id: roadmap
+ref: plugin:roadmap
+kind: plugin
+title: roadmap
+summary: Program increments, slices and the Gauntlet (worker, fresh critic, repair); Linear journal at session end.
+version_seen: 0.7.2
+source: https://github.com/ConnorBritain/roadmap
+install:
+  claude: "claude plugin marketplace add ConnorBritain/roadmap && claude plugin install roadmap@roadmap; npm i -D @connorbritain/roadmap"
+  codex: "Register the graph MCP server through kitctl (an mcp: primitive), not `roadmap init --client codex --apply`."
+steps:
+  - id: roadmap.ready-wave
+    stage: orient
+    kind: orienter
+    mode: ambient
+    invoke: the ready wave, backlog count and Linear status; silent outside roadmap repos
+  - id: roadmap.slice
+    stage: intend
+    kind: planner
+    mode: explicit
+    invoke: /roadmap:slice to scope the next slice from roadmap.yaml
+  - id: roadmap.gauntlet
+    stage: check
+    kind: reviewer
+    mode: explicit
+    invoke: /roadmap:gauntlet, a fresh critic at the exact PR head, then lead-written repair
+  - id: roadmap.journal
+    stage: record
+    kind: recorder
+    mode: ambient
+    invoke: posts a git-derived progress note to the mapped Linear issue; silent on any failure
+  - id: roadmap.cycle
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /roadmap:cycle, sprint planning against the graph
+  - id: roadmap.retro
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /roadmap:retro
+hooks:
+  - { event: SessionStart, blocking: false, mechanism: context, serves: roadmap.ready-wave, lines: 3, quiet_unless: "file-exists:docs/roadmap/roadmap.yaml" }
+  - { event: Stop, blocking: false, mechanism: none, serves: roadmap.journal, quiet_unless: "file-exists:docs/roadmap/roadmap.yaml", note: "engineering profile with LINEAR_API_KEY only" }
+harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
+cost: { skills: 13, agents: 4, commands: 0, listing_tokens: 1308, session_start_lines: 3, measured_from: roadmap@70978c3 }
+mcp: { servers: 1, tools: 40, note: "graph server, mcp__plugin_roadmap_graph__*; deferred by default in Claude Code" }
+worker: { tier: worker, mechanism: headless }
+notes: Linear through GraphQL with LINEAR_API_KEY (optional), not the Linear MCP.

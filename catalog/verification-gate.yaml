@@ -1,0 +1,31 @@
+schema: gestalt-catalog/1
+id: verification-gate
+ref: plugin:verification-gate
+kind: plugin
+title: verification-gate (agent-primitives)
+summary: Tier-1 gates as a Stop hook, then verification-critic and architecture-reviewer in parallel, clean context.
+version_seen: 0.1.0
+source: https://github.com/ConnorBritain/agent-primitives/tree/main/bundles/verification-gate
+install:
+  claude: "Install the verification-gate bundle from agent-primitives; paste wiring/claude-md.md; add .claude/gates.json per repo."
+  codex: "Paste wiring/agents-md.md; run each reviewer as a fresh `codex exec`."
+steps:
+  - id: verification-gate.gates
+    stage: check
+    kind: gate
+    mode: ambient
+    invoke: tests, typecheck, lint and build from .claude/gates.json, before any critic
+  - id: verification-gate.critics
+    stage: check
+    kind: reviewer
+    mode: protocol
+    invoke: verification-critic and architecture-reviewer subagents in parallel, given the original request
+    wiring_marker: "## Self-verification gate"
+hooks:
+  - { event: Stop, blocking: true, mechanism: exit-2, opt_in: .claude/gates.json, serves: verification-gate.gates, note: "gate-runner: a red Tier-1 gate blocks the turn; a broken hook does not; timeout 600s" }
+knobs:
+  - { file: .claude/gates.json, scope: repo, key: gates, default: [], change_with: "edit .claude/gates.json" }
+harness: { claude: enforced, codex: advisory, cursor: partial, agents-md: advisory }
+cost: { skills: 0, agents: 2, commands: 0, listing_tokens: 186, session_start_lines: 0, wiring_lines: 40, measured_from: agent-primitives@c52b0ec }
+worker: { tier: critic, mechanism: agent-file }
+notes: Gates before critics, always; uncertainty resolves to BLOCK. Verdicts SHIP / BLOCK (critic), SHIP / SHIP WITH FIXES / DO NOT SHIP (architecture).

@@ -1,0 +1,34 @@
+schema: gestalt-catalog/1
+id: brand-builder
+ref: plugin:brand-builder
+kind: plugin
+title: brand-builder
+summary: Branded sites without AI-design tells; BRAND.md, style tiles, slop audit and repair.
+version_seen: 0.3.1
+source: https://github.com/ConnorBritain/brand-builder
+slot: design.generator
+install:
+  claude: "/plugin marketplace add ConnorBritain/brand-builder && /plugin install brand-builder@brand-builder"
+  codex: "Codex marketplace; install-codex-hook.mjs only where plugin hooks are unavailable"
+steps:
+  - id: brand-builder.foundation
+    stage: plan
+    kind: planner
+    mode: explicit
+    invoke: brand-foundation and design-direction, BRAND.md then DESIGN.md
+  - id: brand-builder.build
+    stage: make
+    kind: author
+    mode: dispatcher
+    invoke: build-site
+  - id: brand-builder.audit
+    stage: check
+    kind: reviewer
+    mode: explicit
+    invoke: slop-audit and the design-critic agent
+hooks:
+  - { event: PostToolUse, blocking: false, mechanism: context, matcher: "Edit|Write|MultiEdit|apply_patch", opt_in: .brand-builder.json, note: "path-scoped slop scan; heartbeat in $TMPDIR" }
+harness: { claude: enforced, codex: partial, cursor: none, agents-md: advisory }
+cost: { skills: 6, agents: 2, commands: 0, listing_tokens: 851, session_start_lines: 0, measured_from: brand-builder@aa4d814 }
+worker: { tier: worker, mechanism: subagent }
+exclusive_of: [ui-magic.build]

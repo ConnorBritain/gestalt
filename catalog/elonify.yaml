@@ -1,0 +1,39 @@
+schema: gestalt-catalog/1
+id: elonify
+ref: plugin:elonify
+kind: plugin
+title: elonify
+summary: First-principles critic for plans and diffs; verdict PROCEED, CUT FIRST or REFRAME.
+version_seen: 0.1.0
+source: https://github.com/ConnorBritain/elonify
+install:
+  claude: "/plugin marketplace add ConnorBritain/elonify && /plugin install elonify@elonify"
+  codex: "Paste wiring/agents-md.md into AGENTS.md; run the critic as a fresh `codex exec`."
+  cursor: "Install the .cursor-plugin; no Stop hook, so the gate is a rule, not a block."
+steps:
+  - id: elonify.plan-review
+    stage: plan
+    kind: reviewer
+    mode: protocol
+    invoke: /elonify:review on the plan, with the user's original request verbatim
+    wiring_marker: "<!-- elonify -->"
+  - id: elonify.diff-review
+    stage: check
+    kind: reviewer
+    mode: protocol
+    invoke: /elonify:review on the diff, in parallel with the verification critics
+    wiring_marker: "<!-- elonify -->"
+hooks:
+  - { event: PostToolUse, blocking: false, mechanism: none, matcher: "^(Write|Edit|MultiEdit|NotebookEdit|ExitPlanMode)$", opt_in: .claude/elonify.json, note: "counts edits and plan approvals" }
+  - { event: SubagentStop, blocking: false, mechanism: none, opt_in: .claude/elonify.json, note: "reads the critic's VERDICT line" }
+  - { event: Stop, blocking: true, mechanism: exit-2, opt_in: .claude/elonify.json, honours_stop_hook_active: true, serves: elonify.diff-review, note: "blocks when edits >= min_edits and the critic has not run, or the verdict is in block_on; released by 'elonify: skip — reason'" }
+knobs:
+  - { file: .claude/elonify.json, scope: repo, key: min_edits, default: 5, change_with: "edit .claude/elonify.json" }
+  - { file: .claude/elonify.json, scope: repo, key: block_on, default: [REFRAME, CUT FIRST], change_with: "edit .claude/elonify.json" }
+harness: { claude: enforced, codex: advisory, cursor: partial, agents-md: advisory }
+cost: { skills: 1, agents: 1, commands: 0, listing_tokens: 258, session_start_lines: 0, wiring_lines: 8, measured_from: elonify@8f17dcf }
+feeds:
+  - { on: REFRAME, to: cairn.capture, as: choice, status: proposed }
+worker: { tier: critic, mechanism: agent-file }
+exclusive_of: [verification-gate.critics]
+notes: Refuses findings owned by verification-critic and architecture-reviewer, so it runs beside them, not instead of them.

@@ -1,0 +1,18 @@
+schema: gestalt-catalog/1
+id: prose-outline
+ref: plugin:prose-outline
+kind: plugin
+title: prose-outline (vonnegut)
+summary: Outlines with a revision history, before drafting.
+version_seen: 0.1.1
+source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-outline
+install:
+  claude: "/plugin install prose-outline@vonnegut"
+steps:
+  - id: prose-outline.outline
+    stage: plan
+    kind: planner
+    mode: dispatcher
+    invoke: prose-outline
+harness: { claude: partial, codex: advisory, cursor: partial, agents-md: advisory }
+cost: { skills: 1, agents: 0, commands: 0, listing_tokens: 135, session_start_lines: 0, measured_from: vonnegut@402bb35 }
