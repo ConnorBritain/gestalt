@@ -6,6 +6,6 @@ description: Connor England's way in writing repos (file-exists:WRITING.md).
 extends: []
 plugins: [plugin:prose-review, plugin:prose-tell-scan]
 instructions: |
-  ### In writing repos   <!-- gestalt -->
+  ### In writing (WRITING.md present)   <!-- gestalt -->
   - Before calling non-trivial work done: prose-tell-scan scan → prose-review review.
   - Route reviewing a plan, a finished diff or a draft → the prose-review critic, as its own agent in fresh context.

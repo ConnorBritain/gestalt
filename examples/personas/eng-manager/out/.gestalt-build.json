@@ -1,0 +1,19 @@
+{
+  "generator": "gestalt compile",
+  "files": [
+    "SETUP.md",
+    "TASTE-TEST.md",
+    "WAY.md",
+    "agents/claude/reporter.md",
+    "agents/codex/reporter.toml",
+    "block.md",
+    "block.rfc.md",
+    "block.service.md",
+    "kit/gaps.md",
+    "kit/kit.rfc.yaml",
+    "kit/kit.service.yaml",
+    "kit/loadouts/gestalt-flow.yaml",
+    "kit/loadouts/gestalt-rfc.yaml",
+    "kit/loadouts/gestalt-service.yaml"
+  ]
+}

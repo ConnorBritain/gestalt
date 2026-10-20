@@ -1,0 +1,92 @@
+# A tabula-rasa engineering manager. Plan review on every RFC (a REFRAME goes to Morgan,
+# never back to the model), gates then parallel critics in service repos, decisions logged
+# for calibration, and the weekly update drafted by a worker that holds Jira and Outlook.
+schema: gestalt-way/1
+person:
+  name: Morgan (engineering manager)
+  roles: [engineering manager, reviewer]
+  goals:
+    - { id: challenge, text: Every design doc gets challenged before we build. }
+    - { id: calibrate, text: Know which of my calls were right a quarter later. }
+    - { id: update, text: The weekly update writes itself from Jira. }
+  pains:
+    - Two reviewers saying the same thing in different words.
+    - I forget what I decided and why.
+harnesses: [claude, codex]
+writer: kitctl
+connectors:
+  - { id: atlassian, ref: mcp:atlassian, role: tracker, note: Jira is the source of truth; Confluence holds designs }
+  - { id: github, ref: mcp:github, role: code }
+  - { id: m365, ref: mcp:m365, role: mail }
+contexts:
+  everywhere: { when: always }
+  service: { when: "file-exists:Makefile" }
+  rfc: { when: "file-exists:RFC.md" }
+flow:
+  orient:
+    - { use: cairn.debt }
+  plan:
+    - { use: elonify.plan-review, in: [rfc, service] }
+  check:
+    - { use: verification-gate.gates, in: [service] }
+    - { use: verification-gate.critics, in: [service], after: [verification-gate.gates] }
+    - { use: elonify.diff-review, in: [service], parallel_with: [verification-gate.critics], after: [verification-gate.gates] }
+  record:
+    - { use: cairn.capture }
+links:
+  - { from: elonify.plan-review, on: REFRAME, to: user, via: instruction }
+  - { from: elonify.diff-review, on: REFRAME, to: cairn.capture, as: choice, via: instruction }
+reflect:
+  weekly: [cairn.review, team-update.send]
+  monthly: [cairn.resolve, gestalt.trim]
+disable:
+  # The second code reviewer from the survey: verification-gate's critics already cover it.
+  service: [plugin:code-review-extra]
+budgets:
+  # Five rules in service repos: elonify's snippet, the verification snippet, both REFRAME
+  # hand-offs and the Codex cairn fallback. Each is a gate the model would skip unprompted.
+  protocol_rules: 5
+  # cairn (6), gestalt (3, monthly trim) and the team-update skill everywhere.
+  skills_per_context: 12
+topology:
+  tiers:
+    claude: { lead: opus, worker: sonnet, critic: sonnet }
+  workers:
+    - id: critics
+      tier: critic
+      mechanism: agent-file
+      uses: [elonify.plan-review, elonify.diff-review, verification-gate.critics]
+      route: reviewing an RFC or a finished diff
+    - id: reporter
+      tier: worker
+      mechanism: subagent
+      uses: [team-update.send]
+      mcp: [atlassian, m365]
+      route: "the weekly update, or any question answered from Jira"
+      returns: A draft update in Outlook (never sent) and the Jira query it came from.
+catalog:
+  - id: team-update
+    ref: skill:team-update
+    kind: skill
+    title: team-update (Morgan's own skill)
+    summary: Drafts the weekly update from Jira; never sends.
+    confidence: guess
+    steps:
+      - { id: team-update.send, stage: reflect, kind: ritual, mode: explicit, invoke: "draft Friday's update from this week's Jira changes" }
+    harness: { claude: enforced, codex: partial }
+    cost: { skills: 1, listing_tokens: 40 }
+taste:
+  - id: rfc
+    prompt: "Read RFC.md and start implementing the new rate limiter it describes."
+    context: rfc
+    path: [plan]
+  - id: fix
+    prompt: "Fix the flaky retry test in the payments service."
+    context: service
+    path: [make, check, record]
+  - id: decision
+    prompt: "I'm moving the payments team to the platform squad. Log it; I think 65% it cuts lead time by Q2."
+    context: everywhere
+    path: [record]
+    expect: [cairn.capture]
+    expect_quiet: [elonify.plan-review]

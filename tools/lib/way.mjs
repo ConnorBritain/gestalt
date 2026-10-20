@@ -188,7 +188,13 @@ export function normaliseWay(raw, { catalogDir } = {}) {
   // stop order, links
   const stepIds = new Set([...flowIds, ...Object.values(reflect).flat().map(r => r.use)]);
   const stopOrder = list(raw.stop_order);
-  for (const s of stopOrder) if (!flowIds.has(s) && !PLATFORM_RE.test(s)) p.add("GST-REF", "stop_order", `"${s}" is neither a flow step nor platform:<name>`);
+  // A Stop gate can come from a plugin hook whose step is not in the flow (it fires anyway),
+  // so stop_order accepts any step of a primitive the flow uses.
+  const usedEntries = new Set(flow.map(f => f.entry.id));
+  for (const s of stopOrder) {
+    const cat = catalog.steps.get(s);
+    if (!flowIds.has(s) && !PLATFORM_RE.test(s) && !(cat && usedEntries.has(cat.entry.id))) p.add("GST-REF", "stop_order", `"${s}" is neither a step of a primitive in this flow nor platform:<name>`);
+  }
   const links = [];
   for (const [i, l] of list(raw.links).entries()) {
     const w = `links[${i}]`;

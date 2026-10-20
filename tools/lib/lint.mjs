@@ -22,17 +22,31 @@ const stageIndex = s => (s === "reflect" ? STAGES.length : STAGES.indexOf(s));
 
 export const CODES = ["GST-SCHEMA", "GST-REF", "GST-ORDER", "GST-INVOKE", "GST-LINK", "GST-RECORDER-BLOCKS", "GST-GATE", "GST-SLOT", "GST-PROTOCOL", "GST-BUDGET", "GST-LEAD", "GST-HARNESS", "GST-TIER", "GST-WORKER", "GST-TRIGGER"];
 
+/**
+ * Whether a hook fires in a scenario. A hook with no opt-in fires wherever its plugin is
+ * enabled, whether or not the way lists its step: leaving the step out does not switch it
+ * off. A hook with an opt-in file fires only where the way switches it on, which is where
+ * its step is active and hook-backed (enforce: hook, or an ambient step that is the hook).
+ * SETUP.md says "create" for exactly these and "leave off" for the rest.
+ */
+export function hookFires(hook, active) {
+  if (!hook.serves) return true;
+  const f = active.get(hook.serves);
+  if (!hook.opt_in) return true;
+  return Boolean(f && (f.enforce === "hook" || f.mode === "ambient"));
+}
+
 /** User-owned blocking hooks of the active entries in a scenario, by event. */
 export function blockingHooks(way, scenario) {
   const steps = activeSteps(way, scenario);
-  const activeIds = new Set(steps.map(f => f.use));
+  const active = new Map(steps.map(f => [f.use, f]));
   const out = {};
   for (const entry of activeEntries(way, scenario)) {
     for (const hook of entry.hooks ?? []) {
       if (!hook.blocking) continue;
-      if (hook.serves && !activeIds.has(hook.serves)) continue;
+      if (!hookFires(hook, active)) continue;
       if (hook.quiet_unless && !scenario.active.some(c => way.contexts[c].when === hook.quiet_unless)) continue;
-      (out[hook.event] ??= []).push({ entry: entry.id, serves: hook.serves ?? null, mechanism: hook.mechanism, opt_in: hook.opt_in ?? null });
+      (out[hook.event] ??= []).push({ entry: entry.id, serves: hook.serves ?? null, mechanism: hook.mechanism, opt_in: hook.opt_in ?? null, implicit: Boolean(hook.serves && !active.has(hook.serves)) });
     }
   }
   return out;
@@ -41,11 +55,11 @@ export function blockingHooks(way, scenario) {
 /** Lines injected at session start in a scenario, per orienter. */
 export function sessionStartLines(way, scenario) {
   const out = [];
-  const activeIds = new Set(activeSteps(way, scenario).map(f => f.use));
+  const active = new Map(activeSteps(way, scenario).map(f => [f.use, f]));
   for (const entry of activeEntries(way, scenario)) {
     for (const hook of entry.hooks ?? []) {
       if (hook.event !== "SessionStart" || !hook.lines) continue;
-      if (hook.serves && !activeIds.has(hook.serves)) continue;
+      if (!hookFires(hook, active)) continue;
       if (hook.quiet_unless && !scenario.active.some(c => way.contexts[c].when === hook.quiet_unless)) continue;
       out.push({ entry: entry.id, lines: hook.lines });
     }
@@ -158,6 +172,9 @@ export function lintWay(way, catalog, { survey = null, problems: initial = [] } 
     if (w.mechanism === "subagent") {
       for (const m of w.mcp) if (!way.connectors.find(c => c.id === m)?.server) add("GST-WORKER", w.where, `${m} has no inline server, so the subagent shares the lead's connection (and the lead still lists its tools)`, "info");
     }
+    if (w.mechanism === "headless") {
+      for (const m of w.mcp) if (!way.connectors.find(c => c.id === m)?.server) add("GST-WORKER", w.where, `a headless worker runs with --strict-mcp-config, so ${m} reaches it only with an inline server; give the connector a server: block or drop it from the worker`);
+    }
     if (w.mechanism === "script" && !["script"].includes(w.tier)) add("GST-WORKER", w.where, `a script worker needs tier: script (no model)`);
   }
   const owner = new Map();
@@ -206,7 +223,8 @@ export function lintWay(way, catalog, { survey = null, problems: initial = [] } 
       const ids = hooks.map(h => h.serves ?? h.entry);
       if (event === "Stop" && ids.every(id => ordered.has(id))) continue;
       const missing = event === "Stop" ? ids.filter(id => !ordered.has(id)) : ids;
-      add("GST-GATE", at, `${hooks.length} blocking ${event} hooks (${ids.join(", ")})${event === "Stop" ? `; add ${missing.join(", ")} to stop_order` : "; they fire together with no order"}`, "error", { scenario: sc.name });
+      const implicit = hooks.filter(h => h.implicit).map(h => h.serves);
+      add("GST-GATE", at, `${hooks.length} blocking ${event} hooks (${ids.join(", ")})${event === "Stop" ? `; add ${missing.join(", ")} to stop_order` : "; they fire together with no order"}${implicit.length ? `. ${implicit.join(", ")} fires whenever its plugin is on, listed in the flow or not` : ""}`, "error", { scenario: sc.name });
     }
 
     // GST-SLOT (slot names and exclusive_of)

@@ -1,0 +1,78 @@
+# A tabula-rasa writer. One generator for the voice (prose-author), after humanizer strips
+# the default patterns; a deterministic tell-scan before the clean-context prose critics;
+# research in a headless worker; and cairn to calibrate headline instincts against opens.
+schema: gestalt-way/1
+person:
+  name: Ade (newsletter writer)
+  roles: [writer, researcher]
+  goals:
+    - { id: voice, text: "Every issue sounds like me; my time goes to ideas, not sanding sentences." }
+    - { id: calibrate, text: Know whether my headline instincts are any good. }
+  pains:
+    - Two drafting tools fighting over my voice.
+    - "Research I can't trace back to a source."
+harnesses: [claude]
+writer: manual
+connectors:
+  - { id: drive, ref: mcp:gdrive, role: files, note: Research links and clippings }
+  - { id: cms, ref: mcp:newsletter, role: publish, auth: NEWSLETTER_API_KEY, optional: true }
+contexts:
+  everywhere: { when: always }
+  book: { when: "file-exists:BOOK.md" }
+flow:
+  orient:
+    - { use: cairn.debt }
+  plan:
+    - { use: prose-outline.outline, in: [book] }
+  make:
+    - { use: prose-research.research }
+    - { use: humanizer.strip }
+    - { use: prose-author.draft, after: [humanizer.strip] }
+  check:
+    - { use: prose-tell-scan.scan }
+    - { use: prose-review.review, after: [prose-tell-scan.scan] }
+  record:
+    - { use: cairn.capture }
+links:
+  - { from: humanizer.strip, on: done, to: prose-author.draft, as: neutral draft, via: manual }
+reflect:
+  weekly: [cairn.review, prose-author.style-tune]
+  monthly: [cairn.resolve]
+budgets: { always_on_tokens: 5000, skills_per_context: 12 }
+disable:
+  # The second drafting plugin from the marketplace: one generator per slot.
+  everywhere: [plugin:quickwrite]
+topology:
+  tiers:
+    claude: { lead: opus, worker: sonnet, critic: sonnet }
+  lead:
+    note: Drafting stays in the lead, on the strongest model; the voice is the product.
+  workers:
+    - id: research
+      tier: worker
+      mechanism: headless
+      uses: [prose-research.research]
+      route: "gathering sources for an issue, each with a link and a date"
+      returns: A source list (link, date, one-line claim) filed in the research store.
+    - id: critics
+      tier: critic
+      mechanism: agent-file
+      uses: [prose-review.review]
+      route: reviewing a finished draft before it is sent
+taste:
+  - id: draft
+    prompt: "Draft this week's issue from notes.md, about 700 words."
+    context: everywhere
+    path: [plan, make, check]
+    expect: [prose-author.draft]
+  - id: sources
+    prompt: "Find three sources on four-day work weeks, with dates."
+    context: everywhere
+    path: [make]
+    expect: [prose-research.research]
+    expect_quiet: [prose-review.review]
+  - id: headline
+    prompt: "Subject line A or B: which gets more opens? Log my guess (A, 70%)."
+    context: everywhere
+    path: [record]
+    expect: [cairn.capture]

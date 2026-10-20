@@ -85,7 +85,7 @@ check("existing loadouts are referenced, never rewritten", "brand-studio is the 
 check("the block body travels as loadout instructions", "with kitctl present, kitctl owns and writes the block text", () => {
   const { files } = compile(fullPath);
   assert.match(parseYaml(files["kit/loadouts/gestalt-flow.yaml"]).instructions, /^## Way of work/);
-  assert.match(parseYaml(files["kit/loadouts/gestalt-code.yaml"]).instructions, /In code repos/);
+  assert.match(parseYaml(files["kit/loadouts/gestalt-code.yaml"]).instructions, /In code \(package\.json present\)/);
 });
 
 const kitctl = (() => {

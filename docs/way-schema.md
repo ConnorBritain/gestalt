@@ -5,7 +5,7 @@ writes it from the survey and the interview; `node tools/cli.mjs lint` checks it
 `compile` turns it into everything the harness reads. Unknown keys are errors.
 
 A complete worked example is [`examples/connor/way.yaml`](../examples/connor/way.yaml);
-the persona folders under `examples/personas/` start from nothing.
+the [persona folders](../examples/personas/) start from nothing.
 
 ## Keys
 

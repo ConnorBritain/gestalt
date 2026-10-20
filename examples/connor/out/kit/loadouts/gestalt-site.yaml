@@ -9,7 +9,7 @@ slots:
   design.generator: plugin:brand-builder
 disable: [plugin:anthropic/frontend-design]
 instructions: |
-  ### In site repos   <!-- gestalt -->
+  ### In site (BRAND.md present)   <!-- gestalt -->
   - Before building from a plan: elonify plan-review.
   - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
   - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.

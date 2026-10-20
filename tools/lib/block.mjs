@@ -126,7 +126,8 @@ export function renderBlocks(way, catalog) {
     const ctx = sc.active[sc.active.length - 1];
     const lines = blockLines(way, catalog, sc, base).filter(l => !baseKeys.has(l.key));
     if (!lines.length) continue;
-    out.contexts.push({ context: ctx, when: way.contexts[ctx].when, ...make(`way.${ctx}`, `### In ${ctx} repos   <!-- gestalt -->`, lines, false) });
+    const marker = way.contexts[ctx].when.replace(/^file-exists:/, "");
+    out.contexts.push({ context: ctx, when: way.contexts[ctx].when, ...make(`way.${ctx}`, `### In ${ctx} (${marker} present)   <!-- gestalt -->`, lines, false) });
   }
   return out;
 }

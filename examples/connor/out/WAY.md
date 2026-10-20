@@ -130,7 +130,7 @@ Rituals never go in the always-on block; they live here and in your calendar.
 
 ## The block
 
-Base block ≈163 tokens (budget 450); context blocks: plugin ≈173, roadmap ≈174, app ≈171, site ≈172, writing ≈77.
+Base block ≈163 tokens (budget 450); context blocks: plugin ≈181, roadmap ≈181, app ≈176, site ≈175, writing ≈81.
 
 ```markdown
 <!-- gestalt:begin way -->
@@ -146,7 +146,7 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 
 ```markdown
 <!-- gestalt:begin way.plugin -->
-### In plugin repos   <!-- gestalt -->
+### In plugin (.claude-plugin/plugin.json present)   <!-- gestalt -->
 - Before building from a plan: elonify plan-review.
 - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
 - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
@@ -157,7 +157,7 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 
 ```markdown
 <!-- gestalt:begin way.roadmap -->
-### In roadmap repos   <!-- gestalt -->
+### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->
 - Before building from a plan: elonify plan-review.
 - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
 - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
@@ -168,7 +168,7 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 
 ```markdown
 <!-- gestalt:begin way.app -->
-### In app repos   <!-- gestalt -->
+### In app (.ui-magic.json present)   <!-- gestalt -->
 - Before building from a plan: elonify plan-review.
 - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
 - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
@@ -179,7 +179,7 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 
 ```markdown
 <!-- gestalt:begin way.site -->
-### In site repos   <!-- gestalt -->
+### In site (BRAND.md present)   <!-- gestalt -->
 - Before building from a plan: elonify plan-review.
 - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
 - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
@@ -190,7 +190,7 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 
 ```markdown
 <!-- gestalt:begin way.writing -->
-### In writing repos   <!-- gestalt -->
+### In writing (WRITING.md present)   <!-- gestalt -->
 - Before calling non-trivial work done: prose-tell-scan scan → prose-review review.
 - Route reviewing a plan, a finished diff or a draft → the prose-review critic, as its own agent in fresh context.
 <!-- gestalt:end way.writing -->

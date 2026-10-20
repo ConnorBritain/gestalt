@@ -1,0 +1,15 @@
+{
+  "generator": "gestalt compile",
+  "files": [
+    "SETUP.md",
+    "TASTE-TEST.md",
+    "WAY.md",
+    "block.md",
+    "kit/gaps.md",
+    "kit/kit.book.yaml",
+    "kit/loadouts/gestalt-book.yaml",
+    "kit/loadouts/gestalt-flow.yaml",
+    "workers/research.prompt.md",
+    "workers/research.sh"
+  ]
+}

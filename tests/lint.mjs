@@ -40,6 +40,25 @@ check("Stop gates are counted per context, and quiet outside it", "verification 
   assert.equal(blockingHooks(way, base).Stop, undefined);
   assert.deepEqual(blockingHooks(way, code).Stop.map(h => h.serves), ["verification-gate.gates"]);
 });
+check("a hook with no opt-in counts even when its step is left out of the flow", "compounder's Stop nudge fires whenever compounder is on; omitting the step must not hide the gate", () => {
+  const { way, catalog, problems } = readWay(join(FIXTURES, "ways", "minimal.way.yaml"));
+  way.flow.unshift({ ...way.flow[0], use: "compounder.brief", stage: "orient", mode: "ambient", in: ["everywhere", "code"], after: [], parallel_with: [], waive: [], step: catalog.steps.get("compounder.brief"), entry: catalog.entries.get("compounder"), where: "flow.orient[0]" });
+  const gate = lintWay(way, catalog, { problems }).problems.find(p => p.code === "GST-GATE");
+  assert.ok(gate, "expected GST-GATE");
+  assert.match(gate.message, /compounder\.stop-lines fires whenever its plugin is on/);
+  way.stop_order = ["verification-gate.gates", "compounder.stop-lines"];
+  assert.ok(!lintWay(way, catalog, { problems }).problems.some(p => p.code === "GST-GATE"), "a stop_order naming the implicit gate clears it");
+});
+check("an opt-in hook counts only where the way switches it on", "SETUP says create the opt-in file only for hook-backed steps; lint must count the same hooks", () => {
+  const { way, catalog, problems } = readWay(join(dir, "GST-GATE.way.yaml"));
+  way.flow.find(f => f.use === "elonify.diff-review").enforce = "none";
+  assert.ok(!lintWay(way, catalog, { problems }).problems.some(p => p.code === "GST-GATE"), "a protocol-only elonify has no Stop gate");
+});
+check("a headless worker cannot reach a connector without an inline server", "--strict-mcp-config gives it only what its own config names", () => {
+  const { way, catalog, problems } = readWay(join(FIXTURES, "ways", "full.way.yaml"));
+  way.topology.workers.find(w => w.id === "prose").mcp = ["github"];
+  assert.ok(lintWay(way, catalog, { problems }).problems.some(p => p.code === "GST-WORKER" && /strict-mcp-config, so github/.test(p.message)));
+});
 check("ordering every Stop gate clears GST-GATE", "stop_order is the documented way to let several gates coexist", () => {
   const { way, catalog } = readWay(join(dir, "GST-GATE.way.yaml"));
   way.stop_order = ["verification-gate.gates", "elonify.diff-review"];

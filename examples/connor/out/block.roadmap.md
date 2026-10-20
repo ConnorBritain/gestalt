@@ -1,5 +1,5 @@
 <!-- gestalt:begin way.roadmap -->
-### In roadmap repos   <!-- gestalt -->
+### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->
 - Before building from a plan: elonify plan-review.
 - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
 - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.

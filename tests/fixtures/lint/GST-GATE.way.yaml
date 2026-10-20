@@ -27,6 +27,7 @@ flow:
       after: [verification-gate.gates]
     - use: elonify.diff-review
       in: [code]
+      enforce: hook
       parallel_with: [verification-gate.critics]
 stop_order: [verification-gate.gates]
 taste:
