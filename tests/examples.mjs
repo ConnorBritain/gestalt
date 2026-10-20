@@ -20,7 +20,7 @@ for (const dir of examples) {
     const { way, catalog, problems } = readWay(join(dir, "way.yaml"));
     const surveyPath = join(dir, "survey", "survey.json");
     const survey = existsSync(surveyPath) ? JSON.parse(readFileSync(surveyPath, "utf8")) : null;
-    const result = compileWay(way, catalog, { survey, problems });
+    const result = compileWay(way, catalog, { survey, problems, wayText: readFileSync(join(dir, "way.yaml"), "utf8") });
     assert.ok(result.ok, result.lint.problems.filter(p => p.severity === "error").map(p => `${p.code} ${p.where}: ${p.message}`).join("\n"));
     if (process.env.GESTALT_UPDATE_EXAMPLES) writeBuild(join(dir, "out"), result.files);
     assert.deepEqual(checkBuild(join(dir, "out"), result.files), [], `recompile: node tools/cli.mjs compile --way ${name}/way.yaml${survey ? ` --survey ${name}/survey/survey.json` : ""} --out ${name}/out`);

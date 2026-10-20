@@ -1,6 +1,7 @@
 {
   "generator": "gestalt compile",
   "files": [
+    "BOOTSTRAP.md",
     "SETUP.md",
     "TASTE-TEST.md",
     "WAY.md",

@@ -11,11 +11,12 @@ import { emitAgents } from "./agents-emit.mjs";
 import { renderWay } from "./render-way.mjs";
 import { renderSetup } from "./render-setup.mjs";
 import { renderTaste } from "./render-taste.mjs";
+import { renderBootstrap } from "./render-bootstrap.mjs";
 
 const LEDGER = ".gestalt-build.json";
 
 /** Pure: returns { ok, lint, files } where files maps relative path → text. */
-export function compileWay(way, catalog, { survey = null, problems = [] } = {}) {
+export function compileWay(way, catalog, { survey = null, problems = [], wayText = null } = {}) {
   const lint = lintWay(way, catalog, { survey, problems });
   if (!way) return { ok: false, lint, files: {} };
   const blocks = renderBlocks(way, catalog);
@@ -36,6 +37,7 @@ export function compileWay(way, catalog, { survey = null, problems = [] } = {}) 
   files["WAY.md"] = renderWay(way, catalog, { lint, blocks, survey });
   files["SETUP.md"] = renderSetup(way, catalog, { blocks, kit, agentFiles, survey });
   files["TASTE-TEST.md"] = renderTaste(way, catalog);
+  files["BOOTSTRAP.md"] = renderBootstrap(way, catalog, files, { wayText });
   return { ok: true, lint, files, blocks };
 }
 
@@ -73,7 +75,8 @@ export function runCompile(argv, { parseArgs, loadSurvey }) {
   const wayPath = resolve(a.way ?? defaultWayPath());
   const out = resolve(a.out ?? join(gestaltHome(), "build"));
   const { way, catalog, problems } = readWay(wayPath);
-  const result = compileWay(way, catalog, { survey: loadSurvey(a.survey), problems });
+  const wayText = existsSync(wayPath) ? readFileSync(wayPath, "utf8") : null;
+  const result = compileWay(way, catalog, { survey: loadSurvey(a.survey), problems, wayText });
   if (!result.ok) {
     console.log(formatProblems(result.lint));
     console.error("gestalt compile: refused; fix the errors above (or waive them with a reason) and compile again.");

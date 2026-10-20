@@ -37,7 +37,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 - Stop gates: compounder stop-lines.
 - Lead always-on ≈732 tokens (budget 3000), 8 skills (budget 8).
-- Session-start lines 4 (budget 8); always-on protocol rules 0 (budget 3).
+- Session-start lines 13 (budget 13); always-on protocol rules 0 (budget 3).
 
 ### app (file-exists:package.json)
 
@@ -45,7 +45,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 - Stop gates: verification-gate gates → compounder stop-lines.
 - Lead always-on ≈918 tokens (budget 3000), 8 skills (budget 8).
-- Session-start lines 4 (budget 8); always-on protocol rules 2 (budget 3).
+- Session-start lines 13 (budget 13); always-on protocol rules 2 (budget 3).
 
 ## Lead and workers
 

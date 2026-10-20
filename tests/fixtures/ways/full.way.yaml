@@ -40,7 +40,7 @@ links:
 reflect:
   daily: [compounder.checkin]
   weekly: [cairn.review, gestalt.trim]
-budgets: { protocol_rules: 6, session_start_lines: 8, index: true }
+budgets: { protocol_rules: 6, session_start_lines: 16, index: true }
 disable:
   writing: [plugin:ui-magic]
 topology:

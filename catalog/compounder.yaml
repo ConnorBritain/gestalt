@@ -45,7 +45,7 @@ steps:
     mode: explicit
     invoke: /compounder:review, weekly; sets next week's mode
 hooks:
-  - { event: SessionStart, blocking: false, mechanism: context, serves: compounder.brief, lines: 4 }
+  - { event: SessionStart, blocking: false, mechanism: context, serves: compounder.brief, lines: 13, note: "a status line plus a brief of about 12 lines in focus sessions (scripts/lib/brief.mjs sessionBrief); 2 lines in work, paid and neutral lanes" }
   - { event: UserPromptSubmit, blocking: true, mechanism: decision-block, serves: compounder.guard, note: "!park, off-lane repos and new-project talk in focus or lockdown" }
   - { event: PreToolUse, blocking: true, mechanism: permission-decision, serves: compounder.guard, note: "scaffolds and project-creating MCP calls (Linear save_project, Todoist add-projects)" }
   - { event: PostToolUse, blocking: false, mechanism: none, note: counts edits }
@@ -55,7 +55,7 @@ knobs:
   - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge, default: true, change_with: /compounder:update, loosening: true }
   - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge_min_edits, default: 3, change_with: /compounder:update, loosening: true }
 harness: { claude: enforced, codex: none, cursor: none, agents-md: none }
-cost: { skills: 8, agents: 0, commands: 0, listing_tokens: 732, session_start_lines: 4, measured_from: compounder@437906f }
+cost: { skills: 8, agents: 0, commands: 0, listing_tokens: 732, session_start_lines: 13, measured_from: compounder@437906f }
 feeds:
   - { on: shareable, to: compounder.ship, as: receipt, status: built }
 worker: { tier: script, mechanism: script }

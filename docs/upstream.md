@@ -33,6 +33,10 @@ the smallest change that would fix it.
 - **Its Stop lines are a recorder that blocks the turn.** A non-blocking mode (a
   `systemMessage` instead of `decision: block`), or `stop_nudge` per lane, would remove the
   last `GST-RECORDER-BLOCKS` in Connor's way.
+- **Its session-start brief is about 13 lines in a focus session** (a status line plus the
+  brief from `scripts/lib/brief.mjs`), more than an 8-line session-start budget by itself.
+  A three-line default (focus, next move, ship clock), with the rest on `/compounder:checkin`,
+  would fit beside other orienters.
 - **Claude Code only.** Codex and Cursor manifests would let its brief and guard travel.
 - **Ritual skills list every turn.** `review`, `interview`, `update`, `mode` and `focus` are
   invoked by name. `disable-model-invocation: true` takes them out of the always-on listing

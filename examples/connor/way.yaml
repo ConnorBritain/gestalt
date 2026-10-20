@@ -72,24 +72,21 @@ reflect:
     - { use: roadmap.cycle, in: [roadmap] }
     - kitctl.doctor
   monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
+# Budgets are limits (Connor's decision, 2026-10-20): the defaults, unraised. What exceeds
+# them today is waived below with the reason, visibly, until the trims land.
 budgets:
-  # PENDING CONNOR: protocol_rules, session_start_lines and skills_per_context below were
-  # raised to the measured values by the session that composed this way. Keep them (budgets
-  # as a printout) or restore 3 / 8 / 8 and trim until lint passes (budgets as limits).
   block_tokens: 450
-  # Five always-on rules in code repos: elonify's snippet, the verification snippet, the
-  # Stop order, the REFRAME hand-off and the Codex cairn fallback. Each one is a gate the
-  # model would otherwise skip or a collision it would otherwise mishandle.
-  protocol_rules: 5
+  protocol_rules: 3
   unordered_blocking_per_event: 1
-  # cairn 2 + compounder 4 + roadmap 3 in roadmap repos; the ready wave is the plan there.
-  session_start_lines: 9
+  session_start_lines: 8
   always_on_tokens: 12000
-  # cairn (6) and compounder (8) list every skill in every repo, rituals included. The trim
-  # target is under 16 once their ritual skills stop listing (docs/upstream.md). Roadmap
-  # repos sit exactly at this budget because of roadmap's 13 skills.
-  skills_per_context: 32
+  skills_per_context: 8
   index: false
+waive:
+  - code: GST-BUDGET
+    reason: "Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver."
+  - code: GST-LEAD
+    reason: "cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes."
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]

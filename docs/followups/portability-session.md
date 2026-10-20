@@ -84,6 +84,26 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
    Codex agent fields, restore Codex worker agents in `tools/lib/agents-emit.mjs` (removed in
    0.1.0 because they were unverified).
 
+8. **Connor's budgets, back within limits.** Connor chose budgets as limits. Once
+   compounder's brief is short (upstream.md) and cairn's and compounder's ritual skills no
+   longer list every turn, trim `examples/connor/way.yaml` until it lints under the default
+   budgets, and delete its two way-level waivers. If it still cannot fit, put the remaining
+   overrun to Connor; do not raise a budget on his behalf.
+9. **Trail (formerly Graft, trailhq) as a new-repo ritual.**
+   - Read Trail's own README first. Secondary sources say it keeps a marker-fenced section
+     in AGENTS.md, an MCP config, and a generated repo map that is gitignored; confirm that.
+   - Add `catalog/trail.yaml`. Trail owns any nested CLAUDE.md / AGENTS.md it writes; Gestalt
+     never writes nested files.
+   - Add an "on entering a repo" cadence to the way model (beside daily, weekly and monthly),
+     in this order: `kitctl use` the repo's loadouts → the Trail walk → `gestalt write --block
+     --context` (or kitctl's block). Lint should warn when two tools would write unmarked text
+     into the same instruction file.
+   - Add it to Connor's way, recompile, and add Trail's marker to the survey's marker detection.
+10. **Connor's BOOTSTRAP.md.** Copy `examples/connor/out/BOOTSTRAP.md` (or a fresh compile
+    of his real `~/.gestalt/way.yaml`) into his private warehouse, `ConnorBritain/agent-kits`,
+    next to the kitctl loadouts, if this session can reach that repo. It is personal; keep it
+    out of public repos.
+
 ## Rules for every repo
 
 - Read the repo's `AGENTS.md` / `CLAUDE.md` and follow its gate:
@@ -106,4 +126,6 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
 
 Each repo has a merged-ready PR with: the new manifests, a portability table, tests green,
 and the harness facts it relied on (with dates). Gestalt's catalog and examples reflect the
-new coverage, and `node tools/check.mjs` passes there.
+new coverage, Connor's way lints under its limits without waivers (or the overrun is put
+to him), Trail is in his way as a new-repo ritual, and `GESTALT_STRICT=1 node tools/check.mjs`
+passes there.

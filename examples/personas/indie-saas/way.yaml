@@ -34,7 +34,12 @@ stop_order: [verification-gate.gates, compounder.stop-lines]
 reflect:
   daily: [compounder.checkin]
   weekly: [compounder.review]
-budgets: { always_on_tokens: 3000, skills_per_context: 8 }
+budgets:
+  always_on_tokens: 3000
+  skills_per_context: 8
+  # compounder's focus brief is about 13 lines at session start; Jordan takes that in
+  # exchange for the Saturday guard.
+  session_start_lines: 13
 topology:
   tiers:
     claude: { lead: opus, worker: sonnet, critic: sonnet }

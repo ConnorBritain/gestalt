@@ -55,32 +55,32 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief → **intend** compounder guard → **make** humanizer strip, prose-author draft → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: compounder stop-lines.
-- Lead always-on ≈1841 tokens (budget 12000), 18 skills (budget 32).
-- Session-start lines 6 (budget 9); always-on protocol rules 1 (budget 5).
+- Lead always-on ≈1841 tokens (budget 12000), 18 skills (budget 8).
+- Session-start lines 15 (budget 8); always-on protocol rules 1 (budget 3).
 
 ### plugin (file-exists:.claude-plugin/plugin.json)
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈2285 tokens (budget 12000), 19 skills (budget 32).
-- Session-start lines 6 (budget 9); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈2285 tokens (budget 12000), 19 skills (budget 8).
+- Session-start lines 15 (budget 8); always-on protocol rules 5 (budget 3).
 
 ### roadmap (file-exists:docs/roadmap/roadmap.yaml)
 
 **orient** cairn debt, compounder brief, roadmap ready-wave → **intend** compounder guard, roadmap slice → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture, roadmap journal
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈3593 tokens (budget 12000), 32 skills (budget 32).
-- Session-start lines 9 (budget 9); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈3593 tokens (budget 12000), 32 skills (budget 8).
+- Session-start lines 18 (budget 8); always-on protocol rules 5 (budget 3).
 
 ### app (file-exists:.ui-magic.json)
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review, ui-magic foundation → **make** ui-magic build, humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics, ui-magic audit → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈3375 tokens (budget 12000), 26 skills (budget 32).
-- Session-start lines 6 (budget 9); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈3375 tokens (budget 12000), 26 skills (budget 8).
+- Session-start lines 15 (budget 8); always-on protocol rules 5 (budget 3).
 - kitctl loadouts: app-studio.
 - Disabled here: plugin:anthropic/frontend-design.
 
@@ -89,8 +89,8 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review, brand-builder foundation → **make** brand-builder build, humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics, brand-builder audit → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
-- Lead always-on ≈3136 tokens (budget 12000), 25 skills (budget 32).
-- Session-start lines 6 (budget 9); always-on protocol rules 5 (budget 5).
+- Lead always-on ≈3136 tokens (budget 12000), 25 skills (budget 8).
+- Session-start lines 15 (budget 8); always-on protocol rules 5 (budget 3).
 - kitctl loadouts: brand-studio.
 - Disabled here: plugin:anthropic/frontend-design.
 
@@ -99,8 +99,8 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief → **intend** compounder guard → **make** humanizer strip, prose-author draft → **check** prose-tell-scan scan, prose-review review → **record** compounder stop-lines, compounder ship, cairn capture
 
 - Stop gates: compounder stop-lines.
-- Lead always-on ≈2892 tokens (budget 12000), 19 skills (budget 32).
-- Session-start lines 6 (budget 9); always-on protocol rules 2 (budget 5).
+- Lead always-on ≈2892 tokens (budget 12000), 19 skills (budget 8).
+- Session-start lines 15 (budget 8); always-on protocol rules 2 (budget 3).
 
 ## Lead and workers
 
@@ -192,4 +192,20 @@ Order: orient → intend → plan → make → check → record. Checkers report
 - warn **GST-HARNESS** flow.check[2]: verification-gate.critics is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-HARNESS** flow.check[6]: prose-review.review is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-RECORDER-BLOCKS** flow.record[0]: compounder.stop-lines records, yet its Stop hook blocks the turn (ordered last in stop_order, so tolerated)
+- info **GST-BUDGET** context everywhere: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-LEAD** context everywhere: lead sees 18 skills (budget 8) _(waived: cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
+- info **GST-BUDGET** context plugin: 5 always-on protocol rules (budget 3): elonify.plan-review, verification-gate.critics, elonify.diff-review→cairn.capture, stop_order, cairn.debt@codex _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-BUDGET** context plugin: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-LEAD** context plugin: lead sees 19 skills (budget 8) _(waived: cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
+- info **GST-BUDGET** context roadmap: 5 always-on protocol rules (budget 3): elonify.plan-review, verification-gate.critics, elonify.diff-review→cairn.capture, stop_order, cairn.debt@codex _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-BUDGET** context roadmap: 18 session-start lines (budget 8): cairn 2, compounder 13, roadmap 3 _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-LEAD** context roadmap: lead sees 32 skills (budget 8) _(waived: cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
+- info **GST-BUDGET** context app: 5 always-on protocol rules (budget 3): elonify.plan-review, verification-gate.critics, elonify.diff-review→cairn.capture, stop_order, cairn.debt@codex _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-BUDGET** context app: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-LEAD** context app: lead sees 26 skills (budget 8) _(waived: cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
+- info **GST-BUDGET** context site: 5 always-on protocol rules (budget 3): elonify.plan-review, verification-gate.critics, elonify.diff-review→cairn.capture, stop_order, cairn.debt@codex _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-BUDGET** context site: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-LEAD** context site: lead sees 25 skills (budget 8) _(waived: cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
+- info **GST-BUDGET** context writing: 15 session-start lines (budget 8): cairn 2, compounder 13 _(waived: Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver.)_
+- info **GST-LEAD** context writing: lead sees 19 skills (budget 8) _(waived: cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes.)_
 

@@ -27,7 +27,7 @@ const ENV_NAME_RE = /^[A-Z_][A-Z0-9_]*$/;
 const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 const PLATFORM_RE = /^platform:[a-z0-9][a-z0-9-]*$/;
 
-const TOP_KEYS = ["schema", "person", "harnesses", "writer", "connectors", "contexts", "flow", "stop_order", "links", "reflect", "budgets", "disable", "topology", "catalog", "taste"];
+const TOP_KEYS = ["schema", "person", "harnesses", "writer", "connectors", "contexts", "flow", "stop_order", "links", "reflect", "budgets", "disable", "topology", "catalog", "taste", "waive"];
 const KEYS = {
   person: ["name", "roles", "goals", "pains"],
   connector: ["id", "ref", "role", "auth", "optional", "server", "note"],
@@ -35,6 +35,7 @@ const KEYS = {
   context: ["when", "loadouts", "note"],
   step: ["use", "in", "mode", "enforce", "after", "parallel_with", "waive", "note"],
   waive: ["code", "reason"],
+  wayWaive: ["code", "reason", "in"],
   link: ["from", "on", "to", "as", "via"],
   topology: ["tiers", "lead", "workers"],
   lead: ["keeps", "note"],
@@ -219,6 +220,18 @@ export function normaliseWay(raw, { catalogDir } = {}) {
     }
   }
 
+  // way-level waivers: for context-level codes (budgets, the lead's load) that no single
+  // step owns. Each needs the person's reason and stays visible in WAY.md.
+  const waive = [];
+  for (const [i, w] of list(raw.waive).entries()) {
+    const where = `waive[${i}]`;
+    if (!p.keys(w, KEYS.wayWaive, where)) continue;
+    if (!["GST-BUDGET", "GST-LEAD", "GST-HARNESS", "GST-TIER"].includes(w.code)) p.add("GST-SCHEMA", `${where}.code`, "way-level waivers cover GST-BUDGET, GST-LEAD, GST-HARNESS and GST-TIER; waive a step's own code on the step");
+    if (!isStr(w.reason) || w.reason.length < 12) p.add("GST-SCHEMA", `${where}.reason`, "a waiver needs a stated reason (12+ characters)");
+    for (const c of list(w.in)) if (!contexts[c]) p.add("GST-REF", `${where}.in`, `unknown context "${c}"`);
+    waive.push({ code: w.code, reason: w.reason, in: list(w.in) });
+  }
+
   // topology
   const topology = { tiers: {}, lead: { keeps: [] }, workers: [] };
   if (raw.topology != null && p.keys(raw.topology, KEYS.topology, "topology")) {
@@ -264,7 +277,7 @@ export function normaliseWay(raw, { catalogDir } = {}) {
   const way = {
     schema: raw.schema, person: { roles: [], pains: [], ...person, goals: list(person.goals) }, harnesses, writer,
     connectors, contexts, flow, reflect, stop_order: stopOrder, links, budgets, disable, topology, taste,
-    catalog: list(raw.catalog),
+    catalog: list(raw.catalog), waive,
   };
   return { way, catalog, problems: p.items };
 }

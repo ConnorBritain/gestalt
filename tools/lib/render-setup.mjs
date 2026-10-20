@@ -3,7 +3,7 @@
 // manual writes, worker placement, and the harnesses kitctl cannot reach.
 import { activeEntries, activeSteps, scenarios } from "./way.mjs";
 import { label } from "./block.mjs";
-import { expectedTrace } from "./render-taste.mjs";
+import { pilotTaste } from "./render-taste.mjs";
 
 export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = null }) {
   const L = [];
@@ -11,8 +11,7 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
   L.push("Gestalt writes only its own block and its own generated files. Everything else is here. Pilot one repo first; roll out the rest once its taste prompt passes.", "");
 
   // 0. Pilot: the taste prompt that exercises the most steps, in its own context, end to end.
-  const traces = way.taste.map((t, i) => ({ t, i, tr: expectedTrace(way, catalog, t) }));
-  const pilot = traces.reduce((best, x) => (x.tr.fires.length > best.tr.fires.length ? x : best), traces[0]);
+  const pilot = pilotTaste(way, catalog);
   if (pilot) {
     const sc = scenarios(way).find(x => x.name === pilot.tr.scenario);
     const ctx = pilot.t.context;

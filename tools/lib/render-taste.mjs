@@ -36,6 +36,12 @@ export function expectedTrace(way, catalog, taste) {
   return { scenario: sc.name, fires, may, onAsk, quiet: [...quiet].map(id => label(id, catalog)), stopOrder, workers };
 }
 
+/** The pilot: the taste prompt that exercises the most steps (first wins a tie). */
+export function pilotTaste(way, catalog) {
+  const traces = way.taste.map((t, i) => ({ t, i, tr: expectedTrace(way, catalog, t) }));
+  return traces.reduce((best, x) => (x.tr.fires.length > best.tr.fires.length ? x : best), traces[0]);
+}
+
 export function renderTaste(way, catalog) {
   const L = [];
   L.push(`# Taste test for ${way.person.name}'s way`, "");

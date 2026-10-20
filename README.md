@@ -33,6 +33,7 @@ hands heavy or connected work to focused workers on the right tier. Then a three
 | `agents/`, `workers/` | Worker definitions: subagents with their own model and MCP, headless launch scripts |
 | `SETUP.md` | Everything Gestalt will not do itself, as a checklist |
 | `TASTE-TEST.md` | Three prompts with the trace each should produce, computed from the way |
+| `BOOTSTRAP.md` | One portable file: hand it to any coding agent, anywhere, and it sets your harness up from your way (with Gestalt, or by copying every generated file verbatim) |
 
 See the [author's way](examples/connor/) and [four people starting from
 nothing](examples/personas/): a Cowork analyst trimming org plugins, a solo developer, a

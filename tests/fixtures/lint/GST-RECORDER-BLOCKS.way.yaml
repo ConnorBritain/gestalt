@@ -43,3 +43,5 @@ taste:
     prompt: Rename sum to add everywhere.
     context: code
     path: [make, check]
+budgets:
+  session_start_lines: 20

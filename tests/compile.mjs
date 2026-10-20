@@ -23,7 +23,7 @@ check("the full fixture compiles, twice, to identical bytes", "goldens and --che
   const b = compile(fullPath);
   assert.ok(a.ok, JSON.stringify(a.lint.problems.filter(p => p.severity === "error")));
   assert.deepEqual(a.files, b.files);
-  for (const f of ["WAY.md", "SETUP.md", "TASTE-TEST.md", "block.md", "block.code.md", "block.writing.md", "kit/loadouts/gestalt-flow.yaml", "kit/kit.code.yaml", "agents/claude/tracker.md", "workers/prose.sh"]) assert.ok(f in a.files, f);
+  for (const f of ["WAY.md", "SETUP.md", "TASTE-TEST.md", "BOOTSTRAP.md", "block.md", "block.code.md", "block.writing.md", "kit/loadouts/gestalt-flow.yaml", "kit/kit.code.yaml", "agents/claude/tracker.md", "workers/prose.sh"]) assert.ok(f in a.files, f);
 });
 check("compile refuses a way lint rejects", "nothing that contradicts the principles may reach a harness", () => {
   const r = compile(join(FIXTURES, "lint", "GST-GATE.way.yaml"));
@@ -156,6 +156,19 @@ check("no Codex agent files until their fields are verified", "config that may n
   const { files } = compile(fullPath);
   assert.ok(!Object.keys(files).some(f => f.startsWith("agents/codex/")));
   assert.match(files["workers/prose.sh"], /# Codex alternative \(unverified flags\): codex exec -m gpt-worker/);
+});
+
+group("bootstrap");
+check("BOOTSTRAP.md carries the way and every generated file, verbatim", "it must set a harness up without Gestalt and without improvising", () => {
+  const wayText = readFileSync(fullPath, "utf8");
+  const { way, catalog, problems } = readWay(fullPath);
+  const { files } = compileWay(way, catalog, { problems, wayText });
+  const b = files["BOOTSTRAP.md"];
+  assert.ok(b.includes(wayText.trimEnd()), "path A embeds the way");
+  for (const f of ["block.md", "block.code.md", "agents/claude/tracker.md", "workers/prose.sh", "kit/loadouts/gestalt-flow.yaml"]) assert.ok(b.includes(files[f].trimEnd()), f);
+  assert.match(b, /Never write a secret/);
+  assert.match(b, /environment variable `LINEAR_API_KEY`/);
+  assert.ok(!/lin_api_|sk-ant/.test(b));
 });
 
 group("taste");

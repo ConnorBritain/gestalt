@@ -18,7 +18,10 @@ First vertical slice.
   by `kitctl validate` with stubbed primitives, when kitctl is available), subagent files
   with inline MCP, headless worker scripts (with a `codex exec` line), SETUP.md that starts
   with a one-repo pilot, and a taste test with computed traces. `--check` detects drift.
-  Codex custom-agent files wait until their fields are verified.
+  Codex custom-agent files wait until their fields are verified. BOOTSTRAP.md carries the
+  way and every generated file, so any agent in any harness can set the way up.
+- **Waivers** at way level for budget and lead-load codes no single step owns, each with a
+  required reason printed in WAY.md: budgets stay limits, exceptions stay visible.
 - **Write**: the only writer, dry-run first, limited to Gestalt's markers and its own files.
 - **Skills**: `/gestalt:way`, `/gestalt:trim`, `/gestalt:taste` (about 280 always-on tokens).
 - **Catalog**: 19 primitives. The 13 with checkouts have costs measured exactly and

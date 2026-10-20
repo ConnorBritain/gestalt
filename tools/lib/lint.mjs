@@ -269,6 +269,16 @@ export function lintWay(way, catalog, { survey = null, problems: initial = [] } 
       pr.waived = w.reason;
     }
   }
+  // Way-level waivers: context codes no single step owns.
+  for (const w of way.waive ?? []) {
+    for (const pr of problems) {
+      if (pr.code !== w.code || pr.severity === "info") continue;
+      const ctx = pr.scenario ? pr.scenario.split("+").pop() : null;
+      if (w.in.length && !(ctx && w.in.includes(ctx))) continue;
+      pr.severity = "info";
+      pr.waived = w.reason;
+    }
+  }
   return summarise(dedupe(problems));
 }
 

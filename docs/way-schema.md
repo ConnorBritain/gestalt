@@ -25,6 +25,7 @@ the [persona folders](../examples/personas/) start from nothing.
 | `disable` | `{context: [ref]}` | primitives to switch off in a context; becomes kitctl `disable:` |
 | `topology` | `{tiers, lead, workers}` | see below |
 | `catalog` | `[entry]` | way-local catalog entries for primitives Gestalt does not ship facts about (`confidence: guess`) |
+| `waive` | `[{code, reason, in?}]` | way-level waivers for codes no single step owns (`GST-BUDGET`, `GST-LEAD`, `GST-HARNESS`, `GST-TIER`), optionally per context. The reason is required and printed in WAY.md. Budgets stay limits; a waiver is a visible, dated exception |
 | `taste` | exactly 3 `{id, prompt, context, path[], expect[], expect_quiet[]}` | the taste test. `path` is the stages the prompt should travel. Hooks and protocol steps on the path are expected; a description-routed step is expected only when listed in `expect` (otherwise it "may fire"). `expect_quiet` steps must not fire |
 
 ## Budgets (defaults)

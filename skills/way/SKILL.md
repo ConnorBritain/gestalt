@@ -75,4 +75,6 @@ them through it rather than doing it.
 ## 8. Hand over the taste test
 
 Point them at `~/.gestalt/build/TASTE-TEST.md`: three prompts, each in a fresh chat, then
-paste the results into `/gestalt:taste`.
+paste the results into `/gestalt:taste`. Tell them about `~/.gestalt/build/BOOTSTRAP.md`:
+the one file to keep somewhere private (their kitctl warehouse, say) and hand to any agent
+on any other machine or harness to set the same way up.

@@ -83,6 +83,16 @@ check("delegating critics saves nothing while their plugin also fires a hook in 
   assert.equal(leadLoad(way, sc).tokens, before);
 });
 
+check("a way-level waiver turns a context code into info, scoped and with its reason", "budgets as limits need a visible, reasoned exception, not a silently raised number", () => {
+  const { way, catalog, problems } = readWay(join(dir, "GST-BUDGET.way.yaml"));
+  way.waive = [{ code: "GST-BUDGET", reason: "two rules until the snippet merges upstream", in: ["everywhere"] }];
+  assert.ok(lintWay(way, catalog, { problems }).problems.some(p => p.code === "GST-BUDGET" && p.severity === "error"), "scoped to another context: still an error");
+  way.waive[0].in = ["code"];
+  const waived = lintWay(way, catalog, { problems }).problems.find(p => p.code === "GST-BUDGET");
+  assert.equal(waived.severity, "info");
+  assert.match(waived.waived, /merges upstream/);
+});
+
 group("cli");
 check("gestalt lint exits 1 on errors and prints the code", "skills branch on the exit status", () => {
   const r = run(["lint", "--way", join(dir, "GST-GATE.way.yaml")]);
