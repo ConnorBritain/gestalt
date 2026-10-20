@@ -89,16 +89,52 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
    longer list every turn, trim `examples/connor/way.yaml` until it lints under the default
    budgets, and delete its two way-level waivers. If it still cannot fit, put the remaining
    overrun to Connor; do not raise a budget on his behalf.
-9. **Trail (formerly Graft, trailhq) as a new-repo ritual.**
-   - Read Trail's own README first. Secondary sources say it keeps a marker-fenced section
-     in AGENTS.md, an MCP config, and a generated repo map that is gitignored; confirm that.
-   - Add `catalog/trail.yaml`. Trail owns any nested CLAUDE.md / AGENTS.md it writes; Gestalt
-     never writes nested files.
-   - Add an "on entering a repo" cadence to the way model (beside daily, weekly and monthly),
-     in this order: `kitctl use` the repo's loadouts → the Trail walk → `gestalt write --block
-     --context` (or kitctl's block). Lint should warn when two tools would write unmarked text
-     into the same instruction file.
-   - Add it to Connor's way, recompile, and add Trail's marker to the survey's marker detection.
+9. **Trail-code (formerly Graft, `trailhq/Graft`) as a new-repo ritual.** These facts come
+   from its README at commit `dfcbf4c` (read 2026-10-20). Confirm them with
+   `trail init --dry-run` before relying on them.
+   - **What it is.** `npm i -g @trailhq/trail-code && trail init`; the old `graft` commands
+     still work. `trail init` does four things:
+     - builds a local tree-sitter **code map** (`graft/`, gitignored, rebuilt per clone);
+     - creates **learnings** in `.trail/` (committed: decisions and preferences about the code)
+       and `~/.trail/` (personal);
+     - registers an MCP server with six tools (`trail_find_code`, `trail_trace_calls`, …);
+     - wires each agent you select.
+   - **What it writes.**
+     - A marker-fenced section in AGENTS.md (Codex and others).
+     - An owned `.claude/skills/trail/SKILL.md` and `.cursor/rules/trail.mdc`. It never
+       touches CLAUDE.md.
+     - The project `.mcp.json`.
+     - **Machine-wide:** `~/.claude/settings.json` (SessionStart, UserPromptSubmit,
+       PostToolUse and Stop hooks, plus a statusline), `~/.claude.json` (MCP),
+       `~/.codex/config.toml` and `~/.codex/hooks.json`.
+     - `--no-global`, `--no-hooks`, `--no-statusline` and `--agents <ids>` narrow this.
+   - **It does not write nested per-folder AGENTS.md.** Per-file knowledge lives in the map,
+     and per-code decisions in `.trail/learnings/`, both fetched on demand. That serves
+     Connor's "each folder atomically understood" better than nested always-on files, so
+     Gestalt should not add any.
+   - **Collisions for Gestalt to resolve** (lint and the survey will show them):
+     - another SessionStart injector, a UserPromptSubmit context injector, a PostToolUse edit
+       hook and a Stop hook (find out whether it blocks);
+     - a statusline that competes with compounder's;
+     - machine-wide writes that bypass kitctl. Run it with `--no-global` and let kitctl
+       carry the user-level hooks and MCP as primitives (upstream ask);
+     - learnings of kind "decision" overlap cairn's `choice`. They differ: Trail records why
+       the code is the way it is, for agents; cairn records a judgment with a confidence, for
+       calibration. Link them, don't merge them.
+   - **Telemetry** is anonymous and opt-out, and includes an install ping from npm
+     postinstall. Ask Connor whether to set `DO_NOT_TRACK=1` in his way's SETUP.
+   - **Its numbers are its own.** The README reports 46% fewer tool calls and 33/50 vs 27/50 on
+     SWE-bench Verified. Treat them as vendor claims; Gestalt's eval would test them on
+     Connor's repos.
+   - **Then:**
+     1. Add `catalog/trail.yaml`: orient (repo map, ambient), make (`trail_find_code`
+        through MCP), check (`trail check`, which flags a change that undoes a recorded
+        decision), record (save a learning).
+     2. Add an "on entering a repo" cadence to the way model (beside daily, weekly and
+        monthly), in this order: `kitctl use` the repo's loadouts → `trail init --no-global
+        --agents <the way's harnesses>` → the Gestalt context block.
+     3. Teach the survey Trail's AGENTS.md marker.
+     4. Add it to Connor's way and recompile; the session-start budget is the thing to watch.
 10. **Connor's BOOTSTRAP.md.** Copy `examples/connor/out/BOOTSTRAP.md` (or a fresh compile
     of his real `~/.gestalt/way.yaml`) into his private warehouse, `ConnorBritain/agent-kits`,
     next to the kitctl loadouts, if this session can reach that repo. It is personal; keep it
