@@ -1,0 +1,4 @@
+{"type":"user","message":{"role":"user","content":"<command-name>/elonify:review</command-name> please"}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"compounder:checkin"}},{"type":"tool_use","name":"Agent","input":{"subagent_type":"elonify-critic","prompt":"SECRET_PROMPT_TEXT"}},{"type":"tool_use","name":"mcp__linear__list_issues","input":{"query":"SECRET_QUERY"}}]}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"compounder:checkin"}}]}}
+not json

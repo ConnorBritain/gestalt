@@ -1,0 +1,20 @@
+model = "SECRET_MODEL_NAME"
+
+[mcp_servers.linear]
+command = "npx"
+args = ["-y", "linear-mcp"]
+env = { LINEAR_API_KEY = "lin_api_SECRET_CODEX" }
+
+[mcp_servers."docs.search"]
+url = "https://example.com/mcp?key=SECRET_URL_KEY"
+enabled = false
+
+[plugins."cairn@cairn"]
+enabled = true
+
+[hooks.state]
+trusted = ["SECRET_TRUST_ENTRY"]
+
+[[skills.config]]
+name = "big-skill"
+enabled = false

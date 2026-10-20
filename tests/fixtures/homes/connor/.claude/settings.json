@@ -1,0 +1,23 @@
+{
+  "enabledPlugins": {
+    "elonify@elonify": true,
+    "compounder@compounder": true,
+    "roadmap@roadmap": false,
+    "acme-guard@acme": true
+  },
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-ant-SECRET_SETTINGS_ENV"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/bin/hello.sh SECRET_HOOK_ARG"
+          }
+        ]
+      }
+    ]
+  }
+}

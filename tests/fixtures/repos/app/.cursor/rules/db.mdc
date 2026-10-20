@@ -1,0 +1,5 @@
+---
+description: Database conventions, when touching migrations
+alwaysApply: false
+---
+Use snake_case.

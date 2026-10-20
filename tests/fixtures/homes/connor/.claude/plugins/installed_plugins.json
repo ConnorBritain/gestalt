@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "plugins": {
+    "elonify@elonify": [
+      {
+        "scope": "user",
+        "installPath": "~/.claude/plugins/cache/elonify/elonify/0.1.0",
+        "version": "0.1.0",
+        "gitCommitSha": "8f17dcf"
+      }
+    ],
+    "compounder@compounder": [
+      {
+        "scope": "user",
+        "installPath": "~/.claude/plugins/cache/compounder/compounder/0.1.0",
+        "version": "0.1.0"
+      }
+    ],
+    "roadmap@roadmap": [
+      {
+        "scope": "user",
+        "installPath": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2",
+        "version": "0.7.2"
+      }
+    ],
+    "acme-guard@acme": [
+      {
+        "scope": "user",
+        "installPath": "~/.claude/plugins/cache/acme/acme-guard/1.2.0",
+        "version": "1.2.0"
+      }
+    ],
+    "ghost@acme": [
+      {
+        "scope": "user",
+        "installPath": "~/.claude/plugins/cache/acme/ghost/0.0.1",
+        "version": "0.0.1"
+      }
+    ]
+  }
+}
