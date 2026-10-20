@@ -26,6 +26,6 @@ steps:
     mode: explicit
     invoke: /gestalt:taste after any change to the way
 harness: { claude: enforced, codex: partial, cursor: partial, agents-md: advisory }
-cost: { skills: 3, agents: 0, commands: 0, listing_tokens: 200, session_start_lines: 0 }
+cost: { skills: 3, agents: 0, commands: 0, listing_tokens: 280, session_start_lines: 0, measured_from: gestalt@0.1.0 }
 worker: { tier: lead, mechanism: script }
 notes: Can be disabled after setup; nothing it compiles needs it loaded.
