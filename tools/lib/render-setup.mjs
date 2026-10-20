@@ -1,0 +1,109 @@
+// SETUP.md: everything Gestalt will not do itself, as one ordered checklist. Installs,
+// wiring snippets, knob changes (with the owning tool's command), the kitctl commands or the
+// manual writes, worker placement, and the harnesses kitctl cannot reach.
+import { activeEntries, activeSteps, scenarios } from "./way.mjs";
+import { label } from "./block.mjs";
+
+export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = null }) {
+  const L = [];
+  L.push(`# Setup for ${way.person.name}'s way`, "");
+  L.push("Gestalt writes only its own block and its own generated files. Everything else is here, in order. Tick as you go.", "");
+
+  // 1. Install
+  const all = new Map();
+  for (const sc of scenarios(way)) for (const e of activeEntries(way, sc)) all.set(e.id, e);
+  L.push("## 1. Install", "");
+  for (const e of [...all.values()].sort((a, b) => a.id.localeCompare(b.id))) {
+    const lines = way.harnesses.map(h => (e.install?.[h] ? `${h}: ${e.install[h]}` : null)).filter(Boolean);
+    const coverage = way.harnesses.filter(h => (e.harness?.[h] ?? "none") === "none");
+    L.push(`- [ ] **${e.title ?? e.id}** (${e.ref})${lines.length ? `: ${lines.join("; ")}` : ""}${coverage.length ? `. _Not available on ${coverage.join(", ")}._` : ""}`);
+  }
+  for (const c of way.connectors) L.push(`- [ ] **${c.id}** connector (${c.ref}, ${c.role})${c.auth ? `: set \`${c.auth}\` in your environment, never in a file` : ""}${c.optional ? " (optional)" : ""}`);
+  L.push("");
+
+  // 2. Wire
+  L.push("## 2. Wire the tools' own snippets", "");
+  L.push("Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gestalt's block orders them; it does not restate them.", "");
+  const markers = new Map();
+  for (const sc of scenarios(way)) for (const f of activeSteps(way, sc)) if (f.mode === "protocol" && f.step.wiring_marker) markers.set(f.step.wiring_marker, f);
+  const present = new Set((survey?.instructions ?? []).flatMap(i => i.markers));
+  if (!markers.size) L.push("- Nothing to wire: no protocol steps carry a snippet.");
+  for (const [marker, f] of markers) {
+    const found = present.has(marker.replace(/<!--\s*|\s*-->/g, "").trim()) || present.has(f.entry.id);
+    L.push(`- [${found ? "x" : " "}] ${f.entry.title}: its \`${marker}\` snippet${found ? " (found by the survey)" : ""}${f.in.length < Object.keys(way.contexts).length ? `, in ${f.in.join(", ")} repos` : ""}.`);
+  }
+  L.push("");
+
+  // 3. Knobs and opt-ins
+  L.push("## 3. Switch on the hooks this way relies on", "");
+  const opt = [];
+  for (const sc of scenarios(way)) {
+    const ids = new Set(activeSteps(way, sc).map(f => f.use));
+    for (const f of activeSteps(way, sc)) {
+      for (const h of (f.entry.hooks ?? []).filter(x => x.serves === f.use && x.opt_in)) {
+        const wanted = f.enforce === "hook" || f.mode === "ambient";
+        opt.push({ key: `${h.opt_in}|${f.use}`, text: `- [ ] ${wanted ? "Create" : "Leave off (the step is not hook-enforced in this way)"}: \`${h.opt_in}\` for ${label(f.use, catalog)} (${h.event}${h.blocking ? ", blocks" : ""}) in ${sc.name} repos.` });
+      }
+    }
+    void ids;
+  }
+  const seen = new Set();
+  for (const o of opt) if (!seen.has(o.key)) { seen.add(o.key); L.push(o.text); }
+  for (const e of all.values()) for (const k of e.knobs ?? []) {
+    if (!k.loosening) continue;
+    const step = way.flow.find(f => f.entry.id === e.id && way.stop_order.includes(f.use));
+    if (step) L.push(`- [ ] Leave \`${k.key}\` at ${JSON.stringify(k.default)} (${e.id}). The Stop order handles the overlap; if the taste test shows it does not, change it with ${k.change_with} (that tool treats it as loosening).`);
+  }
+  if (!opt.length) L.push("- No opt-in hooks.");
+  L.push("");
+
+  // 4. Apply
+  L.push("## 4. Apply", "");
+  if (way.writer === "kitctl") {
+    L.push("kitctl writes native config; Gestalt only emitted the loadouts.", "");
+    L.push("- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`) and add any primitive listed in `kit/gaps.md`.");
+    L.push("- [ ] `kitctl validate`");
+    for (const name of Object.keys(kit.files).filter(f => f.startsWith("kit.")).sort()) L.push(`- [ ] In each matching repo: copy \`kit/${name}\` to \`kit.yaml\`, then \`kitctl plan\` and \`kitctl apply\`.`);
+    L.push("- [ ] For repos with no other context: `kitctl use gestalt-flow`.");
+  } else {
+    L.push("No kitctl: Gestalt writes its marked block itself, dry-run first.", "");
+    L.push(`- [ ] \`gestalt write --block ~/.claude/CLAUDE.md\` (and \`~/.codex/AGENTS.md\` for Codex), then again with \`--yes\`.`);
+    for (const b of blocks.contexts) L.push(`- [ ] In ${b.context} repos (${b.when}): \`gestalt write --block AGENTS.md --context ${b.context}\`.`);
+    L.push("- [ ] Switch plugins on or off per repo by hand (`/plugin` in Claude Code), following the disable list in WAY.md.");
+  }
+  L.push("");
+
+  // 5. Workers
+  const workerFiles = Object.keys(agentFiles).sort();
+  L.push("## 5. Workers", "");
+  if (!way.topology.workers.length) L.push("- No workers.");
+  for (const w of way.topology.workers) {
+    if (w.mechanism === "subagent") L.push(`- [ ] \`${w.id}\`: \`gestalt write --agents ~/.claude/agents\` places \`agents/claude/${w.id}.md\` (a user agent, not a plugin agent, so its mcpServers apply).`);
+    if (w.mechanism === "headless") {
+      const plugins = [...new Set(w.uses.map(u => catalog.steps.get(u)?.entry).filter(e => e?.ref.startsWith("plugin:")).map(e => e.id))];
+      L.push(`- [ ] \`${w.id}\`: keep \`workers/${w.id}.sh\` at \`~/.gestalt/build/workers/\`${plugins.length ? ` and export ${plugins.map(id => `\`GESTALT_PLUGIN_${id.toUpperCase().replace(/[^A-Z0-9]/g, "_")}\``).join(", ")} (the plugin directory; disable the plugin in the lead's loadout so only the worker loads it)` : ""}.`);
+    }
+    if (w.mechanism === "agent-file") L.push(`- [ ] \`${w.id}\`: uses the plugin's own agent; nothing to place.`);
+    if (w.mechanism === "script") L.push(`- [ ] \`${w.id}\`: a script; no model.`);
+  }
+  if (workerFiles.some(f => f.startsWith("agents/codex/"))) L.push("- [ ] Codex: `agents/codex/*.toml` go in `~/.codex/agents/`. Their fields are unverified; check with your Codex version first.");
+  L.push("");
+
+  // 6. Other harnesses
+  const manual = way.harnesses.filter(h => h === "cursor" || h === "agents-md");
+  if (manual.length) {
+    L.push("## 6. Harnesses kitctl does not reach", "");
+    if (manual.includes("cursor")) L.push("- [ ] Cursor: paste the block into `.cursor/rules/gestalt.mdc` with `alwaysApply: true`. No Stop hooks there: every gate is a rule, not a block.");
+    if (manual.includes("agents-md")) L.push("- [ ] Other AGENTS.md agents: `gestalt write --block AGENTS.md`. Reviewers run as fresh processes, not in the writer's context.");
+    L.push("");
+  }
+
+  // 7. Survey findings
+  if (survey?.collisions?.length) {
+    L.push("## Found by the survey", "");
+    for (const c of survey.collisions) L.push(`- ${c.code}: ${c.message}`);
+    L.push("");
+  }
+  L.push("## Then", "", "- [ ] Run the three prompts in `TASTE-TEST.md`, each in a fresh chat, and paste the results into `/gestalt:taste`.", "");
+  return `${L.join("\n")}\n`;
+}
