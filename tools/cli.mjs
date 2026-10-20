@@ -11,7 +11,7 @@ const USAGE = `gestalt — decide what your harness runs, and in what order.
   gestalt survey   [--home DIR] [--repo DIR]... [--plugin DIR]... [--usage DAYS] [--json] [--out DIR]
   gestalt lint     [--way FILE] [--survey FILE] [--json]
   gestalt compile  [--way FILE] [--survey FILE] [--out DIR] [--check]
-  gestalt write    --block FILE [--context NAME] | --agents DIR [--harness claude|codex]  [--from DIR] [--yes]
+  gestalt write    --block FILE [--context NAME] | --agents DIR  [--from DIR] [--yes]
   gestalt eval     --plan [--way FILE]
   gestalt help
 

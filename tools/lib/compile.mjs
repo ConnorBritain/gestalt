@@ -1,7 +1,7 @@
 // compile: way.yaml → WAY.md, the managed blocks, kitctl loadouts, worker definitions,
 // SETUP.md and TASTE-TEST.md. Deterministic (same inputs, same bytes) and refuses to emit
 // while lint has errors, so nothing that contradicts the principles reaches a harness.
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { defaultWayPath, gestaltHome, readWay } from "./way.mjs";
 import { formatProblems, lintWay } from "./lint.mjs";
@@ -62,6 +62,9 @@ export function checkBuild(out, files) {
   }
   const ledgerPath = join(out, LEDGER);
   if (existsSync(ledgerPath)) for (const old of JSON.parse(readFileSync(ledgerPath, "utf8")).files ?? []) if (!(old in files)) drift.push(`stale ${old}`);
+  // A file the ledger does not list (hand-added, or left by an older compiler) is drift too.
+  const walk = (dir, rel = "") => existsSync(dir) ? readdirSync(dir).flatMap(n => (statSync(join(dir, n)).isDirectory() ? walk(join(dir, n), `${rel}${n}/`) : [`${rel}${n}`])) : [];
+  for (const f of walk(out)) if (f !== LEDGER && !(f in files) && !drift.includes(`stale ${f}`)) drift.push(`extra ${f}`);
   return drift;
 }
 

@@ -22,9 +22,9 @@ check("--plan prints the matrix and never calls claude", "planning must cost not
   assert.match(r.stdout, /not run/);
   assert.ok(!existsSync(marker), "claude was invoked");
 });
-check("--spend refuses with exit 2", "a run needs an authorised budget, not a flag", () => {
-  const r = run(["eval", "--spend", "--way", full], { env });
-  assert.equal(r.status, 2);
+check("there is no way to run it from the CLI", "a run needs an authorised budget, not a flag", () => {
+  assert.equal(run(["eval", "--spend", "--way", full], { env }).status, 2);
+  assert.equal(run(["eval", "--way", full], { env }).status, 2);
   assert.ok(!existsSync(marker));
 });
 check("the matrix is taste × conditions, with the topology condition only when there are workers", "the lead/worker claim is only tested where a way makes it", () => {

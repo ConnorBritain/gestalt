@@ -1,7 +1,7 @@
 // eval --plan: the experiment that tests whether a way helps, printed but never run.
 // The question it answers is the one behind Gestalt: does a lean, ordered harness (and a
 // lean lead with workers) do the person's real tasks better than everything loaded at once?
-// Running it spends model time, so v0.1 only plans it; --spend refuses.
+// Running it spends model time, so v0.1 only plans it.
 import { resolve } from "node:path";
 import { defaultWayPath, readWay } from "./way.mjs";
 import { expectedTrace } from "./render-taste.mjs";
@@ -66,11 +66,7 @@ export function renderEvalPlan(plan, way) {
 }
 
 export function runEval(argv, { parseArgs }) {
-  const a = parseArgs(argv, { plan: "flag", spend: "flag", way: "value", runs: "value", "per-run-usd": "value", json: "flag" });
-  if (a.spend) {
-    console.error("gestalt eval --spend: not in v0.1. Running the eval spends model time; it needs an authorised budget first (docs/eval.md).");
-    return 2;
-  }
+  const a = parseArgs(argv, { plan: "flag", way: "value", runs: "value", "per-run-usd": "value", json: "flag" });
   if (!a.plan) throw Object.assign(new Error("eval needs --plan (v0.1 plans the experiment; it never runs it)"), { name: "UsageError" });
   const { way, catalog, problems } = readWay(resolve(a.way ?? defaultWayPath()));
   if (!way || problems.some(p => p.severity === "error")) {

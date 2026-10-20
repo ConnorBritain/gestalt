@@ -130,7 +130,7 @@ Rituals never go in the always-on block; they live here and in your calendar.
 
 ## The block
 
-Base block ≈163 tokens (budget 450); context blocks: plugin ≈181, roadmap ≈181, app ≈176, site ≈175, writing ≈81.
+Base block ≈140 tokens (budget 450); context blocks: plugin ≈117, roadmap ≈118, app ≈112, site ≈111, writing ≈52.
 
 ```markdown
 <!-- gestalt:begin way -->
@@ -140,51 +140,38 @@ Order: orient → intend → plan → make → check → record. Checkers report
 - (Codex) At session start run `cairn debt`; it prints nothing when nothing is due.
 - Route drafting or revising prose in my voice, in any repo → `sh ~/.gestalt/build/workers/prose.sh "<task>"`.
 - Route the daily check-in, or anything that reads or updates Linear → the `linear` subagent.
-Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when you do.
 <!-- gestalt:end way -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.plugin -->
 ### In plugin (.claude-plugin/plugin.json present)   <!-- gestalt -->
-- Before building from a plan: elonify plan-review.
-- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
-- When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
+- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
 - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
-- Route reviewing a plan, a finished diff or a draft → the elonify / verification-gate critics, each as its own agent in fresh context.
 <!-- gestalt:end way.plugin -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.roadmap -->
 ### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->
-- Before building from a plan: elonify plan-review.
-- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
-- When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
+- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
 - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
-- Route reviewing a plan, a finished diff or a draft → the elonify / verification-gate critics, each as its own agent in fresh context.
 <!-- gestalt:end way.roadmap -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.app -->
 ### In app (.ui-magic.json present)   <!-- gestalt -->
-- Before building from a plan: elonify plan-review.
-- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
-- When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
+- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
 - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
-- Route reviewing a plan, a finished diff or a draft → the elonify / verification-gate critics, each as its own agent in fresh context.
 <!-- gestalt:end way.app -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.site -->
 ### In site (BRAND.md present)   <!-- gestalt -->
-- Before building from a plan: elonify plan-review.
-- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
-- When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
+- Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
 - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
-- Route reviewing a plan, a finished diff or a draft → the elonify / verification-gate critics, each as its own agent in fresh context.
 <!-- gestalt:end way.site -->
 ```
 
@@ -192,7 +179,6 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 <!-- gestalt:begin way.writing -->
 ### In writing (WRITING.md present)   <!-- gestalt -->
 - Before calling non-trivial work done: prose-tell-scan scan → prose-review review.
-- Route reviewing a plan, a finished diff or a draft → the prose-review critic, as its own agent in fresh context.
 <!-- gestalt:end way.writing -->
 ```
 

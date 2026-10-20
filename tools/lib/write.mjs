@@ -76,10 +76,10 @@ export function writeBlock(target, buildDir, { context = null, yes = false } = {
   return { changed: true, written: yes, file, name, message: `${yes ? "wrote" : "would " + verb}: block ${name} in ${file}`, preview: block };
 }
 
-export function writeAgents(targetDir, buildDir, { harness = "claude", yes = false } = {}) {
-  const src = join(buildDir, "agents", harness);
-  const ext = harness === "codex" ? ".toml" : ".md";
-  if (!existsSync(src)) return [{ changed: false, message: `no ${harness} agents in this build` }];
+export function writeAgents(targetDir, buildDir, { yes = false } = {}) {
+  const src = join(buildDir, "agents", "claude");
+  const ext = ".md";
+  if (!existsSync(src)) return [{ changed: false, message: "no subagent workers in this build" }];
   const out = [];
   const dir = resolve(targetDir);
   for (const f of readdirSync(src).filter(x => x.endsWith(ext)).sort()) {
@@ -97,7 +97,7 @@ export function writeAgents(targetDir, buildDir, { harness = "claude", yes = fal
 }
 
 export function runWrite(argv, { parseArgs }) {
-  const a = parseArgs(argv, { block: "value", agents: "value", context: "value", from: "value", harness: "value", yes: "flag" });
+  const a = parseArgs(argv, { block: "value", agents: "value", context: "value", from: "value", yes: "flag" });
   if (!a.block === !a.agents) throw Object.assign(new Error("give exactly one of --block FILE or --agents DIR"), { name: "UsageError" });
   const buildDir = resolve(a.from ?? join(gestaltHome(), "build"));
   try {
@@ -106,7 +106,7 @@ export function runWrite(argv, { parseArgs }) {
       console.log(r.message);
       if (r.changed && !a.yes) console.log(`\n${r.preview}\nDry run. Add --yes to write.`);
     } else {
-      const results = writeAgents(a.agents, buildDir, { harness: a.harness ?? "claude", yes: a.yes });
+      const results = writeAgents(a.agents, buildDir, { yes: a.yes });
       for (const r of results) console.log(r.message);
       if (results.some(r => r.changed) && !a.yes) console.log("\nDry run. Add --yes to write.");
     }

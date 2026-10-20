@@ -67,7 +67,7 @@ Rituals never go in the always-on block; they live here and in your calendar.
 
 ## The block
 
-Base block ≈114 tokens (budget 450); context blocks: app ≈115.
+Base block ≈92 tokens (budget 450); context blocks: app ≈74.
 
 ```markdown
 <!-- gestalt:begin way -->
@@ -75,16 +75,13 @@ Base block ≈114 tokens (budget 450); context blocks: app ≈115.
 
 Order: orient → intend → plan → make → check → record. Checkers report; they never fix. Give every worker and critic the user's original request verbatim and the decisions made since.
 - Route the morning check-in, or any question about the beta's issues → the `linear` subagent.
-Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when you do.
 <!-- gestalt:end way -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.app -->
 ### In app (package.json present)   <!-- gestalt -->
-- Before calling non-trivial work done: verification-gate gates (hook) → verification-gate critics.
-- When several Stop hooks fire together, answer them in this order: verification-gate gates, then compounder stop-lines.
-- Route reviewing a finished diff before calling it done → the verification-gate critic, as its own agent in fresh context.
+- Before calling non-trivial work done: verification-gate gates (hook) → verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines.
 <!-- gestalt:end way.app -->
 ```
 

@@ -5,7 +5,7 @@ its gates and gives heavy work to focused workers should do a person's real task
 least as well as one with everything on, and more cheaply. The research in
 [DESIGN.md](../DESIGN.md#research) makes that plausible, but none of it measured this
 person's harness. This eval is how a person checks their own way. v0.1 designs it and
-prints it (`gestalt eval --plan`); running it spends model time, so `--spend` refuses
+prints it (`gestalt eval --plan`); running it spends model time, so the CLI has no way to start it
 until the run is authorised.
 
 ## Conditions

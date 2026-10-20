@@ -1,8 +1,16 @@
 # Setup for Sam (bid analyst)'s way
 
-Gestalt writes only its own block and its own generated files. Everything else is here, in order. Tick as you go.
+Gestalt writes only its own block and its own generated files. Everything else is here. Pilot one repo first; roll out the rest once its taste prompt passes.
 
-## 1. Install
+## Start here: pilot one repo with `MODEL.md`
+
+- [ ] Install org-finance (synced) (commands in §1).
+- [ ] Place the block: `gestalt write --block AGENTS.md --yes` and `gestalt write --block AGENTS.md --context pricing --yes` in that repo.
+- [ ] Run taste prompt 1 (cost-table) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.
+
+When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.
+
+## 1. Install everything
 
 - [ ] **org-brand (synced)** (plugin:org-brand)
 - [ ] **org-finance (synced)** (plugin:org-finance)

@@ -9,4 +9,3 @@ disable: [plugin:org-brand, plugin:org-rfp]
 instructions: |
   ### In pricing (MODEL.md present)   <!-- gestalt -->
   - Before calling non-trivial work done: org-finance check.
-  - Route checking a draft's citations or a model's assumptions → the org-finance critic, as its own agent in fresh context.

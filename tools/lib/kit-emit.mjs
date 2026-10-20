@@ -32,6 +32,7 @@ function loadoutFor(name, description, entries, way, disable, instructions) {
 export function emitKit(way, blocks) {
   const files = {};
   const gaps = [];
+  const docs = [];
   const [base, ...rest] = scenarios(way);
   const harnesses = way.harnesses.filter(h => KIT_HARNESSES.includes(h));
   // The lead's loadout enables only what the lead loads. What a headless worker owns, and a
@@ -44,6 +45,7 @@ export function emitKit(way, blocks) {
   const baseDisable = [...new Set([...base.active.flatMap(c => way.disable[c] ?? []), ...workerOwned(base), ...isolated])];
   const flow = loadoutFor("gestalt-flow", `${way.person.name}'s way: what every repo gets.`, baseEntries, way, baseDisable, blocks.base.body);
   files["loadouts/gestalt-flow.yaml"] = emitYaml(flow, { header: HEADER });
+  docs.push(flow);
   const baseIds = new Set(baseEntries.map(e => e.id));
   for (const sc of rest) {
     const ctx = sc.active[sc.active.length - 1];
@@ -55,15 +57,18 @@ export function emitKit(way, blocks) {
     if (added.length || disable.length || block) {
       const doc = loadoutFor(`gestalt-${ctx}`, `${way.person.name}'s way in ${ctx} repos (${way.contexts[ctx].when}).`, added, way, disable, block?.body);
       files[`loadouts/gestalt-${ctx}.yaml`] = emitYaml(doc, { header: HEADER });
+      docs.push(doc);
       loadouts.push(`gestalt-${ctx}`);
     }
     for (const name of own) { loadouts.push(name); gaps.push(`${ctx}: loadout "${name}" is referenced, not generated; it must exist in the warehouse.`); }
     files[`kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}.`, "Copy into the repo as kit.yaml, then: kitctl plan && kitctl apply."] });
   }
-  const refs = new Set();
-  for (const f of Object.values(files)) for (const m of f.matchAll(/\b(?:plugin|skill|mcp|tool|hook|marketplace):[a-z0-9][\w./-]*/g)) refs.add(m[0]);
-  for (const r of [...refs].sort()) gaps.push(`${r}: needs a primitive in the warehouse (primitives/<kind>/<name>.yaml) before kitctl validate passes.`);
+  // Missing warehouse primitives are kitctl validate's to report ("missing primitive"); not
+  // repeated here. A slot is different: kitctl rejects it unless the primitive declares it.
+  for (const doc of docs) for (const [slot, ref] of Object.entries(doc.slots ?? {})) {
+    gaps.push(`${ref}: its warehouse primitive must list \`${slot}\` under provides (${doc.name} assigns it that slot).`);
+  }
   if (way.harnesses.includes("cursor")) gaps.push("cursor: kitctl does not target Cursor; SETUP.md lists the manual steps.");
-  files["gaps.md"] = `# kitctl gaps\n\nWhat kitctl needs before these loadouts apply cleanly.\n\n${gaps.map(g => `- ${g}`).join("\n")}\n`;
+  files["gaps.md"] = `# kitctl gaps\n\nWhat kitctl needs from you before these loadouts apply. \`kitctl validate\` names any primitive missing from your warehouse.\n\n${gaps.length ? gaps.map(g => `- ${g}`).join("\n") : "- Nothing beyond what kitctl validate reports."}\n`;
   return { files, gaps };
 }

@@ -1,7 +1,7 @@
 // Worker definitions. A subagent becomes a non-plugin agent file (plugin agents ignore
-// mcpServers), a headless worker becomes a launch script plus its MCP config, and every
-// worker carries the hand-off contract. Codex custom agents are emitted labelled
-// unverified: their fields come from documentation snippets, not a tested CLI.
+// mcpServers), a headless worker becomes a launch script plus its MCP config (with a
+// `codex exec` line for Codex), and every worker carries the hand-off contract. Codex
+// custom-agent files are not emitted until their fields are verified against a real CLI.
 import { command } from "./block.mjs";
 import { emitYaml } from "./yaml-emit.mjs";
 
@@ -70,18 +70,6 @@ export function emitAgents(way, catalog) {
       if (way.harnesses.includes("codex")) lines.push(`# Codex alternative (unverified flags): codex exec${codexModel ? ` -m ${codexModel}` : ""} "$PROMPT"`);
       files[`workers/${w.id}.sh`] = `${lines.join("\n")}\n`;
       files[`workers/${w.id}.prompt.md`] = `<!-- ${GENERATED}; edit the way, not this file. -->\n${body}\n\n## Task\n`;
-    }
-    if ((w.mechanism === "subagent" || w.mechanism === "headless") && way.harnesses.includes("codex")) {
-      const codexModel = way.topology.tiers.codex?.[w.tier];
-      const toml = [
-        `# ${GENERATED}. Codex custom agent for worker "${w.id}".`,
-        "# UNVERIFIED: field names come from Codex documentation, not a tested CLI. Check with the installed Codex before relying on them.",
-        `name = ${JSON.stringify(w.id)}`,
-        `description = ${JSON.stringify(`Use for ${w.route}.`)}`,
-        ...(codexModel ? [`model = ${JSON.stringify(codexModel)}`] : []),
-        `developer_instructions = """\n${body.replace(/"""/g, '\\"\\"\\"')}\n"""`,
-      ];
-      files[`agents/codex/${w.id}.toml`] = `${toml.join("\n")}\n`;
     }
   }
   return files;

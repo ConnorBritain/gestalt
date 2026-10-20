@@ -74,14 +74,13 @@ Rituals never go in the always-on block; they live here and in your calendar.
 
 ## The block
 
-Base block ≈90 tokens (budget 450); context blocks: rfp ≈96, pricing ≈76.
+Base block ≈68 tokens (budget 450); context blocks: rfp ≈66, pricing ≈45.
 
 ```markdown
 <!-- gestalt:begin way -->
 ## Way of work   <!-- gestalt -->
 
 Order: orient → intend → plan → make → check → record. Checkers report; they never fix. Give every worker and critic the user's original request verbatim and the decisions made since.
-Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when you do.
 <!-- gestalt:end way -->
 ```
 
@@ -90,7 +89,6 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 ### In rfp (RFP.md present)   <!-- gestalt -->
 - Before calling non-trivial work done: org-rfp score.
 - Route searching past proposals in Confluence and drafting cited answers → the `library` subagent.
-- Route checking a draft's citations or a model's assumptions → the org-rfp critic, as its own agent in fresh context.
 <!-- gestalt:end way.rfp -->
 ```
 
@@ -98,7 +96,6 @@ Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when
 <!-- gestalt:begin way.pricing -->
 ### In pricing (MODEL.md present)   <!-- gestalt -->
 - Before calling non-trivial work done: org-finance check.
-- Route checking a draft's citations or a model's assumptions → the org-finance critic, as its own agent in fresh context.
 <!-- gestalt:end way.pricing -->
 ```
 

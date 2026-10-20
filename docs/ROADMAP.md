@@ -32,5 +32,6 @@ checklist and the version pin.
 - Cloud bootstrap: a Claude Code cloud setup script and SessionStart install hook, and a
   Codex Cloud setup script, as documentation or a kitctl target.
 - Validate emitted loadouts against the real kitctl warehouse.
-- Verify the Codex custom-agent fields against the installed CLI.
+- Verify the Codex custom-agent fields against the installed CLI, then emit Codex worker
+  agents (held back in 0.1.0).
 - Run the eval ([docs/eval.md](eval.md)) once its spend is authorised.

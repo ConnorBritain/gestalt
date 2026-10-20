@@ -1,8 +1,17 @@
 # Setup for Ade (newsletter writer)'s way
 
-Gestalt writes only its own block and its own generated files. Everything else is here, in order. Tick as you go.
+Gestalt writes only its own block and its own generated files. Everything else is here. Pilot one repo first; roll out the rest once its taste prompt passes.
 
-## 1. Install
+## Start here: pilot any repo
+
+- [ ] Install cairn, prose-author (vonnegut), prose-review (vonnegut) (commands in §1).
+- [ ] Wire prose-review (vonnegut)'s `<!-- vonnegut: prose-review -->` snippet into that repo's instruction file (§2).
+- [ ] Place the block: `gestalt write --block AGENTS.md --yes` in that repo.
+- [ ] Run taste prompt 1 (draft) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.
+
+When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.
+
+## 1. Install everything
 
 - [ ] **cairn** (plugin:cairn): claude: /plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn
 - [ ] **humanizer (blader)** (skill:blader/humanizer): claude: Install the humanizer skill from github.com/blader/humanizer into ~/.claude/skills (MIT)

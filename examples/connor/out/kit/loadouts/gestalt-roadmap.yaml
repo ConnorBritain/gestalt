@@ -7,8 +7,5 @@ extends: []
 plugins: [plugin:elonify, plugin:roadmap, plugin:verification-gate]
 instructions: |
   ### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->
-  - Before building from a plan: elonify plan-review.
-  - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics.
-  - When several Stop hooks fire together, answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check.
+  - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
   - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
-  - Route reviewing a plan, a finished diff or a draft → the elonify / verification-gate critics, each as its own agent in fresh context.

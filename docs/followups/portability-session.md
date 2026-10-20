@@ -42,8 +42,9 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
      agents and skills discovery; rule files (`.cursor/rules/*.mdc`, `alwaysApply`); MCP config.
    - **Codex:** plugin hooks (brand-builder notes they run only after the user trusts them,
      with `CLAUDE_PLUGIN_ROOT` set); custom agents (`~/.codex/agents/*.toml`: confirm the
-     field names Gestalt emits as "unverified"); skills directories; whether SessionStart,
-     UserPromptSubmit, PreToolUse and Stop exist.
+     field names, so Gestalt can start emitting Codex worker agents again; it stopped because
+     they were unverified); skills directories; whether SessionStart, UserPromptSubmit,
+     PreToolUse and Stop exist.
    - Use the installed CLIs where possible (`codex --version`, `codex debug prompt-input`).
      Never write a trust store.
 2. **compounder** (largest gap).
@@ -78,8 +79,10 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
    - While there (from upstream.md): `validate` must report, not crash (`KeyError: 'command'`),
      on an external MCP primitive with no launch spec.
 7. **Gestalt**: update `catalog/*.yaml` (`harness:`, `install:`, `version_seen`, re-measured
-   `cost`), recompile `examples/` (`GESTALT_UPDATE_GOLDENS=1 node tests/examples.mjs`, then
-   review the diff), and tick the matching lines in `docs/upstream.md`.
+   `cost`), recompile `examples/` (`GESTALT_UPDATE_EXAMPLES=1 node tests/examples.mjs`, then
+   review the diff), and tick the matching lines in `docs/upstream.md`. If step 1 verified the
+   Codex agent fields, restore Codex worker agents in `tools/lib/agents-emit.mjs` (removed in
+   0.1.0 because they were unverified).
 
 ## Rules for every repo
 

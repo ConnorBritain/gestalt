@@ -3,9 +3,9 @@
 // that kitctl itself accepts.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { check, finish, group, run, tempDir, FIXTURES, ROOT } from "./harness.mjs";
+import { check, finish, group, run, skip, tempDir, FIXTURES, ROOT } from "./harness.mjs";
 import { readWay } from "../tools/lib/way.mjs";
 import { compileWay } from "../tools/lib/compile.mjs";
 import { expectedTrace } from "../tools/lib/render-taste.mjs";
@@ -48,10 +48,13 @@ check("base and context blocks are marked, and a context adds only its own lines
 });
 check("the Stop order, hand-off, fallback and routes are in the block", "these are the lines that sequence the tools; without them the block is decoration", () => {
   const { files } = compile(fullPath);
-  assert.match(files["block.code.md"], /answer them in this order: verification-gate gates, then elonify diff-review, then compounder stop-lines, then platform git-check/);
+  assert.match(files["block.code.md"], /verification-gate gates \(hook\) → elonify diff-review \(hook\) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check\./);
+  assert.ok(!/plan-review/.test(files["block.code.md"]), "a single step its own snippet already triggers is not restated");
+  assert.ok(!/Trivial turns/.test(files["block.md"]), "the skip clause is each tool's own");
   assert.match(files["block.code.md"], /On elonify diff-review REFRAME: .*offer \/cairn to log it as a choice/);
   assert.match(files["block.md"], /\(Codex\) At session start run `cairn debt`/);
   assert.match(files["block.writing.md"], /Route drafting prose in my voice → `sh ~\/\.gestalt\/build\/workers\/prose\.sh/);
+  assert.ok(!/critics/.test(files["block.writing.md"].split("\n").filter(l => l.startsWith("- Route")).join("")), "plugin agents are routed by their own snippets");
 });
 check("the block never restates a tool's own snippet", "two copies of elonify's gate drift apart (vonnegut wiring rule)", () => {
   const { files } = compile(fullPath);
@@ -94,32 +97,44 @@ const kitctl = (() => {
   if (existsSync(join(sibling, "pyproject.toml")) && spawnSync("uv", ["--version"]).status === 0) return ["uv", "run", "--quiet", "--project", sibling, "kitctl"];
   return null;
 })();
-if (!kitctl) console.log("  skip kitctl validate: kitctl not on PATH and no sibling checkout with uv");
-else check("kitctl validate accepts the emitted loadouts", "the loadouts are only useful if the real compiler accepts them", () => {
-  const { files } = compile(fullPath);
+// Shape check only: every ref is stubbed from itself (no real warehouse here), and MCP
+// stubs are http so they avoid kitctl's crash on external MCP (docs/upstream.md).
+function kitctlValidate(loadoutTexts) {
   const wh = tempDir();
   mkdirSync(join(wh, "loadouts"), { recursive: true });
   const refs = new Set();
-  for (const [path, text] of Object.entries(files)) {
-    if (!path.startsWith("kit/loadouts/")) continue;
-    writeFileSync(join(wh, "loadouts", path.split("/").pop()), text);
+  const provides = {};
+  for (const [name, text] of Object.entries(loadoutTexts)) {
+    writeFileSync(join(wh, "loadouts", name), text);
     const doc = parseYaml(text);
+    for (const [slot, ref] of Object.entries(doc.slots ?? {})) (provides[ref] ??= []).push(slot);
     for (const r of [...(doc.plugins ?? []), ...(doc.skills ?? []), ...(doc.disable ?? []), ...Object.values(doc.mcp ?? {}).map(m => m.primitive)]) refs.add(r);
   }
-  // brand-studio is referenced by kit.code.yaml only, so it is not needed here.
   for (const ref of refs) {
     const [kind, name] = ref.split(":");
     const dir = join(wh, "primitives", { plugin: "plugins", skill: "skills", mcp: "mcp" }[kind], ...name.split("/").slice(0, -1));
     mkdirSync(dir, { recursive: true });
     const stub = kind === "mcp"
       ? `schema_version: 2\nkind: mcp\nname: ${name}\ndescription: stub\ntransport: http\nurl: https://example.com/mcp\n`
-      : `schema_version: 2\nkind: ${kind}\nname: ${name}\ndescription: stub\nexternal: true\nharnesses: { claude: {}, codex: {} }\n`;
+      : `schema_version: 2\nkind: ${kind}\nname: ${name}\ndescription: stub\nexternal: true\nharnesses: { claude: {}, codex: {} }\n${provides[ref] ? `provides: [${provides[ref].join(", ")}]\n` : ""}`;
     writeFileSync(join(dir, `${name.split("/").pop()}.yaml`), stub);
   }
   const r = spawnSync(kitctl[0], [...kitctl.slice(1), "validate", wh, "--json"], { encoding: "utf8" });
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.deepEqual(JSON.parse(r.stdout).problems, []);
-});
+}
+const loadoutsOf = files => Object.fromEntries(Object.entries(files).filter(([p]) => p.startsWith("kit/loadouts/")).map(([p, t]) => [p.split("/").pop(), t]));
+const exampleKits = [];
+for (const base of [join(ROOT, "examples", "connor"), ...(existsSync(join(ROOT, "examples", "personas")) ? readdirSync(join(ROOT, "examples", "personas")).map(d => join(ROOT, "examples", "personas", d)) : [])]) {
+  const dir = join(base, "out", "kit", "loadouts");
+  if (existsSync(dir)) exampleKits.push([base.slice(ROOT.length + 1), Object.fromEntries(readdirSync(dir).map(f => [f, readFileSync(join(dir, f), "utf8")]))]);
+}
+if (!kitctl) {
+  skip("kitctl validate accepts the emitted loadouts", "kitctl not on PATH and no sibling checkout with uv");
+} else {
+  check("kitctl validate accepts the emitted loadouts (schema; refs stubbed)", "the loadouts are only useful if the real compiler accepts their shape", () => kitctlValidate(loadoutsOf(compile(fullPath).files)));
+  for (const [name, kit] of exampleKits) check(`kitctl validate accepts ${name}'s committed loadouts (schema; refs stubbed)`, "the examples are what people copy", () => kitctlValidate(kit));
+}
 
 group("workers");
 check("a subagent is a user agent file with model and inline MCP", "plugin agents ignore mcpServers, so isolation needs a user agent file", () => {
@@ -137,10 +152,10 @@ check("a headless worker script parses and isolates its plugin", "the lead must 
   assert.match(files["workers/prose.sh"], /claude -p --model sonnet --strict-mcp-config --plugin-dir "\$\{GESTALT_PLUGIN_PROSE_AUTHOR/);
   assert.match(files["workers/prose.prompt.md"], /original request, verbatim/);
 });
-check("Codex agents are emitted and labelled unverified", "an unverified field must never be presented as tested", () => {
+check("no Codex agent files until their fields are verified", "config that may not load must not look finished", () => {
   const { files } = compile(fullPath);
-  assert.match(files["agents/codex/tracker.toml"], /^# UNVERIFIED/m);
-  assert.match(files["agents/codex/tracker.toml"], /model = "gpt-worker"/);
+  assert.ok(!Object.keys(files).some(f => f.startsWith("agents/codex/")));
+  assert.match(files["workers/prose.sh"], /# Codex alternative \(unverified flags\): codex exec -m gpt-worker/);
 });
 
 group("taste");
@@ -167,6 +182,8 @@ check("compile writes, --check passes, a hand edit is caught, a stale file is re
   const r = run(["compile", "--way", fullPath, "--out", out, "--check"]);
   assert.equal(r.status, 1);
   assert.match(r.stdout, /changed WAY\.md/);
+  writeFileSync(join(out, "notes.md"), "mine\n");
+  assert.match(run(["compile", "--way", fullPath, "--out", out, "--check"]).stdout, /extra notes\.md/);
   assert.equal(run(["compile", "--way", minimalPath, "--out", out]).status, 0);
   assert.ok(!existsSync(join(out, "workers", "prose.sh")), "files from the previous way are removed");
   assert.ok(existsSync(join(out, "block.code.md")));

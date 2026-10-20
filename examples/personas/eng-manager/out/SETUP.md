@@ -1,8 +1,18 @@
 # Setup for Morgan (engineering manager)'s way
 
-Gestalt writes only its own block and its own generated files. Everything else is here, in order. Tick as you go.
+Gestalt writes only its own block and its own generated files. Everything else is here. Pilot one repo first; roll out the rest once its taste prompt passes.
 
-## 1. Install
+## Start here: pilot one repo with `Makefile`
+
+- [ ] Install cairn, verification-gate (agent-primitives), elonify, kitctl (commands in §1).
+- [ ] Wire elonify's `<!-- elonify -->` and verification-gate (agent-primitives)'s `## Self-verification gate` snippets into that repo's instruction file (§2).
+- [ ] Create `.claude/gates.json` there.
+- [ ] Place the block: `kitctl use gestalt-flow` and `kitctl use gestalt-service` in that repo.
+- [ ] Run taste prompt 2 (fix) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.
+
+When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.
+
+## 1. Install everything
 
 - [ ] **cairn** (plugin:cairn): claude: /plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn; codex: node install-cairn-codex.mjs (verify with --check)
 - [ ] **elonify** (plugin:elonify): claude: /plugin marketplace add ConnorBritain/elonify && /plugin install elonify@elonify; codex: Paste wiring/agents-md.md into AGENTS.md; run the critic as a fresh `codex exec`
@@ -30,8 +40,8 @@ Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gest
 
 kitctl writes native config; Gestalt only emitted the loadouts.
 
-- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`) and add any primitive listed in `kit/gaps.md`.
-- [ ] `kitctl validate`
+- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.
+- [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).
 - [ ] In each matching repo: copy `kit/kit.rfc.yaml` to `kit.yaml`, then `kitctl plan` and `kitctl apply`.
 - [ ] In each matching repo: copy `kit/kit.service.yaml` to `kit.yaml`, then `kitctl plan` and `kitctl apply`.
 - [ ] For repos with no other context: `kitctl use gestalt-flow`.
@@ -40,7 +50,7 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 
 - [ ] `critics`: uses the plugin's own agent; nothing to place.
 - [ ] `reporter`: `gestalt write --agents ~/.claude/agents` places `agents/claude/reporter.md` (a user agent, not a plugin agent, so its mcpServers apply).
-- [ ] Codex: `agents/codex/*.toml` go in `~/.codex/agents/`. Their fields are unverified; check with your Codex version first.
+- [ ] Codex: headless workers carry a `codex exec` line in their script. Codex custom-agent files are not generated until their fields are verified.
 
 ## Then
 

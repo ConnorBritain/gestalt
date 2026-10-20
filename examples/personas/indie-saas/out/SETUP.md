@@ -1,8 +1,18 @@
 # Setup for Jordan (solo SaaS developer)'s way
 
-Gestalt writes only its own block and its own generated files. Everything else is here, in order. Tick as you go.
+Gestalt writes only its own block and its own generated files. Everything else is here. Pilot one repo first; roll out the rest once its taste prompt passes.
 
-## 1. Install
+## Start here: pilot one repo with `package.json`
+
+- [ ] Install compounder, verification-gate (agent-primitives) (commands in §1).
+- [ ] Wire verification-gate (agent-primitives)'s `## Self-verification gate` snippet into that repo's instruction file (§2).
+- [ ] Create `.claude/gates.json` there.
+- [ ] Place the block: `gestalt write --block AGENTS.md --yes` and `gestalt write --block AGENTS.md --context app --yes` in that repo.
+- [ ] Run taste prompt 1 (weakened-test) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.
+
+When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.
+
+## 1. Install everything
 
 - [ ] **compounder** (plugin:compounder): claude: /plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview. _Not available on cursor._
 - [ ] **verification-gate (agent-primitives)** (plugin:verification-gate): claude: Install the verification-gate bundle from agent-primitives; paste wiring/claude-md.md; add .claude/gates.json per repo

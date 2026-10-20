@@ -3,16 +3,42 @@
 // manual writes, worker placement, and the harnesses kitctl cannot reach.
 import { activeEntries, activeSteps, scenarios } from "./way.mjs";
 import { label } from "./block.mjs";
+import { expectedTrace } from "./render-taste.mjs";
 
 export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = null }) {
   const L = [];
   L.push(`# Setup for ${way.person.name}'s way`, "");
-  L.push("Gestalt writes only its own block and its own generated files. Everything else is here, in order. Tick as you go.", "");
+  L.push("Gestalt writes only its own block and its own generated files. Everything else is here. Pilot one repo first; roll out the rest once its taste prompt passes.", "");
+
+  // 0. Pilot: the taste prompt that exercises the most steps, in its own context, end to end.
+  const traces = way.taste.map((t, i) => ({ t, i, tr: expectedTrace(way, catalog, t) }));
+  const pilot = traces.reduce((best, x) => (x.tr.fires.length > best.tr.fires.length ? x : best), traces[0]);
+  if (pilot) {
+    const sc = scenarios(way).find(x => x.name === pilot.tr.scenario);
+    const ctx = pilot.t.context;
+    // Only what the pilot prompt exercises, plus kitctl when kitctl places the block.
+    const used = new Set(pilot.tr.fires.map(f => catalog.steps.get(f.id).entry.id));
+    if (way.writer === "kitctl") used.add("kitctl");
+    const entries = [...used].map(id => catalog.entries.get(id)).filter(Boolean);
+    const snippets = [...new Set(activeSteps(way, sc).filter(f => f.mode === "protocol" && f.step.wiring_marker).map(f => `${f.entry.title}'s \`${f.step.wiring_marker}\``))];
+    const opts = [...new Set(activeSteps(way, sc).flatMap(f => (f.entry.hooks ?? []).filter(h => h.serves === f.use && h.opt_in && (f.enforce === "hook" || f.mode === "ambient")).map(h => `\`${h.opt_in}\``)))];
+    const marker = way.contexts[ctx].when === "always" ? "any repo" : `one repo with \`${way.contexts[ctx].when.replace(/^file-exists:/, "")}\``;
+    L.push(`## Start here: pilot ${marker}`, "");
+    L.push(`- [ ] Install ${entries.map(e => e.title ?? e.id).join(", ")} (commands in §1).`);
+    if (snippets.length) L.push(`- [ ] Wire ${snippets.join(" and ")} snippet${snippets.length > 1 ? "s" : ""} into that repo's instruction file (§2).`);
+    if (opts.length) L.push(`- [ ] Create ${opts.join(" and ")} there.`);
+    const blockCmd = way.writer === "kitctl"
+      ? `\`kitctl use gestalt-flow\`${kit.files[`loadouts/gestalt-${ctx}.yaml`] ? ` and \`kitctl use gestalt-${ctx}\`` : ""} in that repo`
+      : `\`gestalt write --block AGENTS.md --yes\`${blocks.contexts.some(b => b.context === ctx) ? ` and \`gestalt write --block AGENTS.md --context ${ctx} --yes\`` : ""} in that repo`;
+    L.push(`- [ ] Place the block: ${blockCmd}.`);
+    L.push(`- [ ] Run taste prompt ${pilot.i + 1} (${pilot.t.id}) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.`, "");
+    L.push("When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.", "");
+  }
 
   // 1. Install
   const all = new Map();
   for (const sc of scenarios(way)) for (const e of activeEntries(way, sc)) all.set(e.id, e);
-  L.push("## 1. Install", "");
+  L.push("## 1. Install everything", "");
   for (const e of [...all.values()].sort((a, b) => a.id.localeCompare(b.id))) {
     const lines = way.harnesses.map(h => (e.install?.[h] ? `${h}: ${e.install[h].replace(/\.$/, "")}` : null)).filter(Boolean);
     const coverage = way.harnesses.filter(h => (e.harness?.[h] ?? "none") === "none");
@@ -63,8 +89,8 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
   L.push("## 4. Apply", "");
   if (way.writer === "kitctl") {
     L.push("kitctl writes native config; Gestalt only emitted the loadouts.", "");
-    L.push("- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`) and add any primitive listed in `kit/gaps.md`.");
-    L.push("- [ ] `kitctl validate`");
+    L.push("- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.");
+    L.push("- [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).");
     for (const name of Object.keys(kit.files).filter(f => f.startsWith("kit.")).sort()) L.push(`- [ ] In each matching repo: copy \`kit/${name}\` to \`kit.yaml\`, then \`kitctl plan\` and \`kitctl apply\`.`);
     L.push("- [ ] For repos with no other context: `kitctl use gestalt-flow`.");
   } else {
@@ -88,7 +114,7 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
     if (w.mechanism === "agent-file") L.push(`- [ ] \`${w.id}\`: uses the plugin's own agent; nothing to place.`);
     if (w.mechanism === "script") L.push(`- [ ] \`${w.id}\`: a script; no model.`);
   }
-  if (workerFiles.some(f => f.startsWith("agents/codex/"))) L.push("- [ ] Codex: `agents/codex/*.toml` go in `~/.codex/agents/`. Their fields are unverified; check with your Codex version first.");
+  if (way.harnesses.includes("codex") && way.topology.workers.length) L.push("- [ ] Codex: headless workers carry a `codex exec` line in their script. Codex custom-agent files are not generated until their fields are verified.");
   L.push("");
 
   // 6. Other harnesses

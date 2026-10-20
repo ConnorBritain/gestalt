@@ -911,6 +911,11 @@
       "code": "GST-C-COUNTER",
       "severity": "info",
       "message": "4 PostToolUse hooks watch edits: elonify, compounder, ui-magic, brand-builder"
+    },
+    {
+      "code": "GST-C-SLOT",
+      "severity": "warn",
+      "message": "ui-magic and brand-builder generate the same thing; enable one per context"
     }
   ],
   "triggers": [],

@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { check, finish, group } from "./harness.mjs";
+import { check, finish, group, skip } from "./harness.mjs";
 import { loadCatalog, indexCatalog, validateEntry, REF_RE, STAGE_KINDS } from "../tools/lib/catalog.mjs";
 import { frontmatter, listingCost } from "../tools/lib/tokens.mjs";
 
@@ -46,13 +46,22 @@ check("a way-local entry may override a shipped one", "the user's installed vers
 
 // Re-measure against sibling checkouts when they exist (the author's machine and this
 // build's session); a fresh clone of gestalt alone skips this with a note.
-const SIBLINGS = { elonify: "../elonify", cairn: "../cairn", compounder: "../compounder", roadmap: "../roadmap", "ui-magic": "../ui-magic/plugins/ui-magic", "brand-builder": "../brand-builder/plugins/brand-builder", "prose-author": "../vonnegut/bundles/prose-author", "prose-review": "../vonnegut/bundles/prose-review" };
+const SIBLINGS = {
+  elonify: "../elonify", cairn: "../cairn", compounder: "../compounder", roadmap: "../roadmap",
+  "ui-magic": "../ui-magic/plugins/ui-magic", "brand-builder": "../brand-builder/plugins/brand-builder",
+  "prose-author": "../vonnegut/bundles/prose-author", "prose-review": "../vonnegut/bundles/prose-review",
+  "prose-tell-scan": "../vonnegut/bundles/prose-tell-scan", "prose-outline": "../vonnegut/bundles/prose-outline",
+  "prose-research": "../vonnegut/bundles/prose-research",
+  "verification-gate": "../connorbritain/agent-primitives/bundles/verification-gate",
+  gestalt: ".",
+};
 group("catalog cost vs sibling checkouts");
 for (const [id, rel] of Object.entries(SIBLINGS)) {
   const dir = join(import.meta.dirname ?? new URL(".", import.meta.url).pathname, "..", rel);
-  if (!existsSync(dir)) { console.log(`  skip ${id}: no checkout at ${rel}`); continue; }
-  check(`${id} listing cost matches the checkout`, "trim ranks by cost; a stale number misranks what to cut", () => {
+  if (!existsSync(dir)) { skip(`${id} cost matches its checkout`, `no checkout at ${rel}`); continue; }
+  check(`${id} cost matches its checkout exactly`, "lint and trim rank by cost; a stale number misranks what to cut", () => {
     let tok = 0;
+    const count = { skills: 0, agents: 0, commands: 0 };
     for (const [sub, isSkill] of [["skills", true], ["agents", false], ["commands", false]]) {
       const p = join(dir, sub); if (!existsSync(p)) continue;
       for (const e of readdirSync(p)) {
@@ -60,10 +69,11 @@ for (const [id, rel] of Object.entries(SIBLINGS)) {
         if (!existsSync(f) || (!isSkill && !e.endsWith(".md"))) continue;
         const { data } = frontmatter(readFileSync(f, "utf8"));
         tok += listingCost(data.name ?? e, data.description);
+        count[sub] += 1;
       }
     }
-    const recorded = cat.entries.get(id).cost.listing_tokens;
-    assert.ok(Math.abs(tok - recorded) <= Math.max(25, recorded * 0.1), `measured ${tok}, catalog says ${recorded}; update catalog/${id}.yaml`);
+    const c = cat.entries.get(id).cost;
+    assert.deepEqual({ listing_tokens: tok, skills: count.skills, agents: count.agents }, { listing_tokens: c.listing_tokens, skills: c.skills, agents: c.agents }, `update catalog/${id}.yaml`);
   });
 }
 

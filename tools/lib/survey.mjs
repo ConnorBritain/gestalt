@@ -379,6 +379,16 @@ export function survey({ home, repos = [], plugins: pluginDirs = [], usageDays =
     if (slot) slots.set(slot, [...(slots.get(slot) ?? []), p.name]);
   }
   for (const [slot, who] of slots) if (who.length > 1) collisions.push({ code: "GST-C-SLOT", severity: "warn", message: `slot ${slot} has ${who.length} providers: ${who.join(", ")}` });
+  // Generators the catalog marks as alternatives (exclusive_of) collide like a shared slot.
+  const liveSteps = new Map(live.filter(p => p.catalog).flatMap(p => (catalog.entries.get(p.catalog).steps ?? []).map(st => [st.id, p.name])));
+  const seenPairs = new Set();
+  for (const p of live.filter(x => x.catalog)) {
+    for (const x of catalog.entries.get(p.catalog).exclusive_of ?? []) {
+      const other = liveSteps.get(x);
+      const key = [p.name, other].sort().join("|");
+      if (other && other !== p.name && !seenPairs.has(key)) { seenPairs.add(key); collisions.push({ code: "GST-C-SLOT", severity: "warn", message: `${p.name} and ${other} generate the same thing; enable one per context` }); }
+    }
+  }
   for (const ins of instructions) {
     const dup = ins.markers.filter((m, i, a) => a.indexOf(m) !== i && !/:(?:end)\s/.test(m));
     for (const m of new Set(dup)) collisions.push({ code: "GST-C-MARKER", severity: "warn", message: `${ins.path} carries "${m}" more than once` });

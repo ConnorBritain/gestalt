@@ -11,7 +11,7 @@ and when `Last version:` above disagrees with `package.json`.
 - [x] 03 catalog — `catalog/*.yaml`, `tools/lib/catalog.mjs`, `tests/catalog.mjs`
 - [x] 04 way — `tools/lib/way.mjs` (incl. topology), `docs/way-schema.md`, `tests/way.mjs`
 - [x] 05 lint — `tools/lib/lint.mjs`, `tests/fixtures/lint/`, `tests/lint.mjs`
-- [x] 06 survey — `tools/lib/survey.mjs`, `toml-scan.mjs`, `tokens.mjs`, `usage.mjs`, fixture homes, tests
+- [x] 06 survey — `tools/lib/survey.mjs` (with transcript usage), `survey-cli.mjs`, `toml-scan.mjs`, `tokens.mjs`, fixture homes, tests
 - [x] 07 compile — WAY.md, block, kit loadouts, worker agents, SETUP.md, TASTE-TEST.md, `--check`
 - [x] 08 write — `tools/lib/write.mjs`, `tests/write.mjs`
 - [x] 09 skills — `skills/{way,trim,taste}/`

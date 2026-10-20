@@ -73,6 +73,9 @@ reflect:
     - kitctl.doctor
   monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
 budgets:
+  # PENDING CONNOR: protocol_rules, session_start_lines and skills_per_context below were
+  # raised to the measured values by the session that composed this way. Keep them (budgets
+  # as a printout) or restore 3 / 8 / 8 and trim until lint passes (budgets as limits).
   block_tokens: 450
   # Five always-on rules in code repos: elonify's snippet, the verification snippet, the
   # Stop order, the REFRAME hand-off and the Codex cairn fallback. Each one is a gate the

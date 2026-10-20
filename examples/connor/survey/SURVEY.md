@@ -32,6 +32,7 @@ Generated 2026-10-20. Token figures are an estimate: ceil(chars / 4), good for r
 - **GST-C-STOP** (warn): 3 Stop hooks can block the same turn: elonify [opt-in .claude/elonify.json], compounder, verification-gate [opt-in .claude/gates.json]. They run together; nothing orders them.
 - **GST-C-START** (info): 3 SessionStart hooks inject context: cairn, compounder, roadmap
 - **GST-C-COUNTER** (info): 4 PostToolUse hooks watch edits: elonify, compounder, ui-magic, brand-builder
+- **GST-C-SLOT** (warn): ui-magic and brand-builder generate the same thing; enable one per context
 
 ## What the survey cannot see
 

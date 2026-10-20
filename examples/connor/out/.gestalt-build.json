@@ -5,8 +5,6 @@
     "TASTE-TEST.md",
     "WAY.md",
     "agents/claude/linear.md",
-    "agents/codex/linear.toml",
-    "agents/codex/prose.toml",
     "block.app.md",
     "block.md",
     "block.plugin.md",

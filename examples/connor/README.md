@@ -4,7 +4,7 @@ The stack Gestalt was built for, composed from what each tool actually does (rea
 code, not its README) and measured from the real plugin checkouts.
 
 - [`way.yaml`](way.yaml): the way itself.
-- [`survey/SURVEY.md`](survey/SURVEY.md): the eleven plugins measured: ≈7.3k always-on tokens
+- [`survey/SURVEY.md`](survey/SURVEY.md) (regenerate with the command at the end of this file): the eleven plugins measured: ≈7.3k always-on tokens
   across 49 skills and 24 agents if everything were enabled everywhere, and three hooks
   that can block the same Stop.
 - [`out/WAY.md`](out/WAY.md): the compiled way, per kind of repo.
@@ -40,7 +40,8 @@ code, not its README) and measured from the real plugin checkouts.
 
 - **Four Stop gates, one order.** Claude Code runs Stop hooks together, so Gestalt orders
   the model's answer instead: tests, then elonify's verdict, then compounder's three lines,
-  then the cloud's commit-and-push check. It is one line in the code-repo blocks.
+  then the cloud's commit-and-push check. It shares one line with the check order in the
+  code-repo blocks.
 - **A hand-off that did not exist.** On an elonify REFRAME, once Connor has decided, the
   block offers `/cairn` to log the decision as a choice. That is the first step toward
   calibrating elonify against outcomes (see [docs/upstream.md](../../docs/upstream.md)).
@@ -56,5 +57,21 @@ code, not its README) and measured from the real plugin checkouts.
   fresh `codex exec`.
 - compounder's Stop lines are a recorder that blocks (`GST-RECORDER-BLOCKS`). It is
   tolerated because it is ordered after the critics; the upstream ask is a non-blocking mode.
-- cairn and compounder list every skill in every repo, rituals included. The skills
-  budget is raised to 32 with that reason written beside it.
+- cairn and compounder list every skill in every repo, rituals included. **Three budgets
+  (skills 32, session-start lines 9, protocol rules 5) were raised to the measured values by
+  the session that composed this way, not by Connor.** Whether budgets are limits to trim
+  toward or a printout is his decision; until he makes it, they bind nothing here.
+
+## Regenerating the survey
+
+From the directory that holds the checkouts (the gate re-derives it and fails on drift):
+
+```bash
+V=vonnegut/bundles
+GESTALT_NOW=2026-10-20T12:00:00Z node gestalt/tools/cli.mjs survey --home "$PWD" \
+  --plugin elonify --plugin cairn --plugin compounder --plugin roadmap \
+  --plugin ui-magic/plugins/ui-magic --plugin brand-builder/plugins/brand-builder \
+  --plugin $V/prose-author --plugin $V/prose-review --plugin $V/prose-tell-scan \
+  --plugin connorbritain/agent-primitives/bundles/verification-gate --plugin gestalt \
+  --out gestalt/examples/connor/survey
+```

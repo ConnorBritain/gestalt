@@ -30,7 +30,7 @@ Take the first unchecked item; tick it in the same commit that lands it. The pri
   It never serializes an env value, header, or argument.
 - **Compile is deterministic.** Same inputs, same bytes. `compile --check` is the drift test.
 - **Every lint code has a planted-defect fixture** in `tests/fixtures/lint/`, and every
-  example way lints clean.
+  example way lints without errors (its warnings print in its WAY.md).
 - **No dependencies. No GitHub Actions.** `node tools/check.mjs` is the gate. `tools/lib/yaml.mjs`
   is a byte-pinned copy of ui-magic's reader; change it upstream, then refresh the pin.
 - **Sibling repos are read-only from here.** Asks for them go in [`docs/upstream.md`](docs/upstream.md).
@@ -39,6 +39,7 @@ Take the first unchecked item; tick it in the same commit that lands it. The pri
 
 ## Useful commands
 
-- `node tools/check.mjs`
+- `node tools/check.mjs` (`GESTALT_STRICT=1` turns skipped checks, such as kitctl validate, into failures)
+- `GESTALT_UPDATE_EXAMPLES=1 node tests/examples.mjs`, `GESTALT_UPDATE_SURVEY_GOLDENS=1 node tests/survey.mjs`: accept new goldens, then review the diff
 - `node tools/cli.mjs help`
 - `node tools/cli.mjs compile --way examples/connor/way.yaml --out /tmp/out`

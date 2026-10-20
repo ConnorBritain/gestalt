@@ -12,6 +12,7 @@ export const FIXTURES = join(ROOT, "tests", "fixtures");
 
 let passed = 0;
 let failed = 0;
+let skipped = 0;
 const failures = [];
 const temps = [];
 
@@ -28,6 +29,13 @@ export function check(name, why, fn) {
     failures.push(`${name} — ${why} — ${e.message}`);
     process.stdout.write(`  FAIL ${name}\n       why: ${why}\n       ${e.message}\n`);
   }
+}
+
+/** A check that cannot run here. Counted and printed; GESTALT_STRICT=1 turns every skip into a failure. */
+export function skip(name, why) {
+  if (process.env.GESTALT_STRICT) { failed += 1; failures.push(`${name} — skipped under GESTALT_STRICT: ${why}`); process.stdout.write(`  FAIL ${name}\n       skipped under GESTALT_STRICT: ${why}\n`); return; }
+  skipped += 1;
+  process.stdout.write(`  skip ${name}: ${why}\n`);
 }
 
 export function tempDir(prefix = "gestalt-test-") {
@@ -50,6 +58,6 @@ export function run(args, { home, cwd, now = "2026-10-20T12:00:00Z", env = {} } 
 
 export function finish() {
   for (const dir of temps) rmSync(dir, { recursive: true, force: true });
-  process.stdout.write(`\n${passed} passed, ${failed} failed\n`);
+  process.stdout.write(`\n${passed} passed, ${failed} failed${skipped ? `, ${skipped} skipped (GESTALT_STRICT=1 to require them)` : ""}\n`);
   if (failed) { for (const f of failures) process.stdout.write(`  - ${f}\n`); process.exit(1); }
 }

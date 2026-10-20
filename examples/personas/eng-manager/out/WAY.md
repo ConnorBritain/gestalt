@@ -80,7 +80,7 @@ Rituals never go in the always-on block; they live here and in your calendar.
 
 ## The block
 
-Base block ≈134 tokens (budget 450); context blocks: service ≈155, rfc ≈90.
+Base block ≈111 tokens (budget 450); context blocks: service ≈108, rfc ≈50.
 
 ```markdown
 <!-- gestalt:begin way -->
@@ -89,27 +89,22 @@ Base block ≈134 tokens (budget 450); context blocks: service ≈155, rfc ≈90
 Order: orient → intend → plan → make → check → record. Checkers report; they never fix. Give every worker and critic the user's original request verbatim and the decisions made since.
 - (Codex) At session start run `cairn debt`; it prints nothing when nothing is due.
 - Route the weekly update, or any question answered from Jira → the `reporter` subagent.
-Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when you do.
 <!-- gestalt:end way -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.service -->
 ### In service (Makefile present)   <!-- gestalt -->
-- Before building from a plan: elonify plan-review.
 - Before calling non-trivial work done: verification-gate gates (hook) → verification-gate critics ∥ elonify diff-review.
-- On elonify plan-review REFRAME: once the user has decided, stop and put the question to the user.
+- On elonify plan-review REFRAME: stop and put the question to the user; do not decide it.
 - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
-- Route reviewing an RFC or a finished diff → the elonify / verification-gate critics, each as its own agent in fresh context.
 <!-- gestalt:end way.service -->
 ```
 
 ```markdown
 <!-- gestalt:begin way.rfc -->
 ### In rfc (RFC.md present)   <!-- gestalt -->
-- Before building from a plan: elonify plan-review.
-- On elonify plan-review REFRAME: once the user has decided, stop and put the question to the user.
-- Route reviewing an RFC or a finished diff → the elonify critic, as its own agent in fresh context.
+- On elonify plan-review REFRAME: stop and put the question to the user; do not decide it.
 <!-- gestalt:end way.rfc -->
 ```
 

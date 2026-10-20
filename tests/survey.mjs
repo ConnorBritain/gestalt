@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { cpSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { check, finish, group, run, tempDir, FIXTURES } from "./harness.mjs";
+import { check, finish, group, run, skip, tempDir, FIXTURES, ROOT } from "./harness.mjs";
 import { survey, renderSurvey, triggerIn } from "../tools/lib/survey.mjs";
 import { scanToml } from "../tools/lib/toml-scan.mjs";
 
@@ -17,12 +17,13 @@ const cowork = () => survey({ home: join(homes, "cowork-analyst"), now: NOW });
 function golden(name, value) {
   const file = join(FIXTURES, "homes", `${name}.survey.json`);
   const text = `${JSON.stringify(value, null, 2)}\n`;
-  if (process.env.GESTALT_UPDATE_GOLDENS || !existsSync(file)) writeFileSync(file, text);
-  assert.equal(text, readFileSync(file, "utf8"), `${name} survey drifted from its golden (GESTALT_UPDATE_GOLDENS=1 to accept)`);
+  if (process.env.GESTALT_UPDATE_SURVEY_GOLDENS) writeFileSync(file, text);
+  assert.ok(existsSync(file), `${name} golden is missing; create it with GESTALT_UPDATE_SURVEY_GOLDENS=1 and review it`);
+  assert.equal(text, readFileSync(file, "utf8"), `${name} survey drifted from its golden (GESTALT_UPDATE_SURVEY_GOLDENS=1 to accept, then review the diff)`);
 }
 
 group("survey goldens");
-check("connor home + app repo matches its golden", "trim and lint read these numbers; a silent change re-ranks what to cut", () => golden("connor", connor()));
+check("connor home + app repo matches its golden", "lint and the trim skill read these numbers; a silent change re-ranks what to cut", () => golden("connor", connor()));
 check("cowork analyst home matches its golden", "synced org plugins are the enterprise case", () => golden("cowork-analyst", cowork()));
 
 group("safety");
@@ -100,6 +101,38 @@ check("trigger heuristic: shouting is case-sensitive", "\"mandatory citations\" 
   assert.equal(triggerIn("MANDATORY: run first"), "MANDATORY");
   assert.equal(triggerIn("Use proactively after any edit"), "Use proactively");
 });
+
+check("MCP name collisions across scopes are reported", "the same server defined twice connects twice", () => {
+  assert.ok(connor().collisions.some(c => c.code === "GST-C-MCP" && /linear/.test(c.message)));
+});
+check("two generators for the same job collide (GST-C-SLOT)", "ui-magic and brand-builder in one repo make two edit hooks and two opinions", () => {
+  const dir = tempDir();
+  for (const name of ["ui-magic", "brand-builder"]) {
+    mkdirSync(join(dir, name, ".claude-plugin"), { recursive: true });
+    writeFileSync(join(dir, name, ".claude-plugin", "plugin.json"), JSON.stringify({ name, version: "0.0.0" }));
+  }
+  const s = survey({ home: join(homes, "empty"), plugins: [join(dir, "ui-magic"), join(dir, "brand-builder")], now: NOW });
+  assert.equal(s.collisions.filter(c => c.code === "GST-C-SLOT").length, 1);
+});
+check("the survey code never spawns a process", "the survey must not execute a hook, a server or a script", () => {
+  for (const f of ["survey.mjs", "survey-cli.mjs", "toml-scan.mjs", "tokens.mjs", "catalog.mjs"]) {
+    assert.ok(!/child_process|\bspawn|\bexec(File)?Sync\b/.test(readFileSync(join(ROOT, "tools", "lib", f), "utf8")), f);
+  }
+});
+
+group("the author's survey");
+{
+  const H = join(ROOT, "..");
+  const V = join(H, "vonnegut", "bundles");
+  const dirs = [join(H, "elonify"), join(H, "cairn"), join(H, "compounder"), join(H, "roadmap"), join(H, "ui-magic", "plugins", "ui-magic"), join(H, "brand-builder", "plugins", "brand-builder"), join(V, "prose-author"), join(V, "prose-review"), join(V, "prose-tell-scan"), join(H, "connorbritain", "agent-primitives", "bundles", "verification-gate"), ROOT];
+  if (!dirs.every(d => existsSync(d))) skip("examples/connor/survey is re-derived from the checkouts", "sibling checkouts not present");
+  else check("examples/connor/survey is re-derived from the checkouts", "the example claims to be measured; a hand edit or a stale file would not be", () => {
+    const fresh = survey({ home: H, plugins: dirs, now: NOW });
+    const committed = JSON.parse(readFileSync(join(ROOT, "examples", "connor", "survey", "survey.json"), "utf8"));
+    delete fresh.generated_at; delete committed.generated_at;
+    assert.deepEqual(fresh, committed, "re-run the survey command in examples/connor/README.md and commit the result");
+  });
+}
 
 group("toml scanner");
 check("quoted keys, array tables, inline values kept raw, trust state skipped", "Codex config is TOML; the survey reads names and booleans from it, nothing else", () => {

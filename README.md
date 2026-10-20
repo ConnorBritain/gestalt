@@ -28,7 +28,7 @@ hands heavy or connected work to focused workers on the right tier. Then a three
 |---|---|
 | `~/.gestalt/way.yaml` | Your way, as data ([schema](docs/way-schema.md)) |
 | `WAY.md` | The way, readable: the flow, each kind of repo, lead and workers, honesty per harness |
-| `block.md`, `block.<context>.md` | The only always-on text Gestalt adds: order, Stop order, hand-offs, routes. About 150 tokens. |
+| `block.md`, `block.<context>.md` | The only always-on text Gestalt adds: order, Stop order, hand-offs, routes. In the examples, 70–140 tokens plus at most ≈120 for a context: under 300 in any repo. |
 | `kit/` | kitctl loadouts and per-repo `kit.yaml`. kitctl writes native config; Gestalt never does. |
 | `agents/`, `workers/` | Worker definitions: subagents with their own model and MCP, headless launch scripts |
 | `SETUP.md` | Everything Gestalt will not do itself, as a checklist |

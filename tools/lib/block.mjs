@@ -1,7 +1,8 @@
 // The managed block: the only always-on text Gestalt adds. It carries order, not detail:
 // which stage comes first, which gates run in what order when they fire together, the
-// hand-offs, the routing index for workers, harness fallbacks and the skip clause. Each
-// tool's own wiring snippet stays the tool's (restating it creates two copies that drift).
+// hand-offs, routes to Gestalt's own workers, and harness fallbacks. Each tool's own wiring
+// snippet (its trigger, its skip clause, its agents) stays the tool's: restating it creates
+// two copies that drift.
 import { STAGES } from "./catalog.mjs";
 import { activeRituals, activeSteps, scenarios } from "./way.mjs";
 import { stopGates } from "./lint.mjs";
@@ -50,30 +51,43 @@ function protocolLine(stage, steps, catalog) {
 export function blockLines(way, catalog, scenario, base = null) {
   const steps = activeSteps(way, scenario);
   const lines = [];
-  // Ordering lines: per stage that has a protocol step; gates in the same stage are shown in order.
+  // Ordering lines: per stage with a protocol step, gates in the same stage shown in order.
+  // A line that orders a single step carries no order; it is kept only when no tool snippet
+  // already tells the model to run that step (a way-local step, say).
+  const stop = stopGates(way, scenario);
+  const order = stop.length >= 2 ? way.stop_order.filter(id => id.startsWith("platform:") || stop.includes(id)) : [];
+  let stopPlaced = false;
   for (const stage of STAGES) {
     const atStage = steps.filter(f => f.stage === stage);
     if (!atStage.some(f => f.mode === "protocol")) continue;
     const shown = atStage.filter(f => f.mode === "protocol" || (stage === "check" && f.step.kind === "gate"));
-    lines.push({ key: `stage:${stage}:${shown.map(f => f.use).join(",")}`, text: protocolLine(stage, shown, catalog) });
+    if (shown.length === 1 && shown[0].step.wiring_marker) continue;
+    let text = protocolLine(stage, shown, catalog);
+    if (stage === "check" && order.length) {
+      // One line, not two: the Stop order extends the check order with what comes after it.
+      const rest = order.filter(id => !shown.some(f => f.use === id));
+      text = `${text.slice(0, -1)}; when Stop hooks fire together, answer in that order${rest.length ? `, then ${rest.map(id => label(id, catalog)).join(", then ")}` : ""}.`;
+      stopPlaced = true;
+    }
+    lines.push({ key: `stage:${stage}:${shown.map(f => f.use).join(",")}:${stage === "check" ? order.join(",") : ""}`, text });
   }
-  const stop = stopGates(way, scenario);
-  if (stop.length >= 2) {
-    const order = way.stop_order.filter(id => id.startsWith("platform:") || stop.includes(id));
+  if (order.length && !stopPlaced) {
     lines.push({ key: `stop:${order.join(",")}`, text: `When several Stop hooks fire together, answer them in this order: ${order.map(id => label(id, catalog)).join(", then ")}.` });
   }
   const ids = new Set(steps.map(f => f.use));
   for (const l of way.links.filter(x => x.via === "instruction" && ids.has(x.from))) {
     const to = l.to === "user" ? null : catalog.steps.get(l.to);
-    const action = to ? `offer ${command(to) ?? label(l.to, catalog)}${l.as ? ` to log it as a ${l.as}` : ""}` : "stop and put the question to the user";
-    lines.push({ key: `link:${l.from}:${l.on}:${l.to}`, text: `On ${label(l.from, catalog)} ${l.on}: once the user has decided, ${action}.` });
+    const action = to ? `offer ${command(to) ?? label(l.to, catalog)}${l.as ? ` to log it as a ${l.as}` : ""}` : null;
+    const text = to ? `On ${label(l.from, catalog)} ${l.on}: once the user has decided, ${action}.` : `On ${label(l.from, catalog)} ${l.on}: stop and put the question to the user; do not decide it.`;
+    lines.push({ key: `link:${l.from}:${l.on}:${l.to}`, text });
   }
   for (const f of steps) {
     for (const [h, text] of Object.entries(f.step.fallback ?? {})) {
       if (way.harnesses.includes(h)) lines.push({ key: `fallback:${f.use}:${h}`, text: `(${harnessName(h)}) ${text}` });
     }
   }
-  for (const w of way.topology.workers.filter(x => x.mechanism !== "script")) {
+  // agent-file workers are the plugins' own agents, which their own snippets already route to.
+  for (const w of way.topology.workers.filter(x => x.mechanism === "subagent" || x.mechanism === "headless")) {
     if (!w.uses.some(u => ids.has(u) || activeRituals(way, scenario).some(r => r.use === u))) continue;
     const here = new Set([...ids, ...activeRituals(way, scenario).map(r => r.use)]);
     lines.push({ key: `route:${w.id}:${w.uses.filter(u => here.has(u)).join(",")}`, text: `Route ${w.route} → ${how(w, catalog, here)}.` });
@@ -105,7 +119,6 @@ function harnessName(h) {
 
 const HEAD = "## Way of work   <!-- gestalt -->";
 const ORDER = "Order: orient → intend → plan → make → check → record. Checkers report; they never fix. Give every worker and critic the user's original request verbatim and the decisions made since.";
-const SKIP = "Trivial turns (typo, version bump, a one-line fix) skip these gates; say so when you do.";
 
 /**
  * Render the base block (always-on contexts) and one block per other context holding only
@@ -116,7 +129,7 @@ export function renderBlocks(way, catalog) {
   const baseLines = blockLines(way, catalog, base);
   const baseKeys = new Set(baseLines.map(l => l.key));
   const make = (name, title, lines, withFrame) => {
-    const bodyLines = withFrame ? [HEAD, "", ORDER, ...lines.map(l => `- ${l.text}`), SKIP] : [title, ...lines.map(l => `- ${l.text}`)];
+    const bodyLines = withFrame ? [HEAD, "", ORDER, ...lines.map(l => `- ${l.text}`)] : [title, ...lines.map(l => `- ${l.text}`)];
     const body = `${bodyLines.join("\n")}\n`;
     const text = `${BEGIN(name)}\n${body}${END(name)}\n`;
     return { name, body, text, tokens: estimateTokens(text) };
