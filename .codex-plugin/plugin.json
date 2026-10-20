@@ -1,0 +1,25 @@
+{
+  "name": "gestalt",
+  "version": "0.1.0",
+  "description": "Survey, compose and sequence your agent harness into one lean way of working.",
+  "author": { "name": "Connor England", "url": "https://github.com/ConnorBritain" },
+  "homepage": "https://github.com/ConnorBritain/gestalt",
+  "repository": "https://github.com/ConnorBritain/gestalt",
+  "license": "MIT",
+  "keywords": ["harness","orchestration","sequencing","loadout","context-budget","plugins","skills","hooks","agents-md","workflow"],
+  "skills": "skills",
+  "interface": {
+    "displayName": "Gestalt",
+    "shortDescription": "Decides what your harness runs, and in what order.",
+    "longDescription": "Gestalt surveys the plugins, skills, connectors and hooks you have, measures what they cost in always-on context, interviews you about your goals and data, and compiles a lean way of working: an ordered flow (orient, intend, plan, make, check, record), a short managed block for AGENTS.md, worker definitions for focused sub-agents, kitctl loadouts, and a three-prompt taste test. NOTE: Codex runs the skills; the compiled block is advisory there, and Codex custom-agent fields are emitted as unverified.",
+    "developerName": "Connor England",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive"],
+    "websiteURL": "https://github.com/ConnorBritain/gestalt",
+    "defaultPrompt": [
+      "Set up my way of working",
+      "Trim my harness — what am I paying for that never fires?",
+      "Give me a taste test for my setup"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "gestalt",
+  "version": "0.1.0",
+  "description": "Gestalt composes and sequences your agent harness: it surveys what you have installed, interviews you about how you work, and compiles a lean, ordered way of working (WAY.md) for Claude Code, Codex, Cursor and AGENTS.md agents.",
+  "author": { "name": "Connor England", "url": "https://github.com/ConnorBritain" },
+  "repository": "https://github.com/ConnorBritain/gestalt",
+  "license": "MIT",
+  "keywords": ["harness","orchestration","sequencing","loadout","context-budget","plugins","skills","hooks","agents-md","workflow"]
+}
