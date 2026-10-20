@@ -84,11 +84,12 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
    Codex agent fields, restore Codex worker agents in `tools/lib/agents-emit.mjs` (removed in
    0.1.0 because they were unverified).
 
-8. **Connor's budgets, back within limits.** Connor chose budgets as limits. Once
-   compounder's brief is short (upstream.md) and cairn's and compounder's ritual skills no
-   longer list every turn, trim `examples/connor/way.yaml` until it lints under the default
-   budgets, and delete its two way-level waivers. If it still cannot fit, put the remaining
-   overrun to Connor; do not raise a budget on his behalf.
+8. **Connor's budgets, back within limits.** Connor chose budgets per measure: 5 always-on
+   rules (by choice), 8 session-start lines, 12 listed skills. Once compounder's brief is
+   short (upstream.md) and cairn's and compounder's ritual skills no longer list every turn,
+   trim `examples/connor/way.yaml` until it lints under those limits, and delete its two
+   way-level waivers. If it still cannot fit, put the remaining overrun to Connor; do not
+   raise a budget on his behalf.
 9. **Trail-code (formerly Graft, `trailhq/Graft`) as a new-repo ritual.** These facts come
    from its README at commit `dfcbf4c` (read 2026-10-20). Confirm them with
    `trail init --dry-run` before relying on them.
@@ -126,6 +127,21 @@ Take one repo at a time, on that repo's own development branch, one PR each. Sma
    - **Its numbers are its own.** The README reports 46% fewer tool calls and 33/50 vs 27/50 on
      SWE-bench Verified. Treat them as vendor claims; Gestalt's eval would test them on
      Connor's repos.
+   - **Recommendation, agreed with Connor:**
+     - Adopt Trail in the code contexts (plugin, roadmap, app, site) only, through their kitctl
+       loadouts, not in writing folders. Its code map is retrieval: the agent fetches the
+       relevant functions on demand, the same mechanism RAG-MCP credits for better selection.
+     - Run `trail init --no-global --no-statusline --agents <the way's harnesses>`. kitctl
+       carries its user-level hooks and MCP as primitives, and compounder keeps the status
+       line, so each file keeps one owner.
+     - Keep learnings on, linked to cairn: a cairn `choice` about code may also be saved as a
+       Trail decision.
+     - Ask Connor about `DO_NOT_TRACK=1`.
+     - **Pilot before rollout:** run the `build` taste prompt in one plugin repo with and
+       without Trail, and compare tool calls, tokens and the answer. That tests its own
+       claims on Connor's code.
+     - Shorten compounder's brief first. Trail adds a session-start and a per-prompt
+       injector, which presses on the 8-line budget.
    - **Then:**
      1. Add `catalog/trail.yaml`: orient (repo map, ambient), make (`trail_find_code`
         through MCP), check (`trail check`, which flags a change that undoes a recorded

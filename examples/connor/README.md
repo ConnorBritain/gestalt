@@ -57,12 +57,13 @@ code, not its README) and measured from the real plugin checkouts.
   fresh `codex exec`.
 - compounder's Stop lines are a recorder that blocks (`GST-RECORDER-BLOCKS`). It is
   tolerated because it is ordered after the critics; the upstream ask is a non-blocking mode.
-- **Budgets are limits** (Connor's decision). The defaults stand: 3 always-on rules, 8
-  session-start lines, 8 skills. The way exceeds them today. compounder's focus brief is
-  about 13 lines, code repos carry five rules, and cairn and compounder list their ritual
-  skills every turn. Two way-level waivers record that with the reason and point at the
-  trims the portability session makes ([docs/followups](../../docs/followups/portability-session.md)).
-  WAY.md prints every waived finding.
+- **Budgets per measure** (Connor's decision). Five always-on rules by choice: each is a
+  gate the model would otherwise skip, and that sequencing is the point. Session-start lines
+  (8) and listed skills (12) are limits the way exceeds today: compounder's focus brief is
+  about 13 lines, and cairn and compounder list their ritual skills every turn. Two
+  way-level waivers record that with the reason and point at the trims the portability
+  session makes ([docs/followups](../../docs/followups/portability-session.md)). WAY.md prints
+  every waived finding.
 
 ## Regenerating the survey
 

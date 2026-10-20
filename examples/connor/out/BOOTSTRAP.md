@@ -104,21 +104,25 @@ reflect:
     - { use: roadmap.cycle, in: [roadmap] }
     - kitctl.doctor
   monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
-# Budgets are limits (Connor's decision, 2026-10-20): the defaults, unraised. What exceeds
-# them today is waived below with the reason, visibly, until the trims land.
+# Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason;
+# what exceeds one today is waived below, visibly, until the trims land.
 budgets:
   block_tokens: 450
-  protocol_rules: 3
+  # Five always-on rules in code repos, each a gate the model would otherwise skip: elonify's
+  # snippet, the verification snippet, the Stop order, the REFRAME hand-off to cairn, and the
+  # Codex reminder to check cairn's debt. This is the sequencing; it is worth its lines.
+  protocol_rules: 5
   unordered_blocking_per_event: 1
   session_start_lines: 8
   always_on_tokens: 12000
-  skills_per_context: 8
+  # Model-routable skills per repo. Ritual skills called by name should not list at all.
+  skills_per_context: 12
   index: false
 waive:
   - code: GST-BUDGET
-    reason: "Over today: compounder's ~13-line focus brief, and five always-on rules in code repos. The portability session shortens the brief upstream, then this way trims to fit and drops this waiver."
+    reason: "Session-start lines are 15 against 8: compounder's focus brief is about 13 lines. The portability session shortens it upstream (focus, next move, ship clock), then this waiver goes."
   - code: GST-LEAD
-    reason: "cairn and compounder list their ritual skills every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes."
+    reason: "18 to 32 skills listed against 12: cairn's and compounder's ritual skills list every turn. The portability session hides them (disable-model-invocation) upstream, then this waiver goes."
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]
