@@ -79,7 +79,7 @@ export function renderWay(way, catalog, { lint, blocks, survey = null }) {
   for (const [cadence, items] of Object.entries(way.reflect)) {
     if (!items.length) continue;
     anyReflect = true;
-    L.push(`- **${cadence}**: ${items.map(r => `${label(r.use, catalog)} (${r.step.invoke})`).join("; ")}`);
+    L.push(`- **${cadence}**: ${items.map(r => `${label(r.use, catalog)} (${r.step.invoke})${r.in.length < Object.keys(way.contexts).length ? ` [in ${r.in.join(", ")} repos]` : ""}`).join("; ")}`);
   }
   if (!anyReflect) L.push("- No rituals yet. A weekly `/gestalt:trim` is the cheapest one to start with.");
   L.push("", "Rituals never go in the always-on block; they live here and in your calendar.", "");

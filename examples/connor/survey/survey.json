@@ -1,0 +1,924 @@
+{
+  "schema": "gestalt-survey/1",
+  "generated_at": "2026-10-20T12:00:00.000Z",
+  "token_method": "estimate: ceil(chars / 4)",
+  "harnesses": {
+    "claude": false,
+    "codex": false,
+    "cursor": false
+  },
+  "totals": {
+    "always_on_tokens": 7266,
+    "by_kind": {
+      "instructions": 0,
+      "skills": 4770,
+      "agents": 2476,
+      "commands": 20
+    },
+    "plugins": 11,
+    "skills": 49,
+    "agents": 24,
+    "commands": 1,
+    "mcp_servers": 1
+  },
+  "instructions_tokens": 0,
+  "plugins": [
+    {
+      "name": "brand-builder",
+      "version": "0.3.1",
+      "scope": "checkout",
+      "path": "~/brand-builder/plugins/brand-builder",
+      "catalog": "brand-builder",
+      "skills": 6,
+      "agents": 2,
+      "commands": 0,
+      "listing_tokens": 851,
+      "hooks": [
+        {
+          "event": "PostToolUse",
+          "matcher": "Edit|Write|MultiEdit|apply_patch",
+          "script": "hook-scan.mjs",
+          "origin": "plugin:brand-builder",
+          "blocking": false,
+          "opt_in": ".brand-builder.json"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "brand-builder@checkout",
+      "enabled": true,
+      "ref": "plugin:brand-builder",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "brand-foundation",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/skills/brand-foundation/SKILL.md",
+          "listing_tokens": 108
+        },
+        {
+          "kind": "skill",
+          "name": "build-site",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/skills/build-site/SKILL.md",
+          "listing_tokens": 109
+        },
+        {
+          "kind": "skill",
+          "name": "copy-voice",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/skills/copy-voice/SKILL.md",
+          "listing_tokens": 118
+        },
+        {
+          "kind": "skill",
+          "name": "design-direction",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/skills/design-direction/SKILL.md",
+          "listing_tokens": 121
+        },
+        {
+          "kind": "skill",
+          "name": "slop-audit",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/skills/slop-audit/SKILL.md",
+          "listing_tokens": 106
+        },
+        {
+          "kind": "skill",
+          "name": "slop-repair",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/skills/slop-repair/SKILL.md",
+          "listing_tokens": 95
+        },
+        {
+          "kind": "agent",
+          "name": "design-critic",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/agents/design-critic.md",
+          "listing_tokens": 87
+        },
+        {
+          "kind": "agent",
+          "name": "interaction-reviewer",
+          "scope": "checkout",
+          "path": "~/brand-builder/plugins/brand-builder/agents/interaction-reviewer.md",
+          "listing_tokens": 107
+        }
+      ]
+    },
+    {
+      "name": "cairn",
+      "version": "0.2.0",
+      "scope": "checkout",
+      "path": "~/cairn",
+      "catalog": "cairn",
+      "skills": 6,
+      "agents": 3,
+      "commands": 0,
+      "listing_tokens": 769,
+      "hooks": [
+        {
+          "event": "SessionStart",
+          "matcher": null,
+          "script": "session-start.mjs",
+          "origin": "plugin:cairn",
+          "blocking": false
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "stop-capture.mjs",
+          "origin": "plugin:cairn",
+          "blocking": false,
+          "opt_in": "settings capture_hook=true"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "cairn@checkout",
+      "enabled": true,
+      "ref": "plugin:cairn",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "cairn",
+          "scope": "checkout",
+          "path": "~/cairn/skills/cairn/SKILL.md",
+          "listing_tokens": 91
+        },
+        {
+          "kind": "skill",
+          "name": "cairn-resolve",
+          "scope": "checkout",
+          "path": "~/cairn/skills/cairn-resolve/SKILL.md",
+          "listing_tokens": 87
+        },
+        {
+          "kind": "skill",
+          "name": "cairn-review",
+          "scope": "checkout",
+          "path": "~/cairn/skills/cairn-review/SKILL.md",
+          "listing_tokens": 85
+        },
+        {
+          "kind": "skill",
+          "name": "cairn-score",
+          "scope": "checkout",
+          "path": "~/cairn/skills/cairn-score/SKILL.md",
+          "listing_tokens": 90
+        },
+        {
+          "kind": "skill",
+          "name": "cairn-tune",
+          "scope": "checkout",
+          "path": "~/cairn/skills/cairn-tune/SKILL.md",
+          "listing_tokens": 93
+        },
+        {
+          "kind": "skill",
+          "name": "cairn-witness",
+          "scope": "checkout",
+          "path": "~/cairn/skills/cairn-witness/SKILL.md",
+          "listing_tokens": 79
+        },
+        {
+          "kind": "agent",
+          "name": "cairn-adversary",
+          "scope": "checkout",
+          "path": "~/cairn/agents/cairn-adversary.md",
+          "listing_tokens": 71,
+          "model": "inherit"
+        },
+        {
+          "kind": "agent",
+          "name": "cairn-reviewer",
+          "scope": "checkout",
+          "path": "~/cairn/agents/cairn-reviewer.md",
+          "listing_tokens": 87,
+          "model": "inherit"
+        },
+        {
+          "kind": "agent",
+          "name": "cairn-witness",
+          "scope": "checkout",
+          "path": "~/cairn/agents/cairn-witness.md",
+          "listing_tokens": 86,
+          "model": "inherit"
+        }
+      ]
+    },
+    {
+      "name": "compounder",
+      "version": "0.1.0",
+      "scope": "checkout",
+      "path": "~/compounder",
+      "catalog": "compounder",
+      "skills": 8,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 732,
+      "hooks": [
+        {
+          "event": "SessionStart",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": false
+        },
+        {
+          "event": "UserPromptSubmit",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": true
+        },
+        {
+          "event": "PreToolUse",
+          "matcher": "^(Bash|Write|Edit|MultiEdit|NotebookEdit|mcp__.*__(create_repository|fork_repository|create_team|save_project|save_initiative|create_project|create_initiative|add-projects))$",
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": true
+        },
+        {
+          "event": "PostToolUse",
+          "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": false
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": true
+        },
+        {
+          "event": "SessionEnd",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": false
+        }
+      ],
+      "mcp_servers": [],
+      "id": "compounder@checkout",
+      "enabled": true,
+      "ref": "plugin:compounder",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "checkin",
+          "scope": "checkout",
+          "path": "~/compounder/skills/checkin/SKILL.md",
+          "listing_tokens": 98
+        },
+        {
+          "kind": "skill",
+          "name": "focus",
+          "scope": "checkout",
+          "path": "~/compounder/skills/focus/SKILL.md",
+          "listing_tokens": 77
+        },
+        {
+          "kind": "skill",
+          "name": "interview",
+          "scope": "checkout",
+          "path": "~/compounder/skills/interview/SKILL.md",
+          "listing_tokens": 118
+        },
+        {
+          "kind": "skill",
+          "name": "mode",
+          "scope": "checkout",
+          "path": "~/compounder/skills/mode/SKILL.md",
+          "listing_tokens": 72
+        },
+        {
+          "kind": "skill",
+          "name": "park",
+          "scope": "checkout",
+          "path": "~/compounder/skills/park/SKILL.md",
+          "listing_tokens": 81
+        },
+        {
+          "kind": "skill",
+          "name": "review",
+          "scope": "checkout",
+          "path": "~/compounder/skills/review/SKILL.md",
+          "listing_tokens": 93
+        },
+        {
+          "kind": "skill",
+          "name": "ship",
+          "scope": "checkout",
+          "path": "~/compounder/skills/ship/SKILL.md",
+          "listing_tokens": 90
+        },
+        {
+          "kind": "skill",
+          "name": "update",
+          "scope": "checkout",
+          "path": "~/compounder/skills/update/SKILL.md",
+          "listing_tokens": 103
+        }
+      ]
+    },
+    {
+      "name": "elonify",
+      "version": "0.1.0",
+      "scope": "checkout",
+      "path": "~/elonify",
+      "catalog": "elonify",
+      "skills": 1,
+      "agents": 1,
+      "commands": 0,
+      "listing_tokens": 258,
+      "hooks": [
+        {
+          "event": "PostToolUse",
+          "matcher": "^(Write|Edit|MultiEdit|NotebookEdit|ExitPlanMode)$",
+          "script": "elonify-hook.mjs",
+          "origin": "plugin:elonify",
+          "blocking": false,
+          "opt_in": ".claude/elonify.json"
+        },
+        {
+          "event": "SubagentStop",
+          "matcher": "elonify-critic",
+          "script": "elonify-hook.mjs",
+          "origin": "plugin:elonify",
+          "blocking": false,
+          "opt_in": ".claude/elonify.json"
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "elonify-hook.mjs",
+          "origin": "plugin:elonify",
+          "blocking": true,
+          "opt_in": ".claude/elonify.json"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "elonify@checkout",
+      "enabled": true,
+      "ref": "plugin:elonify",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "review",
+          "scope": "checkout",
+          "path": "~/elonify/skills/review/SKILL.md",
+          "listing_tokens": 94
+        },
+        {
+          "kind": "agent",
+          "name": "elonify-critic",
+          "scope": "checkout",
+          "path": "~/elonify/agents/elonify-critic.md",
+          "listing_tokens": 164,
+          "model": "sonnet"
+        }
+      ]
+    },
+    {
+      "name": "gestalt",
+      "version": "0.1.0",
+      "scope": "checkout",
+      "path": "~/gestalt",
+      "catalog": "gestalt",
+      "skills": 3,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 280,
+      "hooks": [],
+      "mcp_servers": [],
+      "id": "gestalt@checkout",
+      "enabled": true,
+      "ref": "plugin:gestalt",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "taste",
+          "scope": "checkout",
+          "path": "~/gestalt/skills/taste/SKILL.md",
+          "listing_tokens": 83
+        },
+        {
+          "kind": "skill",
+          "name": "trim",
+          "scope": "checkout",
+          "path": "~/gestalt/skills/trim/SKILL.md",
+          "listing_tokens": 83
+        },
+        {
+          "kind": "skill",
+          "name": "way",
+          "scope": "checkout",
+          "path": "~/gestalt/skills/way/SKILL.md",
+          "listing_tokens": 114
+        }
+      ]
+    },
+    {
+      "name": "prose-author",
+      "version": "0.9.0",
+      "scope": "checkout",
+      "path": "~/vonnegut/bundles/prose-author",
+      "catalog": "prose-author",
+      "skills": 4,
+      "agents": 4,
+      "commands": 0,
+      "listing_tokens": 741,
+      "hooks": [],
+      "mcp_servers": [],
+      "id": "prose-author@checkout",
+      "enabled": true,
+      "ref": "plugin:prose-author",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "prose-corpus",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/skills/prose-corpus/SKILL.md",
+          "listing_tokens": 156
+        },
+        {
+          "kind": "skill",
+          "name": "prose-draft",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/skills/prose-draft/SKILL.md",
+          "listing_tokens": 82
+        },
+        {
+          "kind": "skill",
+          "name": "prose-repurpose",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/skills/prose-repurpose/SKILL.md",
+          "listing_tokens": 121
+        },
+        {
+          "kind": "skill",
+          "name": "prose-style-tune",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/skills/prose-style-tune/SKILL.md",
+          "listing_tokens": 79
+        },
+        {
+          "kind": "agent",
+          "name": "voice-profile-render",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/agents/voice-profile-render.md",
+          "listing_tokens": 84
+        },
+        {
+          "kind": "agent",
+          "name": "voice-draft",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/agents/voice-draft.md",
+          "listing_tokens": 80
+        },
+        {
+          "kind": "agent",
+          "name": "voice-feedback-interpret",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/agents/voice-feedback-interpret.md",
+          "listing_tokens": 73
+        },
+        {
+          "kind": "agent",
+          "name": "voice-rhetoric-measure",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-author/agents/voice-rhetoric-measure.md",
+          "listing_tokens": 66
+        }
+      ]
+    },
+    {
+      "name": "prose-review",
+      "version": "0.7.0",
+      "scope": "checkout",
+      "path": "~/vonnegut/bundles/prose-review",
+      "catalog": "prose-review",
+      "skills": 0,
+      "agents": 6,
+      "commands": 0,
+      "listing_tokens": 872,
+      "hooks": [],
+      "mcp_servers": [],
+      "id": "prose-review@checkout",
+      "enabled": true,
+      "ref": "plugin:prose-review",
+      "units": [
+        {
+          "kind": "agent",
+          "name": "prose-voice-critic",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-review/agents/prose-voice-critic.md",
+          "listing_tokens": 116,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "prose-fidelity-critic",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-review/agents/prose-fidelity-critic.md",
+          "listing_tokens": 123,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "prose-reviser",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-review/agents/prose-reviser.md",
+          "listing_tokens": 150,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "prose-structure-critic",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-review/agents/prose-structure-critic.md",
+          "listing_tokens": 152,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "prose-medium-critic",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-review/agents/prose-medium-critic.md",
+          "listing_tokens": 172,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "prose-reader-critic",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-review/agents/prose-reader-critic.md",
+          "listing_tokens": 159,
+          "model": "sonnet"
+        }
+      ]
+    },
+    {
+      "name": "prose-tell-scan",
+      "version": "0.1.1",
+      "scope": "checkout",
+      "path": "~/vonnegut/bundles/prose-tell-scan",
+      "catalog": "prose-tell-scan",
+      "skills": 1,
+      "agents": 0,
+      "commands": 1,
+      "listing_tokens": 179,
+      "hooks": [],
+      "mcp_servers": [],
+      "id": "prose-tell-scan@checkout",
+      "enabled": true,
+      "ref": "plugin:prose-tell-scan",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "tell-scan",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-tell-scan/skills/tell-scan/SKILL.md",
+          "listing_tokens": 159
+        },
+        {
+          "kind": "command",
+          "name": "tell-scan",
+          "scope": "checkout",
+          "path": "~/vonnegut/bundles/prose-tell-scan/commands/tell-scan.md",
+          "listing_tokens": 20
+        }
+      ]
+    },
+    {
+      "name": "roadmap",
+      "version": "0.7.2",
+      "scope": "checkout",
+      "path": "~/roadmap",
+      "catalog": "roadmap",
+      "skills": 13,
+      "agents": 4,
+      "commands": 0,
+      "listing_tokens": 1308,
+      "hooks": [
+        {
+          "event": "SessionStart",
+          "matcher": null,
+          "script": "session-start.mjs",
+          "origin": "plugin:roadmap",
+          "blocking": false
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "journal-post.mjs",
+          "origin": "plugin:roadmap",
+          "blocking": false
+        }
+      ],
+      "mcp_servers": [
+        "graph"
+      ],
+      "id": "roadmap@checkout",
+      "enabled": true,
+      "ref": "plugin:roadmap",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "assign",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/assign/SKILL.md",
+          "listing_tokens": 70
+        },
+        {
+          "kind": "skill",
+          "name": "backlog",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/backlog/SKILL.md",
+          "listing_tokens": 80
+        },
+        {
+          "kind": "skill",
+          "name": "conduct",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/conduct/SKILL.md",
+          "listing_tokens": 96
+        },
+        {
+          "kind": "skill",
+          "name": "cycle",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/cycle/SKILL.md",
+          "listing_tokens": 125
+        },
+        {
+          "kind": "skill",
+          "name": "debrief",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/debrief/SKILL.md",
+          "listing_tokens": 80
+        },
+        {
+          "kind": "skill",
+          "name": "fanout",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/fanout/SKILL.md",
+          "listing_tokens": 46
+        },
+        {
+          "kind": "skill",
+          "name": "gauntlet",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/gauntlet/SKILL.md",
+          "listing_tokens": 73
+        },
+        {
+          "kind": "skill",
+          "name": "imagine",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/imagine/SKILL.md",
+          "listing_tokens": 111
+        },
+        {
+          "kind": "skill",
+          "name": "init",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/init/SKILL.md",
+          "listing_tokens": 60
+        },
+        {
+          "kind": "skill",
+          "name": "prioritize",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/prioritize/SKILL.md",
+          "listing_tokens": 91
+        },
+        {
+          "kind": "skill",
+          "name": "retro",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/retro/SKILL.md",
+          "listing_tokens": 91
+        },
+        {
+          "kind": "skill",
+          "name": "slice",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/slice/SKILL.md",
+          "listing_tokens": 58
+        },
+        {
+          "kind": "skill",
+          "name": "sync",
+          "scope": "checkout",
+          "path": "~/roadmap/skills/sync/SKILL.md",
+          "listing_tokens": 51
+        },
+        {
+          "kind": "agent",
+          "name": "roadmap-auditor",
+          "scope": "checkout",
+          "path": "~/roadmap/agents/roadmap-auditor.md",
+          "listing_tokens": 75,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "roadmap-bootstrapper",
+          "scope": "checkout",
+          "path": "~/roadmap/agents/roadmap-bootstrapper.md",
+          "listing_tokens": 67,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "slice-scoper",
+          "scope": "checkout",
+          "path": "~/roadmap/agents/slice-scoper.md",
+          "listing_tokens": 70,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "wave-shepherd",
+          "scope": "checkout",
+          "path": "~/roadmap/agents/wave-shepherd.md",
+          "listing_tokens": 64,
+          "model": "opus"
+        }
+      ]
+    },
+    {
+      "name": "ui-magic",
+      "version": "0.8.0",
+      "scope": "checkout",
+      "path": "~/ui-magic/plugins/ui-magic",
+      "catalog": "ui-magic",
+      "skills": 7,
+      "agents": 2,
+      "commands": 0,
+      "listing_tokens": 1090,
+      "hooks": [
+        {
+          "event": "PostToolUse",
+          "matcher": "Edit|Write|MultiEdit|apply_patch",
+          "script": "hook-scan.mjs",
+          "origin": "plugin:ui-magic",
+          "blocking": false,
+          "opt_in": ".ui-magic.json"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "ui-magic@checkout",
+      "enabled": true,
+      "ref": "plugin:ui-magic",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "app-audit",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/app-audit/SKILL.md",
+          "listing_tokens": 111
+        },
+        {
+          "kind": "skill",
+          "name": "app-build",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/app-build/SKILL.md",
+          "listing_tokens": 125
+        },
+        {
+          "kind": "skill",
+          "name": "app-foundation",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/app-foundation/SKILL.md",
+          "listing_tokens": 128
+        },
+        {
+          "kind": "skill",
+          "name": "app-repair",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/app-repair/SKILL.md",
+          "listing_tokens": 91
+        },
+        {
+          "kind": "skill",
+          "name": "system-map",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/system-map/SKILL.md",
+          "listing_tokens": 145
+        },
+        {
+          "kind": "skill",
+          "name": "ux-copy",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/ux-copy/SKILL.md",
+          "listing_tokens": 121
+        },
+        {
+          "kind": "skill",
+          "name": "ux-insight",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/skills/ux-insight/SKILL.md",
+          "listing_tokens": 132
+        },
+        {
+          "kind": "agent",
+          "name": "app-critic",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/agents/app-critic.md",
+          "listing_tokens": 113
+        },
+        {
+          "kind": "agent",
+          "name": "flow-walker",
+          "scope": "checkout",
+          "path": "~/ui-magic/plugins/ui-magic/agents/flow-walker.md",
+          "listing_tokens": 124
+        }
+      ]
+    },
+    {
+      "name": "verification-gate",
+      "version": "0.1.0",
+      "scope": "checkout",
+      "path": "~/connorbritain/agent-primitives/bundles/verification-gate",
+      "catalog": "verification-gate",
+      "skills": 0,
+      "agents": 2,
+      "commands": 0,
+      "listing_tokens": 186,
+      "hooks": [
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "gate-runner.mjs",
+          "origin": "plugin:verification-gate",
+          "blocking": true,
+          "opt_in": ".claude/gates.json"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "verification-gate@checkout",
+      "enabled": true,
+      "ref": "plugin:verification-gate",
+      "units": [
+        {
+          "kind": "agent",
+          "name": "verification-critic",
+          "scope": "checkout",
+          "path": "~/connorbritain/agent-primitives/bundles/verification-gate/agents/verification-critic.md",
+          "listing_tokens": 109,
+          "model": "sonnet"
+        },
+        {
+          "kind": "agent",
+          "name": "architecture-reviewer",
+          "scope": "checkout",
+          "path": "~/connorbritain/agent-primitives/bundles/verification-gate/agents/architecture-reviewer.md",
+          "listing_tokens": 77,
+          "model": "sonnet"
+        }
+      ]
+    }
+  ],
+  "loose": [],
+  "instructions": [],
+  "mcp": [],
+  "hooks": {
+    "settings": [],
+    "platform": []
+  },
+  "stop_blockers": [
+    "elonify",
+    "compounder",
+    "verification-gate"
+  ],
+  "collisions": [
+    {
+      "code": "GST-C-STOP",
+      "severity": "warn",
+      "message": "3 Stop hooks can block the same turn: elonify [opt-in .claude/elonify.json], compounder, verification-gate [opt-in .claude/gates.json]. They run together; nothing orders them."
+    },
+    {
+      "code": "GST-C-START",
+      "severity": "info",
+      "message": "3 SessionStart hooks inject context: cairn, compounder, roadmap"
+    },
+    {
+      "code": "GST-C-COUNTER",
+      "severity": "info",
+      "message": "4 PostToolUse hooks watch edits: elonify, compounder, ui-magic, brand-builder"
+    }
+  ],
+  "triggers": [],
+  "usage": {
+    "plugin_counters": null,
+    "transcripts": null
+  },
+  "notes": [
+    "MCP tool definitions are not counted: the survey never starts a server. Claude Code defers them by default (tool search); harnesses that load them up front pay for them every turn."
+  ]
+}

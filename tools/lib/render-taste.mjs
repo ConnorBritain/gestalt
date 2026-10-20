@@ -11,16 +11,21 @@ export function expectedTrace(way, catalog, taste) {
   const sc = scenarios(way).find(s => s.active.includes(taste.context) && (s.active.length === 1 || s.active[s.active.length - 1] === taste.context)) ?? scenarios(way)[0];
   const steps = activeSteps(way, sc);
   const quiet = new Set(taste.expect_quiet);
+  const expected = new Set(taste.expect);
   const fires = [];
   const onAsk = [];
+  const may = [];
   for (const stage of STAGES) {
     for (const f of steps.filter(x => x.stage === stage)) {
       if (quiet.has(f.use)) continue;
       const onPath = stage === "orient" || taste.path.includes(stage);
       if (!onPath) continue;
       const entry = { id: f.use, label: label(f.use, catalog), stage, how: f.mode === "ambient" ? "hook" : f.mode, worker: workerFor(way, f.use)?.id ?? null };
-      if (f.mode === "explicit") onAsk.push(entry);
-      else fires.push(entry);
+      // Hooks and protocol rules are predictable; a description-routed step is only expected
+      // when the prompt is written to trigger it (taste.expect), otherwise it may fire.
+      if (expected.has(f.use) || f.mode === "ambient" || f.mode === "protocol") fires.push(entry);
+      else if (f.mode === "explicit") onAsk.push(entry);
+      else may.push(entry);
     }
   }
   const stop = stopGates(way, sc);
@@ -28,7 +33,7 @@ export function expectedTrace(way, catalog, taste) {
     ? way.stop_order.filter(id => id.startsWith("platform:") || stop.includes(id)).map(id => label(id, catalog))
     : [];
   const workers = [...new Set(fires.map(f => f.worker).filter(Boolean))].map(id => way.topology.workers.find(w => w.id === id));
-  return { scenario: sc.name, fires, onAsk, quiet: [...quiet].map(id => label(id, catalog)), stopOrder, workers };
+  return { scenario: sc.name, fires, may, onAsk, quiet: [...quiet].map(id => label(id, catalog)), stopOrder, workers };
 }
 
 export function renderTaste(way, catalog) {
@@ -38,7 +43,7 @@ export function renderTaste(way, catalog) {
   for (const [i, t] of way.taste.entries()) {
     const tr = expectedTrace(way, catalog, t);
     L.push(`## ${i + 1}. ${t.id}`, "");
-    L.push(`**Open in:** a ${t.context} repo (${way.contexts[t.context].when === "always" ? "any" : way.contexts[t.context].when}).`, "");
+    L.push(`**Open in:** ${way.contexts[t.context].when === "always" ? "any repo" : `a ${t.context} repo (${way.contexts[t.context].when})`}.`, "");
     L.push("**Prompt:**", "", "```text", t.prompt, "```", "");
     L.push("**Should happen, in order:**", "");
     if (!tr.fires.length) L.push("- Nothing beyond a direct answer.");
@@ -46,6 +51,7 @@ export function renderTaste(way, catalog) {
     if (tr.stopOrder.length) L.push(`- At Stop, answered in this order: ${tr.stopOrder.join(" → ")}`);
     L.push("");
     if (tr.workers.length) L.push(`**Workers that should spawn:** ${tr.workers.map(w => `${w.id} (${w.tier}, ${w.mechanism})`).join(", ")}. Each should receive the prompt above verbatim.`, "");
+    if (tr.may.length) L.push(`**May fire, if the prompt calls for it:** ${tr.may.map(f => f.label).join(", ")}.`, "");
     if (tr.onAsk.length) L.push(`**Only if you ask:** ${tr.onAsk.map(f => f.label).join(", ")}.`, "");
     if (tr.quiet.length) L.push(`**Should stay quiet:** ${tr.quiet.join(", ")}.`, "");
     L.push("| Step | Expected | Fired? | In order? | Note |", "|---|---|---|---|---|");

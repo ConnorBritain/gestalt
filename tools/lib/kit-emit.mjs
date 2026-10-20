@@ -1,7 +1,7 @@
 // kitctl output. Gestalt never writes native config: it emits loadouts (schema_version 2)
 // and per-context kit.yaml intents for kitctl to plan, preview and apply. The managed block
 // travels as a loadout's `instructions`, so kitctl owns that text too.
-import { activeEntries, scenarios } from "./way.mjs";
+import { activeEntries, leadEntries, scenarios } from "./way.mjs";
 import { emitYaml } from "./yaml-emit.mjs";
 
 export const V2_LOADOUT_KEYS = ["schema_version", "name", "description", "extends", "skills", "mcp", "hooks", "plugins", "marketplaces", "slots", "disable", "requires", "optional", "setup", "instructions", "profiles"];
@@ -34,16 +34,21 @@ export function emitKit(way, blocks) {
   const gaps = [];
   const [base, ...rest] = scenarios(way);
   const harnesses = way.harnesses.filter(h => KIT_HARNESSES.includes(h));
+  // The lead's loadout enables only what the lead loads. What a headless worker owns, and a
+  // connection a worker holds inline, is disabled for the lead so a global install cannot
+  // leak it back in.
+  const isolated = new Set(way.connectors.filter(c => c.server && way.topology.workers.some(w => w.mcp.includes(c.id))).map(c => c.ref));
   const connectorEntries = way.connectors.map(c => ({ id: c.id, ref: c.ref, kind: "connector" }));
-  const baseEntries = [...activeEntries(way, base), ...connectorEntries.filter(c => !way.topology.workers.some(w => w.mcp.includes(c.id) && way.connectors.find(x => x.id === c.id)?.server))];
-  const baseDisable = base.active.flatMap(c => way.disable[c] ?? []);
+  const workerOwned = sc => activeEntries(way, sc).filter(e => !leadEntries(way, sc).some(l => l.id === e.id)).map(e => e.ref);
+  const baseEntries = [...leadEntries(way, base), ...connectorEntries.filter(c => !isolated.has(c.ref))];
+  const baseDisable = [...new Set([...base.active.flatMap(c => way.disable[c] ?? []), ...workerOwned(base), ...isolated])];
   const flow = loadoutFor("gestalt-flow", `${way.person.name}'s way: what every repo gets.`, baseEntries, way, baseDisable, blocks.base.body);
   files["loadouts/gestalt-flow.yaml"] = emitYaml(flow, { header: HEADER });
   const baseIds = new Set(baseEntries.map(e => e.id));
   for (const sc of rest) {
     const ctx = sc.active[sc.active.length - 1];
-    const added = activeEntries(way, sc).filter(e => !baseIds.has(e.id));
-    const disable = way.disable[ctx] ?? [];
+    const added = leadEntries(way, sc).filter(e => !baseIds.has(e.id));
+    const disable = [...new Set([...(way.disable[ctx] ?? []), ...workerOwned(sc).filter(r => !baseDisable.includes(r))])];
     const block = blocks.contexts.find(b => b.context === ctx);
     const own = way.contexts[ctx].loadouts;
     const loadouts = ["gestalt-flow"];

@@ -4,7 +4,7 @@ One file per person, at `~/.gestalt/way.yaml` (`GESTALT_HOME` overrides). `/gest
 writes it from the survey and the interview; `node tools/cli.mjs lint` checks it;
 `compile` turns it into everything the harness reads. Unknown keys are errors.
 
-A complete worked example is `examples/connor/way.yaml`;
+A complete worked example is [`examples/connor/way.yaml`](../examples/connor/way.yaml);
 the persona folders under `examples/personas/` start from nothing.
 
 ## Keys
@@ -20,12 +20,12 @@ the persona folders under `examples/personas/` start from nothing.
 | `flow` | `{stage: [step]}` for `orient, intend, plan, make, check, record` | step: `{use, in?, mode?, enforce?, after?, parallel_with?, waive?}`. `use` is a catalog step id; `in` limits it to contexts (default: all); `mode` overrides the catalog's; `enforce: hook` says a hook backs it |
 | `stop_order` | `[step id \| platform:<name>]` | the order the model answers simultaneous Stop gates in. Required when several blocking Stop hooks share a context |
 | `links` | `[{from, on, to, as, via}]` | hand-offs, e.g. `{from: elonify.diff-review, on: REFRAME, to: cairn.capture, as: choice, via: instruction}`. `to` may be `user`. `via: instruction` costs one block line |
-| `reflect` | `{daily[], weekly[], monthly[]}` | rituals (catalog steps at the `reflect` stage). Rendered in WAY.md only, never in the always-on block |
+| `reflect` | `{daily[], weekly[], monthly[]}` | rituals (catalog steps at the `reflect` stage), each a step id or `{use, in}` when it belongs to one kind of repo. Rendered in WAY.md only, never in the always-on block |
 | `budgets` | see below | the leanness contract |
 | `disable` | `{context: [ref]}` | primitives to switch off in a context; becomes kitctl `disable:` |
 | `topology` | `{tiers, lead, workers}` | see below |
 | `catalog` | `[entry]` | way-local catalog entries for primitives Gestalt does not ship facts about (`confidence: guess`) |
-| `taste` | exactly 3 `{id, prompt, context, path[], expect_quiet[]}` | the taste test. `path` is the stages the prompt should travel; `expect_quiet` steps must not fire |
+| `taste` | exactly 3 `{id, prompt, context, path[], expect[], expect_quiet[]}` | the taste test. `path` is the stages the prompt should travel. Hooks and protocol steps on the path are expected; a description-routed step is expected only when listed in `expect` (otherwise it "may fire"). `expect_quiet` steps must not fire |
 
 ## Budgets (defaults)
 

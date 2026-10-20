@@ -28,6 +28,10 @@ check("goals are required and capped at three", "a way with no goal cannot be ju
   const four = [1, 2, 3, 4].map(i => ({ id: `g${i}`, text: "t" }));
   assert.match(messages({ ...base(), person: { name: "x", goals: four } }), /at most three goals/);
 });
+check("an unquoted comma in a goal is caught, not silently truncated", "the reader splits it into a stray key and the goal loses half its words", () => {
+  const raw = parseYaml("person: { name: x, goals: [{ id: g, text: one, two }] }\n");
+  assert.match(messages({ ...base(), person: raw.person }), /person.goals\[0\]: unknown key "two"/);
+});
 check("credentials are env names only", "a literal token in way.yaml would be committed and compiled into files", () => {
   assert.match(messages({ ...base(), connectors: [{ id: "linear", ref: "mcp:linear", role: "tracker", auth: "lin_api_123abc" }] }), /environment variable NAME/);
   assert.match(messages({ ...base(), connectors: [{ id: "x", ref: "mcp:x", role: "data", server: { type: "http", url: "https://x", env: { TOKEN: "abc" } } }] }), /never a literal/);
@@ -74,6 +78,15 @@ check("a headless worker takes its plugin out of the lead; a subagent does not",
   raw.topology.workers[0].mechanism = "subagent";
   ({ way } = normaliseWay(raw));
   assert.ok(leadEntries(way, sc).some(e => e.id === "prose-author"));
+});
+check("a ritual scoped to a context loads its plugin only there", "a weekly roadmap cycle in roadmap repos must not keep roadmap in every lead", () => {
+  const raw = base(); raw.reflect = { weekly: [{ use: "roadmap.cycle", in: ["code"] }, "cairn.review"] };
+  const { way, problems } = normaliseWay(raw);
+  assert.deepEqual(problems, []);
+  const [everywhere, code] = scenarios(way);
+  assert.ok(!activeEntries(way, everywhere).some(e => e.id === "roadmap"));
+  assert.ok(activeEntries(way, code).some(e => e.id === "roadmap"));
+  assert.ok(activeEntries(way, everywhere).some(e => e.id === "cairn"));
 });
 check("disable removes an entry from a context", "trim's disable-in-context must change what lint and compile count", () => {
   const raw = base(); raw.disable = { code: ["plugin:verification-gate"] };

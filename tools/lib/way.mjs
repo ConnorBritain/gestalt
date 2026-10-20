@@ -39,7 +39,7 @@ const KEYS = {
   topology: ["tiers", "lead", "workers"],
   lead: ["keeps", "note"],
   worker: ["id", "tier", "mechanism", "uses", "route", "mcp", "returns", "note"],
-  taste: ["id", "prompt", "context", "path", "expect_quiet"],
+  taste: ["id", "prompt", "context", "path", "expect", "expect_quiet"],
 };
 
 export function gestaltHome(env = process.env) {
@@ -86,6 +86,8 @@ export function normaliseWay(raw, { catalogDir } = {}) {
     if (goals.length === 0) p.add("GST-SCHEMA", "person.goals", "at least one goal: a way with no goal cannot be judged");
     if (goals.length > 3) p.add("GST-SCHEMA", "person.goals", "at most three goals; more is a list, not a direction");
     for (const [i, g] of goals.entries()) {
+      // A comma inside an unquoted flow-map value splits it into a stray key: catch it here.
+      if (isMap(g)) p.keys(g, ["id", "text"], `person.goals[${i}]`);
       if (!isMap(g) || !ID_RE.test(g.id ?? "") || !isStr(g.text)) p.add("GST-SCHEMA", `person.goals[${i}]`, "needs an id and text");
     }
   }
@@ -169,11 +171,16 @@ export function normaliseWay(raw, { catalogDir } = {}) {
   if (p.keys(reflectRaw, CADENCES, "reflect")) {
     for (const cadence of CADENCES) {
       reflect[cadence] = [];
-      for (const id of list(reflectRaw[cadence])) {
+      // An item is a step id, or {use, in} when the ritual belongs to one kind of repo
+      // (a roadmap cycle runs in roadmap repos, so it must not load roadmap everywhere).
+      for (const item of list(reflectRaw[cadence])) {
+        const id = typeof item === "string" ? item : item?.use;
+        const inCtx = typeof item === "string" || item?.in == null ? contextNames : list(item.in);
+        for (const c of inCtx) if (!contexts[c]) p.add("GST-REF", `reflect.${cadence}`, `unknown context "${c}"`);
         const cat = catalog.steps.get(id);
         if (!cat) p.add("GST-REF", `reflect.${cadence}`, `"${id}" is not a catalog step`);
         else if (cat.stage !== "reflect") p.add("GST-ORDER", `reflect.${cadence}`, `${id} serves ${cat.stage}, not reflect; in-session steps go in flow`);
-        else reflect[cadence].push({ use: id, step: cat, entry: cat.entry });
+        else reflect[cadence].push({ use: id, in: inCtx, step: cat, entry: cat.entry });
       }
     }
   }
@@ -244,8 +251,8 @@ export function normaliseWay(raw, { catalogDir } = {}) {
     if (!isStr(t.prompt)) p.add("GST-SCHEMA", `${w}.prompt`, "required");
     if (!contexts[t.context]) p.add("GST-REF", `${w}.context`, `unknown context "${t.context}"`);
     for (const s of list(t.path)) if (!STAGES.includes(s)) p.add("GST-SCHEMA", `${w}.path`, `"${s}" is not an in-session stage`);
-    for (const q of list(t.expect_quiet)) if (!flowIds.has(q)) p.add("GST-REF", `${w}.expect_quiet`, `"${q}" is not a flow step`);
-    taste.push({ ...t, path: list(t.path), expect_quiet: list(t.expect_quiet) });
+    for (const q of [...list(t.expect), ...list(t.expect_quiet)]) if (!flowIds.has(q)) p.add("GST-REF", `${w}.expect`, `"${q}" is not a flow step`);
+    taste.push({ ...t, path: list(t.path), expect: list(t.expect), expect_quiet: list(t.expect_quiet) });
   }
 
   const way = {
@@ -288,8 +295,13 @@ export function activeEntries(way, scenario) {
   const disabled = new Set(scenario.active.flatMap(c => way.disable[c] ?? []));
   const entries = new Map();
   for (const f of activeSteps(way, scenario)) if (!disabled.has(f.entry.ref)) entries.set(f.entry.id, f.entry);
-  for (const r of Object.values(way.reflect).flat()) if (!disabled.has(r.entry.ref)) entries.set(r.entry.id, r.entry);
+  for (const r of activeRituals(way, scenario)) if (!disabled.has(r.entry.ref)) entries.set(r.entry.id, r.entry);
   return [...entries.values()];
+}
+
+/** Reflect items that belong to a scenario's contexts. */
+export function activeRituals(way, scenario) {
+  return Object.values(way.reflect).flat().filter(r => r.in.some(c => scenario.active.includes(c)));
 }
 
 /** Which worker (if any) performs a step. */
@@ -307,7 +319,7 @@ export function leadEntries(way, scenario) {
   const steps = activeSteps(way, scenario);
   return activeEntries(way, scenario).filter(entry => {
     if (entry.kind === "connector") return !way.topology.workers.some(w => w.mechanism !== "script" && w.mcp.includes(entry.id) && connectorIsolated(way, entry.id));
-    const mine = [...steps.filter(f => f.entry.id === entry.id).map(f => f.use), ...Object.values(way.reflect).flat().filter(r => r.entry.id === entry.id).map(r => r.use)];
+    const mine = [...steps.filter(f => f.entry.id === entry.id).map(f => f.use), ...activeRituals(way, scenario).filter(r => r.entry.id === entry.id).map(r => r.use)];
     if (mine.length === 0) return true;
     return !mine.every(id => workerFor(way, id)?.mechanism === "headless");
   });

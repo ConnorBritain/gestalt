@@ -3,7 +3,7 @@
 // hand-offs, the routing index for workers, harness fallbacks and the skip clause. Each
 // tool's own wiring snippet stays the tool's (restating it creates two copies that drift).
 import { STAGES } from "./catalog.mjs";
-import { activeSteps, scenarios } from "./way.mjs";
+import { activeRituals, activeSteps, scenarios } from "./way.mjs";
 import { stopGates } from "./lint.mjs";
 import { estimateTokens } from "./tokens.mjs";
 
@@ -74,8 +74,9 @@ export function blockLines(way, catalog, scenario, base = null) {
     }
   }
   for (const w of way.topology.workers.filter(x => x.mechanism !== "script")) {
-    if (!w.uses.some(u => ids.has(u) || Object.values(way.reflect).flat().some(r => r.use === u))) continue;
-    lines.push({ key: `route:${w.id}`, text: `Route ${w.route} → ${how(w, catalog)}.` });
+    if (!w.uses.some(u => ids.has(u) || activeRituals(way, scenario).some(r => r.use === u))) continue;
+    const here = new Set([...ids, ...activeRituals(way, scenario).map(r => r.use)]);
+    lines.push({ key: `route:${w.id}:${w.uses.filter(u => here.has(u)).join(",")}`, text: `Route ${w.route} → ${how(w, catalog, here)}.` });
   }
   if (way.budgets.index) {
     // A context block indexes only what its context adds; the base block indexes the rest.
@@ -86,11 +87,15 @@ export function blockLines(way, catalog, scenario, base = null) {
   return lines;
 }
 
-export function how(worker, catalog) {
+export function how(worker, catalog, active = null) {
   if (worker.mechanism === "subagent") return `the \`${worker.id}\` subagent`;
   if (worker.mechanism === "headless") return `\`sh ${WORKER_DIR}/${worker.id}.sh "<task>"\``;
   // agent-file workers are the plugins' own agents: name the steps, each in fresh context.
-  if (worker.mechanism === "agent-file") return `${worker.uses.map(u => (catalog ? label(u, catalog) : u)).join(" or ")}, each as its own agent in fresh context`;
+  if (worker.mechanism === "agent-file") {
+    const uses = worker.uses.filter(u => !active || active.has(u));
+    const plugins = [...new Set(uses.map(u => catalog?.steps.get(u)?.entry.id ?? u))];
+    return `the ${plugins.join(" / ")} ${uses.length > 1 ? "critics, each" : "critic,"} as its own agent in fresh context`;
+  }
   return `\`${worker.id}\``;
 }
 

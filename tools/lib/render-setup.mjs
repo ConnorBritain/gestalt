@@ -14,7 +14,7 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
   for (const sc of scenarios(way)) for (const e of activeEntries(way, sc)) all.set(e.id, e);
   L.push("## 1. Install", "");
   for (const e of [...all.values()].sort((a, b) => a.id.localeCompare(b.id))) {
-    const lines = way.harnesses.map(h => (e.install?.[h] ? `${h}: ${e.install[h]}` : null)).filter(Boolean);
+    const lines = way.harnesses.map(h => (e.install?.[h] ? `${h}: ${e.install[h].replace(/\.$/, "")}` : null)).filter(Boolean);
     const coverage = way.harnesses.filter(h => (e.harness?.[h] ?? "none") === "none");
     L.push(`- [ ] **${e.title ?? e.id}** (${e.ref})${lines.length ? `: ${lines.join("; ")}` : ""}${coverage.length ? `. _Not available on ${coverage.join(", ")}._` : ""}`);
   }
@@ -36,25 +36,27 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
 
   // 3. Knobs and opt-ins
   L.push("## 3. Switch on the hooks this way relies on", "");
-  const opt = [];
+  const opt = new Map();
   for (const sc of scenarios(way)) {
-    const ids = new Set(activeSteps(way, sc).map(f => f.use));
     for (const f of activeSteps(way, sc)) {
       for (const h of (f.entry.hooks ?? []).filter(x => x.serves === f.use && x.opt_in)) {
-        const wanted = f.enforce === "hook" || f.mode === "ambient";
-        opt.push({ key: `${h.opt_in}|${f.use}`, text: `- [ ] ${wanted ? "Create" : "Leave off (the step is not hook-enforced in this way)"}: \`${h.opt_in}\` for ${label(f.use, catalog)} (${h.event}${h.blocking ? ", blocks" : ""}) in ${sc.name} repos.` });
+        const key = `${h.opt_in}|${f.use}`;
+        if (!opt.has(key)) opt.set(key, { f, h, contexts: new Set() });
+        for (const c of f.in) if (sc.active.includes(c)) opt.get(key).contexts.add(c);
       }
     }
-    void ids;
   }
-  const seen = new Set();
-  for (const o of opt) if (!seen.has(o.key)) { seen.add(o.key); L.push(o.text); }
+  for (const { f, h, contexts } of opt.values()) {
+    const wanted = f.enforce === "hook" || f.mode === "ambient";
+    const where = contexts.size === Object.keys(way.contexts).length ? "everywhere" : `in ${[...contexts].join(", ")} repos`;
+    L.push(`- [ ] ${wanted ? "Create" : "Leave off (the step is not hook-enforced in this way)"}: \`${h.opt_in}\` for ${label(f.use, catalog)} (${h.event}${h.blocking ? ", blocks" : ""}), ${where}.`);
+  }
   for (const e of all.values()) for (const k of e.knobs ?? []) {
     if (!k.loosening) continue;
     const step = way.flow.find(f => f.entry.id === e.id && way.stop_order.includes(f.use));
     if (step) L.push(`- [ ] Leave \`${k.key}\` at ${JSON.stringify(k.default)} (${e.id}). The Stop order handles the overlap; if the taste test shows it does not, change it with ${k.change_with} (that tool treats it as loosening).`);
   }
-  if (!opt.length) L.push("- No opt-in hooks.");
+  if (!opt.size) L.push("- No opt-in hooks.");
   L.push("");
 
   // 4. Apply
@@ -81,7 +83,7 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
     if (w.mechanism === "subagent") L.push(`- [ ] \`${w.id}\`: \`gestalt write --agents ~/.claude/agents\` places \`agents/claude/${w.id}.md\` (a user agent, not a plugin agent, so its mcpServers apply).`);
     if (w.mechanism === "headless") {
       const plugins = [...new Set(w.uses.map(u => catalog.steps.get(u)?.entry).filter(e => e?.ref.startsWith("plugin:")).map(e => e.id))];
-      L.push(`- [ ] \`${w.id}\`: keep \`workers/${w.id}.sh\` at \`~/.gestalt/build/workers/\`${plugins.length ? ` and export ${plugins.map(id => `\`GESTALT_PLUGIN_${id.toUpperCase().replace(/[^A-Z0-9]/g, "_")}\``).join(", ")} (the plugin directory; disable the plugin in the lead's loadout so only the worker loads it)` : ""}.`);
+      L.push(`- [ ] \`${w.id}\`: keep \`workers/${w.id}.sh\` at \`~/.gestalt/build/workers/\`${plugins.length ? ` and export ${plugins.map(id => `\`GESTALT_PLUGIN_${id.toUpperCase().replace(/[^A-Z0-9]/g, "_")}\``).join(", ")} (the plugin directory). The lead's loadout disables the plugin so only the worker loads it. Check once that the worker still sees it (\`sh workers/${w.id}.sh "list your skills"\`); if it does not, run the worker from a directory outside the repo` : ""}.`);
     }
     if (w.mechanism === "agent-file") L.push(`- [ ] \`${w.id}\`: uses the plugin's own agent; nothing to place.`);
     if (w.mechanism === "script") L.push(`- [ ] \`${w.id}\`: a script; no model.`);

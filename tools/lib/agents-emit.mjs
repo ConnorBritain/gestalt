@@ -59,6 +59,7 @@ export function emitAgents(way, catalog) {
         "# Usage: sh " + `${w.id}.sh "<task, with the user's original request verbatim and decisions since>"`,
         "# The worker loads only its own plugins and MCP servers; the lead loads neither.",
         ...pluginVars.map(id => `# Set ${env(id)} to the ${id} plugin directory (see SETUP.md).`),
+        ...(pluginVars.length ? ["# Unverified: that --plugin-dir loads a plugin the lead's settings disable. Check once (SETUP.md §5)."] : []),
         'set -eu',
         'HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)',
         `PROMPT="$(cat "$HERE/${w.id}.prompt.md")`,

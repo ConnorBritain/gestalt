@@ -1,0 +1,31 @@
+{
+  "generator": "gestalt compile",
+  "files": [
+    "SETUP.md",
+    "TASTE-TEST.md",
+    "WAY.md",
+    "agents/claude/linear.md",
+    "agents/codex/linear.toml",
+    "agents/codex/prose.toml",
+    "block.app.md",
+    "block.md",
+    "block.plugin.md",
+    "block.roadmap.md",
+    "block.site.md",
+    "block.writing.md",
+    "kit/gaps.md",
+    "kit/kit.app.yaml",
+    "kit/kit.plugin.yaml",
+    "kit/kit.roadmap.yaml",
+    "kit/kit.site.yaml",
+    "kit/kit.writing.yaml",
+    "kit/loadouts/gestalt-app.yaml",
+    "kit/loadouts/gestalt-flow.yaml",
+    "kit/loadouts/gestalt-plugin.yaml",
+    "kit/loadouts/gestalt-roadmap.yaml",
+    "kit/loadouts/gestalt-site.yaml",
+    "kit/loadouts/gestalt-writing.yaml",
+    "workers/prose.prompt.md",
+    "workers/prose.sh"
+  ]
+}

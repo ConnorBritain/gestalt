@@ -55,4 +55,4 @@ topology:
 taste:
   - { id: orient, prompt: "What should I work on right now? Three lines.", context: everywhere, path: [orient, intend], expect_quiet: [compounder.stop-lines] }
   - { id: build, prompt: "Add a --json flag to the status command, with tests.", context: code, path: [plan, make, check, record] }
-  - { id: write, prompt: "Draft a 150-word update for the newsletter about this week's release.", context: writing, path: [make, check] }
+  - { id: write, prompt: "Draft a 150-word update for the newsletter about this week's release.", context: writing, path: [make, check], expect: [prose-author.draft] }

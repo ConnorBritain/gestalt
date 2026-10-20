@@ -1,0 +1,5 @@
+# kit.yaml for repos where file-exists:docs/roadmap/roadmap.yaml.
+# Copy into the repo as kit.yaml, then: kitctl plan && kitctl apply.
+schema_version: 1
+loadouts: [gestalt-flow, gestalt-roadmap]
+harnesses: [claude, codex]
