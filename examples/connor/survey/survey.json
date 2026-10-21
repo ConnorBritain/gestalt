@@ -8,16 +8,16 @@
     "cursor": false
   },
   "totals": {
-    "always_on_tokens": 6528,
+    "always_on_tokens": 5970,
     "by_kind": {
       "instructions": 0,
-      "skills": 4032,
+      "skills": 3474,
       "agents": 2476,
       "commands": 20
     },
     "plugins": 11,
-    "skills": 41,
-    "hidden_skills": 8,
+    "skills": 35,
+    "hidden_skills": 14,
     "agents": 24,
     "commands": 1,
     "mcp_servers": 1
@@ -215,7 +215,7 @@
     },
     {
       "name": "compounder",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "scope": "checkout",
       "path": "~/compounder",
       "catalog": "compounder",
@@ -611,15 +611,15 @@
     },
     {
       "name": "roadmap",
-      "version": "0.7.2",
+      "version": "0.8.0",
       "scope": "checkout",
       "path": "~/roadmap",
       "catalog": "roadmap",
-      "skills": 13,
-      "hidden_skills": 0,
+      "skills": 7,
+      "hidden_skills": 6,
       "agents": 4,
       "commands": 0,
-      "listing_tokens": 1308,
+      "listing_tokens": 750,
       "hooks": [
         {
           "event": "SessionStart",
@@ -669,14 +669,16 @@
           "name": "cycle",
           "scope": "checkout",
           "path": "~/roadmap/skills/cycle/SKILL.md",
-          "listing_tokens": 125
+          "listing_tokens": 0,
+          "hidden": true
         },
         {
           "kind": "skill",
           "name": "debrief",
           "scope": "checkout",
           "path": "~/roadmap/skills/debrief/SKILL.md",
-          "listing_tokens": 80
+          "listing_tokens": 0,
+          "hidden": true
         },
         {
           "kind": "skill",
@@ -697,28 +699,32 @@
           "name": "imagine",
           "scope": "checkout",
           "path": "~/roadmap/skills/imagine/SKILL.md",
-          "listing_tokens": 111
+          "listing_tokens": 0,
+          "hidden": true
         },
         {
           "kind": "skill",
           "name": "init",
           "scope": "checkout",
           "path": "~/roadmap/skills/init/SKILL.md",
-          "listing_tokens": 60
+          "listing_tokens": 0,
+          "hidden": true
         },
         {
           "kind": "skill",
           "name": "prioritize",
           "scope": "checkout",
           "path": "~/roadmap/skills/prioritize/SKILL.md",
-          "listing_tokens": 91
+          "listing_tokens": 0,
+          "hidden": true
         },
         {
           "kind": "skill",
           "name": "retro",
           "scope": "checkout",
           "path": "~/roadmap/skills/retro/SKILL.md",
-          "listing_tokens": 91
+          "listing_tokens": 0,
+          "hidden": true
         },
         {
           "kind": "skill",

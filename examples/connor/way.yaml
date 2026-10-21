@@ -80,8 +80,9 @@ reflect:
   monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
 # Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason.
 # No waivers: compounder's brief is three lines and the ritual skills run by name (portability
-# session, 2026-10-20). Listed skills in roadmap (24), app (18) and site (17) repos stay over
-# 12, from those tools' own skills; Connor chose to keep that visible as a warning (2026-10-20).
+# session, 2026-10-20). Listed skills in roadmap (18; 24 before roadmap 0.8.0 hid its rituals),
+# app (18) and site (17) repos stay over 12, from those tools' own skills; Connor chose to keep
+# that visible as a warning (2026-10-20).
 budgets:
   block_tokens: 450
   # Five always-on rules in code repos, each a gate the model would otherwise skip: elonify's

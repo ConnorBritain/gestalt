@@ -30,13 +30,13 @@ portability session, 2026-10-20, or later); it is done when that PR merges.
   `codex mcp add`: **`roadmap init --client codex --apply` appends raw text to `~/.codex/config.toml`.**
   That collides with kitctl's ownership ledger. Publishing the graph server as a kitctl
   `mcp:` primitive would let kitctl write it.
-- **Thirteen skills list in every roadmap repo.** Splitting them by profile (`engineering`
+- **Done** ([roadmap#59](https://github.com/ConnorBritain/roadmap/pull/59), 0.8.0, which hides its six rituals instead of splitting by profile: 7 listed skills): **Thirteen skills list in every roadmap repo.** Splitting them by profile (`engineering`
   vs `general`) would halve the lead's skill count in roadmap repos. Connor's way lists 24
   skills there against a limit of 12 (a warning he chose to keep visible, 2026-10-20).
 
 ## compounder
 
-- **Done** (compounder 0.3.0; Claude Code only): **Its Stop lines are a recorder that blocks the turn.** A non-blocking mode (a
+- **Done** ([compounder#2](https://github.com/ConnorBritain/compounder/pull/2), 0.3.0; Claude Code only): **Its Stop lines are a recorder that blocks the turn.** A non-blocking mode (a
   `systemMessage` instead of `decision: block`), or `stop_nudge` per lane, would remove the
   last `GST-RECORDER-BLOCKS` in Connor's way. `rules.stop_mode: context` asks for the lines
   as context mid-session instead; Connor's way sets it (`settings:`). Codex and Cursor still

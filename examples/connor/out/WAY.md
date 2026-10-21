@@ -71,7 +71,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 **orient** cairn debt, compounder brief, roadmap ready-wave → **intend** compounder guard, roadmap slice → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture, roadmap journal
 
 - Stop gates on claude: verification-gate gates → elonify diff-review → platform git-check; compounder stop-lines still blocks on codex, cursor.
-- Lead always-on ≈2855 tokens (budget 12000), 24 skills (budget 12).
+- Lead always-on ≈2297 tokens (budget 12000), 18 skills (budget 12).
 - Session-start lines 8 (budget 8); always-on protocol rules 5 (budget 5).
 
 ### app (file-exists:.ui-magic.json)
@@ -226,7 +226,7 @@ Order: orient → intend → plan → make → check → record. Checkers report
 - warn **GST-HARNESS** flow.check[2]: verification-gate.critics is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-HARNESS** flow.check[6]: prose-review.review is advisory on codex: the rule is written down there but nothing makes it happen
 - info **GST-RECORDER-BLOCKS** flow.record[0]: compounder.stop-lines records; its Stop hook does not block on claude (compounder.rules.stop_mode: context), and still blocks on codex, cursor as the fallback
-- warn **GST-LEAD** context roadmap: lead sees 24 skills (budget 12)
+- warn **GST-LEAD** context roadmap: lead sees 18 skills (budget 12)
 - warn **GST-LEAD** context app: lead sees 18 skills (budget 12)
 - warn **GST-LEAD** context site: lead sees 17 skills (budget 12)
 
