@@ -144,8 +144,8 @@ check("SETUP and BOOTSTRAP list each way setting with the owning tool's command"
   raw.settings = { "compounder.rules.stop_mode": "context" };
   const { way, catalog, problems } = normaliseWay(raw);
   const r = compileWay(way, catalog, { problems });
-  assert.match(r.files["SETUP.md"], /- \[ \] Set `rules\.stop_mode` to `context` in ~\/\.compounder\/charter\.json with \/compounder:update \(compounder\)\./);
-  assert.match(r.files["BOOTSTRAP.md"], /compounder: set `rules\.stop_mode` to `context` in ~\/\.compounder\/charter\.json with \/compounder:update\./);
+  assert.match(r.files["SETUP.md"], /- \[ \] Set `rules\.stop_mode` to `context` in ~\/\.compounder\/charter\.json with the charter CLI \(`cli\.mjs charter show`, edit the JSON, then `cli\.mjs charter set --file <path>`\) \(compounder\)\./);
+  assert.match(r.files["BOOTSTRAP.md"], /compounder: set `rules\.stop_mode` to `context` in ~\/\.compounder\/charter\.json with the charter CLI \(`cli\.mjs charter show`, edit the JSON, then `cli\.mjs charter set --file <path>`\)\./);
   assert.match(r.files["WAY.md"], /Stop gates on claude: verification-gate gates → elonify diff-review → platform git-check; compounder stop-lines still blocks on codex\./);
   assert.match(r.files["WAY.md"], /info \*\*GST-RECORDER-BLOCKS\*\* .*still blocks on codex as the fallback/);
 });

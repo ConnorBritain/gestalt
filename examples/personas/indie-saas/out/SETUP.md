@@ -28,8 +28,8 @@ Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gest
 ## 3. Switch on the hooks this way relies on
 
 - [ ] Create: `.claude/gates.json` for verification-gate gates (Stop, blocks), in app repos.
-- [ ] Leave `rules.stop_nudge` at true (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with /compounder:update (that tool treats it as loosening).
-- [ ] Leave `rules.stop_nudge_min_edits` at 3 (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with /compounder:update (that tool treats it as loosening).
+- [ ] Leave `rules.stop_nudge` at true (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`) (that tool treats it as loosening).
+- [ ] Leave `rules.stop_nudge_min_edits` at 3 (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`) (that tool treats it as loosening).
 
 ## 4. Apply
 

@@ -69,9 +69,9 @@ hooks:
   - { event: Stop, blocking: true, mechanism: decision-block, honours_stop_hook_active: true, once_per_session: true, serves: compounder.stop-lines, unblocked_by: { setting: rules.stop_mode, value: context, harness: [claude] }, note: "in context mode it stays quiet once PostToolUse has asked (a lane's own stop_mode overrides the rule); on Codex and Cursor it still blocks (Cursor: a followup message) as the fallback" }
   - { event: SessionEnd, blocking: false, mechanism: none, note: ledger event }
 knobs:
-  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge, default: true, change_with: /compounder:update, loosening: true }
-  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge_min_edits, default: 3, change_with: /compounder:update, loosening: true }
-  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_mode, default: block, values: [block, context], change_with: /compounder:update, loosening: false }
+  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge, default: true, change_with: "the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`)", loosening: true }
+  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge_min_edits, default: 3, change_with: "the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`)", loosening: true }
+  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_mode, default: block, values: [block, context], change_with: "the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`)", loosening: false }
 harness: { claude: enforced, codex: partial, cursor: partial, agents-md: none }
 cost: { skills: 4, agents: 0, commands: 0, listing_tokens: 341, session_start_lines: 3, measured_from: compounder@b8df5d9 }
 feeds:
