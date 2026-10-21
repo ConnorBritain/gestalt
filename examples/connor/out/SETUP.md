@@ -44,9 +44,9 @@ Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gest
 - [ ] Leave off (the step is not hook-enforced in this way): `settings capture_hook=true` for cairn capture (Stop), everywhere.
 - [ ] Create: `.claude/gates.json` for verification-gate gates (Stop, blocks), in plugin, roadmap, app, site repos.
 - [ ] Create: `.claude/elonify.json` for elonify diff-review (Stop, blocks), in plugin, roadmap, app, site repos.
-- [ ] Set `rules.stop_mode` to `context` in ~/.compounder/charter.json with /compounder:update (compounder).
-- [ ] Leave `rules.stop_nudge` at true (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with /compounder:update (that tool treats it as loosening).
-- [ ] Leave `rules.stop_nudge_min_edits` at 3 (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with /compounder:update (that tool treats it as loosening).
+- [ ] Set `rules.stop_mode` to `context` in ~/.compounder/charter.json with the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`) (compounder).
+- [ ] Leave `rules.stop_nudge` at true (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`) (that tool treats it as loosening).
+- [ ] Leave `rules.stop_nudge_min_edits` at 3 (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`) (that tool treats it as loosening).
 
 ## 4. Apply
 

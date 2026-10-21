@@ -320,7 +320,7 @@ Context blocks go into the repo's own AGENTS.md (CLAUDE.md should be `@AGENTS.md
 
 Change each with the owning tool's own command, never by editing its file from here:
 
-- compounder: set `rules.stop_mode` to `context` in ~/.compounder/charter.json with /compounder:update.
+- compounder: set `rules.stop_mode` to `context` in ~/.compounder/charter.json with the charter CLI (`cli.mjs charter show`, edit the JSON, then `cli.mjs charter set --file <path>`).
 
 ### 4. kitctl loadouts
 
