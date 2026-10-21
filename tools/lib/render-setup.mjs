@@ -27,7 +27,7 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
     if (snippets.length) L.push(`- [ ] Wire ${snippets.join(" and ")} snippet${snippets.length > 1 ? "s" : ""} into that repo's instruction file (§2).`);
     if (opts.length) L.push(`- [ ] Create ${opts.join(" and ")} there.`);
     const blockCmd = way.writer === "kitctl"
-      ? `\`kitctl use gestalt-flow\`${kit.files[`loadouts/gestalt-${ctx}.yaml`] ? ` and \`kitctl use gestalt-${ctx}\`` : ""} in that repo`
+      ? `on a branch there, commit \`live: true\` in its kit.yaml, then \`kitctl use gestalt-flow --live --yes\`${kit.files[`loadouts/gestalt-${ctx}.yaml`] ? ` and \`kitctl use gestalt-${ctx} --live --yes\`` : ""}, committing after each`
       : `\`gestalt write --block AGENTS.md --yes\`${blocks.contexts.some(b => b.context === ctx) ? ` and \`gestalt write --block AGENTS.md --context ${ctx} --yes\`` : ""} in that repo`;
     L.push(`- [ ] Place the block: ${blockCmd}.`);
     L.push(`- [ ] Run taste prompt ${pilot.i + 1} (${pilot.t.id}) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.`, "");
@@ -90,8 +90,8 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
     L.push("kitctl writes native config; Gestalt only emitted the loadouts.", "");
     L.push("- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.");
     L.push("- [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).");
-    for (const name of Object.keys(kit.files).filter(f => f.startsWith("kit.")).sort()) L.push(`- [ ] In each matching repo: copy \`kit/${name}\` to \`kit.yaml\`, then \`kitctl plan\` and \`kitctl apply\`.`);
-    L.push("- [ ] For repos with no other context: `kitctl use gestalt-flow`.");
+    for (const name of Object.keys(kit.files).filter(f => f.startsWith("kit.")).sort()) L.push(`- [ ] In each matching repo, on a branch: copy \`kit/${name}\` to \`kit.yaml\`, add \`live: true\` and commit it, then \`kitctl plan\` and \`kitctl apply --live --yes\`.`);
+    L.push("- [ ] For repos with no other context: the same opt-in, then `kitctl use gestalt-flow --live --yes`.", "- [ ] Live apply refuses on main, on a dirty tree or without the committed opt-in (kitctl's docs/apply.md#live-apply). `kitctl off <loadout> --live --yes` is the undo.");
   } else {
     L.push("No kitctl: Gestalt writes its marked block itself, dry-run first.", "");
     L.push(`- [ ] \`gestalt write --block ~/.claude/CLAUDE.md\` (and \`~/.codex/AGENTS.md\` for Codex), then again with \`--yes\`.`);
