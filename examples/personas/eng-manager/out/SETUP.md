@@ -7,7 +7,7 @@ Gestalt writes only its own block and its own generated files. Everything else i
 - [ ] Install cairn, verification-gate (agent-primitives), elonify, kitctl (commands in §1).
 - [ ] Wire elonify's `<!-- elonify -->` and verification-gate (agent-primitives)'s `## Self-verification gate` snippets into that repo's instruction file (§2).
 - [ ] Create `.claude/gates.json` there.
-- [ ] Place the block: on a branch there, commit `live: true` in its kit.yaml, then `kitctl use gestalt-flow --live --yes` and `kitctl use gestalt-service --live --yes`, committing after each.
+- [ ] Place the block: on a branch there, `kitctl use gestalt-flow` and `kitctl use gestalt-service` (each shows its plan and asks first).
 - [ ] Run taste prompt 2 (fix) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.
 
 When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.
@@ -42,10 +42,10 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 
 - [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.
 - [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).
-- [ ] In each matching repo, on a branch: copy `kit/kit.rfc.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] In each matching repo, on a branch: copy `kit/kit.service.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] For repos with no other context: the same opt-in, then `kitctl use gestalt-flow --live --yes`.
-- [ ] Live apply refuses on main, on a dirty tree or without the committed opt-in (kitctl's docs/apply.md#live-apply). `kitctl off <loadout> --live --yes` is the undo.
+- [ ] In each matching repo, on a branch: copy `kit/kit.rfc.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] In each matching repo, on a branch: copy `kit/kit.service.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] For repos with no other context: `kitctl use gestalt-flow`.
+- [ ] `kitctl off <loadout>` is the undo; it restores the original bytes. Kit warns, and does not refuse, on main or a dirty tree (kitctl's docs/apply.md#writing).
 
 ## 5. Workers
 

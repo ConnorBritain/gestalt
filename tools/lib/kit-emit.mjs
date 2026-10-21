@@ -79,7 +79,7 @@ export function emitKit(way, blocks, profiles = []) {
       loadouts.push(`gestalt-${ctx}`);
     }
     for (const name of own) { loadouts.push(name); gaps.push(`${ctx}: loadout "${name}" is referenced, not generated; it must exist in the warehouse.`); }
-    const intent = "Copy into the repo as kit.yaml on a branch, add live: true and commit it, then: kitctl plan && kitctl apply --live --yes.";
+    const intent = "Copy into the repo as kit.yaml, then: kitctl apply (it shows the plan and asks first).";
     files[`kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}.`, intent] });
     for (const pr of profiles) {
       const named = loadouts.map(l => (l.startsWith("gestalt-") ? `${l}:${pr.name}` : l));
