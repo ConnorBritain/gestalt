@@ -70,7 +70,7 @@ _Nothing runs in session here beyond the defaults._
 
 - **weekly**: org-rfp triage (Monday bid triage) [in rfp repos]
 
-Rituals never go in the always-on block; they live here and in your calendar.
+Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).
 
 ## The block
 

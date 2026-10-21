@@ -60,6 +60,7 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 - [ ] In each matching repo, on a branch: copy `kit/kit.writing.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
 - [ ] For repos with no other context: the same opt-in, then `kitctl use gestalt-flow --live --yes`.
 - [ ] Live apply refuses on main, on a dirty tree or without the committed opt-in (kitctl's docs/apply.md#live-apply). `kitctl off <loadout> --live --yes` is the undo.
+- [ ] Profile **full** (More of compounder: park new ideas, and offer the rituals by name when they are due): use `kit/profiles/full/kit.<context>.yaml` instead, or `kitctl use gestalt-flow:full --live --yes`. `kitctl use gestalt-flow --live --yes` switches back.
 
 ### Then, in each repo you start working in, in order
 

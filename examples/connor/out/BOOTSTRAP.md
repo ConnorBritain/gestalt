@@ -126,6 +126,19 @@ budgets:
   # Model-routable skills per repo. Ritual skills called by name should not list at all.
   skills_per_context: 12
   index: false
+# Profiles (Connor, 2026-10-21): the way above is the lean default. `full` adds parking and
+# compounder's rituals, and names them in the block so the lead offers them when they are due;
+# the rituals still run only by name. Same plugins and budgets: only the block grows.
+# Apply with `kitctl use gestalt-flow:full`, or kit/profiles/full/kit.<context>.yaml.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
+    flow:
+      intend: [{ use: compounder.park }]
+    reflect:
+      weekly: [compounder.update]
+      as_needed: [compounder.focus, compounder.interview]
+    offer: true
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]
@@ -318,6 +331,9 @@ instructions: |
   ### In app (.ui-magic.json present)   <!-- gestalt -->
   - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
   - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
 ```
 
 `~/kits/loadouts/gestalt-flow.yaml`
@@ -344,6 +360,12 @@ instructions: |
   - (Codex) At session start run `cairn debt`; it prints nothing when nothing is due.
   - Route drafting or revising prose in my voice, in any repo → `sh ~/.gestalt/build/workers/prose.sh "<task>"`.
   - Route the daily check-in, or anything that reads or updates Linear → the `linear` subagent.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
+    instructions_append: |
+      - By name, in session: /compounder:park, /compounder:ship, /cairn.
+      - Rituals, by name (offer one when it is due; never start it unasked): /cairn-review, the weekly forced-choice review · /compounder:review, weekly; sets next week's mode · /compounder:update, weekly after the review (the accountability email) · /gestalt:trim, monthly or when the harness feels noisy · /gestalt:taste after any change to the way · /compounder:focus when the focus ships or should change · /compounder:interview when goals change (rebuilds the charter).
 ```
 
 `~/kits/loadouts/gestalt-plugin.yaml`
@@ -360,6 +382,9 @@ instructions: |
   ### In plugin (.claude-plugin/plugin.json present)   <!-- gestalt -->
   - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
   - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
 ```
 
 `~/kits/loadouts/gestalt-roadmap.yaml`
@@ -376,6 +401,11 @@ instructions: |
   ### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->
   - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
   - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
+    instructions_append: |
+      - Added here, by name: /roadmap:slice; rituals /roadmap:cycle, sprint planning against the graph.
 ```
 
 `~/kits/loadouts/gestalt-site.yaml`
@@ -395,6 +425,9 @@ instructions: |
   ### In site (BRAND.md present)   <!-- gestalt -->
   - Before calling non-trivial work done: verification-gate gates (hook) → elonify diff-review (hook) ∥ verification-gate critics; when Stop hooks fire together, answer in that order, then compounder stop-lines, then platform git-check.
   - On elonify diff-review REFRAME: once the user has decided, offer /cairn to log it as a choice.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
 ```
 
 `~/kits/loadouts/gestalt-writing.yaml`
@@ -410,6 +443,11 @@ plugins: [plugin:prose-review, plugin:prose-tell-scan]
 instructions: |
   ### In writing (WRITING.md present)   <!-- gestalt -->
   - Before calling non-trivial work done: prose-tell-scan scan → prose-review review.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
+    instructions_append: |
+      - Added here, by name: /tell-scan.
 ```
 
 ### 4. Workers

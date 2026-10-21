@@ -127,7 +127,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 - **weekly**: cairn review (/cairn-review, the weekly forced-choice review); compounder review (/compounder:review, weekly; sets next week's mode); roadmap cycle (/roadmap:cycle, sprint planning against the graph) [in roadmap repos]; kitctl doctor (`kitctl doctor`: stale disables, pin drift, pending trust, hooks that never fired)
 - **monthly**: gestalt trim (/gestalt:trim, monthly or when the harness feels noisy); gestalt taste (/gestalt:taste after any change to the way); prose-author style-tune (prose-style-tune, turning accepted edits into profile changes)
 
-Rituals never go in the always-on block; they live here and in your calendar.
+Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).
 
 ## The block
 
@@ -181,6 +181,33 @@ Order: orient → intend → plan → make → check → record. Checkers report
 ### In writing (WRITING.md present)   <!-- gestalt -->
 - Before calling non-trivial work done: prose-tell-scan scan → prose-review review.
 <!-- gestalt:end way.writing -->
+```
+
+## Profiles
+
+The way above is the default. A profile is the same way with more added; kitctl applies it as `<loadout>:<profile>` (the loadouts stay the same, only the block grows).
+
+### full
+
+More of compounder: park new ideas, and offer the rituals by name when they are due.
+
+- Adds in session: compounder park (intend, explicit).
+- Adds weekly: compounder update: /compounder:update, weekly after the review (the accountability email).
+- Adds as needed: compounder focus: /compounder:focus when the focus ships or should change; compounder interview: /compounder:interview when goals change (rebuilds the charter).
+- `offer`: the block names what runs by slash command, so the lead can offer the rituals when they are due.
+- Block ≈274 tokens (budget 450); context blocks: plugin ≈117, roadmap ≈142, app ≈112, site ≈111, writing ≈61.
+
+```markdown
+<!-- gestalt:begin way -->
+## Way of work   <!-- gestalt -->
+
+Order: orient → intend → plan → make → check → record. Checkers report; they never fix. Give every worker and critic the user's original request verbatim and the decisions made since.
+- (Codex) At session start run `cairn debt`; it prints nothing when nothing is due.
+- Route drafting or revising prose in my voice, in any repo → `sh ~/.gestalt/build/workers/prose.sh "<task>"`.
+- Route the daily check-in, or anything that reads or updates Linear → the `linear` subagent.
+- By name, in session: /compounder:park, /compounder:ship, /cairn.
+- Rituals, by name (offer one when it is due; never start it unasked): /cairn-review, the weekly forced-choice review · /compounder:review, weekly; sets next week's mode · /compounder:update, weekly after the review (the accountability email) · /gestalt:trim, monthly or when the harness feels noisy · /gestalt:taste after any change to the way · /compounder:focus when the focus ships or should change · /compounder:interview when goals change (rebuilds the charter).
+<!-- gestalt:end way -->
 ```
 
 ## Lint

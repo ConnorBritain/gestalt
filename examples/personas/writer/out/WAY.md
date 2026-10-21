@@ -68,7 +68,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 - **weekly**: cairn review (/cairn-review, the weekly forced-choice review); prose-author style-tune (prose-style-tune, turning accepted edits into profile changes)
 - **monthly**: cairn resolve (/cairn-resolve when a prediction comes due)
 
-Rituals never go in the always-on block; they live here and in your calendar.
+Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).
 
 ## The block
 

@@ -102,4 +102,35 @@ check("disable removes an entry from a context", "trim's disable-in-context must
   assert.equal(activeEntries(way, scenarios(way)[1]).length, 0);
 });
 
+group("profiles");
+check("a profile is the way plus its additions, validated as a whole", "kitctl applies it as <loadout>:<profile>; it must be a complete, checked way", () => {
+  const raw = base();
+  raw.reflect = { weekly: ["compounder.review"] };
+  raw.profiles = { full: { description: "More rituals.", flow: { intend: [{ use: "compounder.park" }] }, reflect: { as_needed: ["compounder.focus"] }, budgets: { block_tokens: 500 }, offer: true } };
+  const { way, problems } = normaliseWay(raw);
+  assert.deepEqual(problems, []);
+  assert.equal(way.offer, false);
+  const [pr] = way.profiles;
+  assert.equal(pr.name, "full");
+  assert.ok(pr.way.offer);
+  assert.deepEqual(pr.way.flow.map(f => f.use), ["compounder.park", "verification-gate.gates", "verification-gate.critics"]);
+  assert.deepEqual(pr.way.reflect.weekly.map(r => r.use), ["compounder.review"]);
+  assert.deepEqual(pr.way.reflect.as_needed.map(r => r.use), ["compounder.focus"]);
+  assert.equal(pr.way.budgets.block_tokens, 500);
+  assert.equal(way.budgets.block_tokens, 450);
+});
+check("a profile's own problems name the profile; the base's are not repeated", "one typo should read as one problem, in the place it was made", () => {
+  const raw = base();
+  raw.profiles = { full: { description: "Typo.", flow: { intend: [{ use: "compounder.parq" }] }, colour: "blue" } };
+  const problems = normaliseWay(raw).problems;
+  assert.ok(problems.some(p => p.code === "GST-SCHEMA" && p.where === "profiles.full" && /colour/.test(p.message)), messages(raw));
+  assert.ok(problems.some(p => p.code === "GST-REF" && p.where === "profiles.full: flow.intend[0]"), messages(raw));
+  const both = base(); both.flow.intend = [{ use: "nope.step" }]; both.profiles = { full: { description: "Fine." } };
+  assert.equal(normaliseWay(both).problems.filter(p => p.code === "GST-REF").length, 1, messages(both));
+});
+check("as_needed rituals are reflect-stage only", "a ritual with no calendar still belongs to reflect, never to a session stage", () => {
+  const raw = base(); raw.reflect = { as_needed: ["compounder.park"] };
+  assert.ok(codes(raw).includes("GST-ORDER"));
+});
+
 finish();

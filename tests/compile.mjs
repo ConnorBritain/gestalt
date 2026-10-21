@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { check, finish, group, run, skip, tempDir, FIXTURES, ROOT } from "./harness.mjs";
-import { readWay } from "../tools/lib/way.mjs";
+import { normaliseWay, readWay } from "../tools/lib/way.mjs";
 import { compileWay } from "../tools/lib/compile.mjs";
 import { expectedTrace } from "../tools/lib/render-taste.mjs";
 import { V2_LOADOUT_KEYS } from "../tools/lib/kit-emit.mjs";
@@ -225,6 +225,40 @@ check("compile on a rejected way exits 1 and prints the codes", "the skill shows
   const r = run(["compile", "--way", join(FIXTURES, "lint", "GST-SLOT.way.yaml"), "--out", tempDir()]);
   assert.equal(r.status, 1);
   assert.match(r.stdout, /GST-SLOT/);
+});
+
+group("profiles");
+const withProfile = () => {
+  const { way, catalog, problems } = readWay(fullPath);
+  const raw = parseYaml(readFileSync(fullPath, "utf8"));
+  raw.profiles = { full: { description: "Offer the rituals by name.", reflect: { as_needed: ["compounder.focus"] }, offer: true } };
+  return { raw, catalog, problems, way };
+};
+check("a profile becomes a kitctl profile on every Gestalt loadout, carrying only the lines it adds", "kitctl profiles narrow and never add, so the base loadouts must already hold every plugin", () => {
+  const { raw } = withProfile();
+  const { way, catalog, problems } = normaliseWay(raw);
+  const r = compileWay(way, catalog, { problems });
+  assert.ok(r.ok, JSON.stringify(r.lint.problems.filter(p => p.severity === "error")));
+  for (const [path, text] of Object.entries(r.files).filter(([p]) => /^kit\/loadouts\/gestalt-/.test(p))) {
+    const doc = parseYaml(text);
+    assert.ok(doc.profiles?.full, `${path} lacks the full profile`);
+    assert.deepEqual(Object.keys(doc.profiles.full).filter(k => !["description", "instructions_append"].includes(k)), [], path);
+  }
+  const flow = parseYaml(r.files["kit/loadouts/gestalt-flow.yaml"]);
+  assert.match(flow.profiles.full.instructions_append, /\/compounder:focus/);
+  assert.ok(!flow.instructions.includes("/compounder:focus"), "the default block stays lean");
+  assert.ok(r.files["profiles/full/block.md"].includes("<!-- gestalt:begin way -->"), "a profile block is whole, under the same marker");
+  assert.deepEqual(parseYaml(r.files["kit/profiles/full/kit.code.yaml"]).loadouts, ["gestalt-flow:full", "gestalt-code:full", "brand-studio"], "a warehouse loadout keeps its own name");
+  assert.match(r.files["WAY.md"], /## Profiles/);
+  assert.match(r.files["SETUP.md"], /gestalt-flow:full/);
+});
+check("a profile is held to its own block budget", "a fuller profile must not quietly outgrow the leanness contract", () => {
+  const { raw } = withProfile();
+  raw.profiles.full.budgets = { block_tokens: 150 };
+  const { way, catalog, problems } = normaliseWay(raw);
+  const r = compileWay(way, catalog, { problems });
+  assert.equal(r.ok, false);
+  assert.ok(r.lint.problems.some(p => p.code === "GST-BUDGET" && p.where === "profile full: block"));
 });
 
 finish();

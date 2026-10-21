@@ -14,8 +14,9 @@ import {
 export const WAY_SCHEMA = "gestalt-way/1";
 export const CONNECTOR_ROLES = ["tracker", "docs", "mail", "calendar", "chat", "publish", "code", "data", "files"];
 // on_enter runs once per repo, in the order listed (set the repo up before working in it);
-// the others are calendar rituals.
-export const CADENCES = ["on_enter", "daily", "weekly", "monthly"];
+// daily, weekly and monthly are calendar rituals; as_needed ones wait for their moment (the
+// focus shipped, the goals changed) and are run by name.
+export const CADENCES = ["on_enter", "daily", "weekly", "monthly", "as_needed"];
 export const DEFAULT_BUDGETS = {
   block_tokens: 450,
   protocol_rules: 3,
@@ -29,7 +30,7 @@ const ENV_NAME_RE = /^[A-Z_][A-Z0-9_]*$/;
 const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 const PLATFORM_RE = /^platform:[a-z0-9][a-z0-9-]*$/;
 
-const TOP_KEYS = ["schema", "person", "harnesses", "writer", "connectors", "contexts", "flow", "stop_order", "links", "reflect", "budgets", "disable", "topology", "catalog", "taste", "waive"];
+const TOP_KEYS = ["schema", "person", "harnesses", "writer", "connectors", "contexts", "flow", "stop_order", "links", "reflect", "budgets", "disable", "topology", "catalog", "taste", "waive", "profiles"];
 const KEYS = {
   person: ["name", "roles", "goals", "pains"],
   connector: ["id", "ref", "role", "auth", "optional", "server", "note"],
@@ -43,6 +44,7 @@ const KEYS = {
   lead: ["keeps", "note"],
   worker: ["id", "tier", "mechanism", "uses", "route", "mcp", "returns", "note"],
   taste: ["id", "prompt", "context", "path", "expect", "expect_quiet"],
+  profile: ["description", "flow", "reflect", "budgets", "offer"],
 };
 
 export function gestaltHome(env = process.env) {
@@ -71,7 +73,7 @@ class Problems {
  * Validate and normalise a parsed way. Returns { way, catalog, problems } where `way` has
  * defaults filled in, every flow step resolved to its catalog step, and `contexts` ordered.
  */
-export function normaliseWay(raw, { catalogDir } = {}) {
+export function normaliseWay(raw, { catalogDir, offer = false } = {}) {
   const p = new Problems();
   if (!p.keys(raw, TOP_KEYS, "way")) return { way: null, catalog: null, problems: p.items };
   if (raw.schema !== WAY_SCHEMA) p.add("GST-SCHEMA", "schema", `must be ${WAY_SCHEMA}`);
@@ -279,8 +281,33 @@ export function normaliseWay(raw, { catalogDir } = {}) {
   const way = {
     schema: raw.schema, person: { roles: [], pains: [], ...person, goals: list(person.goals) }, harnesses, writer,
     connectors, contexts, flow, reflect, stop_order: stopOrder, links, budgets, disable, topology, taste,
-    catalog: list(raw.catalog), waive,
+    catalog: list(raw.catalog), waive, offer, profiles: [],
   };
+
+  // profiles: named variants of the way (a lean default and a fuller one, say). A profile adds
+  // flow steps and rituals, may override budgets, and can turn on `offer`; it is the way with those
+  // changes, validated and linted as a whole, and kitctl applies it as `gestalt-<x>:<name>`.
+  if (raw.profiles != null && !isMap(raw.profiles)) p.add("GST-SCHEMA", "profiles", "must be a map of name → profile");
+  else for (const [name, pr] of Object.entries(raw.profiles ?? {})) {
+    const w = `profiles.${name}`;
+    if (!ID_RE.test(name)) p.add("GST-SCHEMA", w, "profile names are lowercase ids");
+    if (!p.keys(pr, KEYS.profile, w)) continue;
+    if (!isStr(pr.description)) p.add("GST-SCHEMA", `${w}.description`, "say what this profile adds, in one line");
+    if (pr.offer != null && typeof pr.offer !== "boolean") p.add("GST-SCHEMA", `${w}.offer`, "must be true or false");
+    const merged = { ...raw, budgets: { ...(raw.budgets ?? {}), ...(pr.budgets ?? {}) } };
+    delete merged.profiles;
+    for (const [key, slots] of [["flow", STAGES], ["reflect", CADENCES]]) {
+      if (pr[key] == null) continue;
+      if (!p.keys(pr[key], slots, `${w}.${key}`)) continue;
+      merged[key] = { ...(raw[key] ?? {}) };
+      for (const s of slots) if (pr[key][s] != null) merged[key][s] = [...list(raw[key]?.[s]), ...list(pr[key][s])];
+    }
+    const sub = normaliseWay(merged, { catalogDir, offer: pr.offer === true });
+    // Report only what the profile itself introduces; the base's own problems are already listed.
+    const seen = new Set(p.items.map(x => `${x.code}|${x.where}|${x.message}`));
+    for (const x of sub.problems) if (!seen.has(`${x.code}|${x.where}|${x.message}`)) p.add(x.code, `${w}: ${x.where}`, x.message, x.severity);
+    if (sub.way) way.profiles.push({ name, description: pr.description, way: sub.way });
+  }
   return { way, catalog, problems: p.items };
 }
 

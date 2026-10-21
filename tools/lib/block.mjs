@@ -4,7 +4,7 @@
 // snippet (its trigger, its skip clause, its agents) stays the tool's: restating it creates
 // two copies that drift.
 import { STAGES } from "./catalog.mjs";
-import { activeRituals, activeSteps, scenarios } from "./way.mjs";
+import { activeRituals, activeSteps, scenarios, workerFor } from "./way.mjs";
 import { stopGates } from "./lint.mjs";
 import { estimateTokens } from "./tokens.mjs";
 
@@ -92,12 +92,42 @@ export function blockLines(way, catalog, scenario, base = null) {
     const here = new Set([...ids, ...activeRituals(way, scenario).map(r => r.use)]);
     lines.push({ key: `route:${w.id}:${w.uses.filter(u => here.has(u)).join(",")}`, text: `Route ${w.route} → ${how(w, catalog, here)}.` });
   }
+  if (way.offer) lines.push(...offerLines(way, scenario, base));
   if (way.budgets.index) {
     // A context block indexes only what its context adds; the base block indexes the rest.
     const baseIds = new Set(base ? activeSteps(way, base).map(f => f.use) : []);
     const parts = STAGES.map(s => [s, steps.filter(f => f.stage === s && !baseIds.has(f.use)).map(f => f.entry.id)]).filter(([, e]) => e.length).map(([s, e]) => `${s} ${[...new Set(e)].join("·")}`);
     if (parts.length) lines.push({ key: `index:${parts.join("|")}`, text: `${base ? "Index, added here" : "Index"}: ${parts.join(" | ")}.` });
   }
+  return lines;
+}
+
+/**
+ * With `offer`, what runs by name. In-session explicit steps list themselves, yet skills the
+ * model must remember to call often go uncalled (DESIGN.md, research); ritual skills hide
+ * from the listing altogether, so the line carries what each one is for. Worker-routed steps
+ * already have a route line, and on_enter is set-up, not a ritual. A context block names only
+ * what its context adds.
+ */
+function offerLines(way, scenario, base) {
+  const routed = id => ["subagent", "headless"].includes(workerFor(way, id)?.mechanism);
+  const slash = step => (command(step) ?? "").startsWith("/");
+  const pick = sc => ({
+    session: activeSteps(way, sc).filter(f => f.mode === "explicit" && slash(f.step) && !routed(f.use)),
+    rituals: activeRituals(way, sc).filter(r => !way.reflect.on_enter.includes(r) && slash(r.step) && !routed(r.use)),
+  });
+  const mine = pick(scenario);
+  const theirs = base ? pick(base) : { session: [], rituals: [] };
+  const session = mine.session.filter(f => !theirs.session.some(x => x.use === f.use));
+  const rituals = mine.rituals.filter(r => !theirs.rituals.some(x => x.use === r.use));
+  const cmds = [...new Set(session.map(f => command(f.step)))].join(", ");
+  const due = rituals.map(r => r.step.invoke).join(" · ");
+  const key = `offer:${[...session, ...rituals].map(x => x.use).join(",")}`;
+  if (!session.length && !rituals.length) return [];
+  if (base) return [{ key, text: `Added here, by name: ${[cmds, rituals.length ? `rituals ${due}` : ""].filter(Boolean).join("; ")}.` }];
+  const lines = [];
+  if (session.length) lines.push({ key: `${key}:session`, text: `By name, in session: ${cmds}.` });
+  if (rituals.length) lines.push({ key: `${key}:rituals`, text: `Rituals, by name (offer one when it is due; never start it unasked): ${due}.` });
   return lines;
 }
 

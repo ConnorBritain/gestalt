@@ -69,7 +69,7 @@ agents. Nothing Gestalt compiles needs it loaded, so you can disable it after se
 gestalt survey  [--home DIR] [--repo DIR]... [--plugin DIR]... [--usage DAYS] [--out DIR]
 gestalt lint    [--way FILE] [--survey FILE]
 gestalt compile [--way FILE] [--survey FILE] [--out DIR] [--check]
-gestalt write   --block FILE [--context NAME] | --agents DIR   [--yes]
+gestalt write   --block FILE [--context NAME] [--profile NAME] | --agents DIR   [--yes]
 gestalt eval    --plan
 ```
 

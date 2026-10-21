@@ -46,6 +46,21 @@ steps:
     kind: ritual
     mode: explicit
     invoke: /compounder:review, weekly; sets next week's mode
+  - id: compounder.update
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /compounder:update, weekly after the review (the accountability email)
+  - id: compounder.focus
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /compounder:focus when the focus ships or should change
+  - id: compounder.interview
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /compounder:interview when goals change (rebuilds the charter)
 hooks:
   - { event: SessionStart, blocking: false, mechanism: context, serves: compounder.brief, lines: 3, note: "three lines of context in focus sessions (scripts/lib/brief.mjs sessionBrief), 2 in work, paid and neutral lanes; the one-line status goes to the user as systemMessage, not to the model" }
   - { event: UserPromptSubmit, blocking: true, mechanism: decision-block, serves: compounder.guard, note: "!park, off-lane repos and new-project talk in focus or lockdown" }
