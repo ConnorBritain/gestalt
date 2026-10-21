@@ -61,14 +61,14 @@ export function emitKit(way, blocks) {
       loadouts.push(`gestalt-${ctx}`);
     }
     for (const name of own) { loadouts.push(name); gaps.push(`${ctx}: loadout "${name}" is referenced, not generated; it must exist in the warehouse.`); }
-    files[`kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}.`, "Copy into the repo as kit.yaml, then: kitctl plan && kitctl apply."] });
+    files[`kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}.`, "Copy into the repo as kit.yaml on a branch, add live: true and commit it, then: kitctl plan && kitctl apply --live --yes."] });
   }
   // Missing warehouse primitives are kitctl validate's to report ("missing primitive"); not
   // repeated here. A slot is different: kitctl rejects it unless the primitive declares it.
   for (const doc of docs) for (const [slot, ref] of Object.entries(doc.slots ?? {})) {
     gaps.push(`${ref}: its warehouse primitive must list \`${slot}\` under provides (${doc.name} assigns it that slot).`);
   }
-  if (way.harnesses.includes("cursor")) gaps.push("cursor: kitctl does not target Cursor; SETUP.md lists the manual steps.");
+  if (way.harnesses.includes("cursor")) gaps.push("cursor: kit.yaml leaves cursor out of harnesses until you add it; kitctl's Cursor facts are unverified, so check the first repo by hand (SETUP.md §6).");
   files["gaps.md"] = `# kitctl gaps\n\nWhat kitctl needs from you before these loadouts apply. \`kitctl validate\` names any primitive missing from your warehouse.\n\n${gaps.length ? gaps.map(g => `- ${g}`).join("\n") : "- Nothing beyond what kitctl validate reports."}\n`;
   return { files, gaps };
 }
