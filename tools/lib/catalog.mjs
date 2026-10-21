@@ -43,7 +43,7 @@ export const MECHANISMS = ["subagent", "headless", "agent-file", "script"];
 
 // Mirrors kitctl/src/kitctl/model.py so a catalog ref is a valid kitctl ref.
 const SEGMENT = "[a-z0-9](?:[a-z0-9._-]{0,62})";
-export const KIT_KINDS = ["skill", "mcp", "hook", "plugin", "marketplace", "tool"];
+export const KIT_KINDS = ["skill", "mcp", "hook", "plugin", "marketplace", "tool", "agent"];
 export const REF_RE = new RegExp(`^(${KIT_KINDS.join("|")}):((?:${SEGMENT}/)?${SEGMENT})$`);
 export const SLOT_RE = /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*$/;
 export const WHEN_RE = /^file-exists:(.+)$/;
@@ -52,8 +52,9 @@ export const ENTRY_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 const ENTRY_KEYS = new Set(["schema", "id", "ref", "kind", "title", "summary", "version_seen", "source", "install", "slot", "steps", "hooks", "knobs", "harness", "cost", "mcp", "feeds", "worker", "exclusive_of", "confidence", "notes"]);
 const STEP_KEYS = new Set(["id", "stage", "kind", "mode", "invoke", "wiring_marker", "fallback", "when", "note"]);
-const HOOK_KEYS = new Set(["event", "matcher", "blocking", "mechanism", "opt_in", "honours_stop_hook_active", "serves", "lines", "quiet_unless", "once_per_session", "note"]);
-const KNOB_KEYS = new Set(["file", "scope", "key", "default", "change_with", "loosening"]);
+const HOOK_KEYS = new Set(["event", "matcher", "blocking", "mechanism", "opt_in", "honours_stop_hook_active", "serves", "lines", "quiet_unless", "once_per_session", "unblocked_by", "note"]);
+const KNOB_KEYS = new Set(["file", "scope", "key", "default", "values", "change_with", "loosening"]);
+const UNBLOCK_KEYS = new Set(["setting", "value", "harness"]);
 const COST_KEYS = new Set(["skills", "agents", "commands", "listing_tokens", "session_start_lines", "measured_from", "wiring_lines"]);
 const MCP_KEYS = new Set(["servers", "tools", "note"]);
 const FEED_KEYS = new Set(["on", "to", "as", "status"]);
@@ -63,6 +64,7 @@ function unknown(obj, allowed, where, problems) {
   for (const k of Object.keys(obj ?? {})) if (!allowed.has(k)) problems.push(`${where}: unknown key "${k}"`);
 }
 const isStr = v => typeof v === "string" && v.length > 0;
+export const isScalar = v => ["string", "number", "boolean"].includes(typeof v);
 
 /** Validate one entry. Returns a list of problems (empty when valid). */
 export function validateEntry(entry, where = entry?.id ?? "entry") {
@@ -102,8 +104,29 @@ export function validateEntry(entry, where = entry?.id ?? "entry") {
     if (hook.blocking && !hook.mechanism) problems.push(`${w}: a blocking hook names its mechanism`);
     if (hook.serves != null && !stepIds.has(hook.serves)) problems.push(`${w}: serves "${hook.serves}" is not a step of ${entry.id}`);
     if (hook.quiet_unless != null && !WHEN_RE.test(hook.quiet_unless)) problems.push(`${w}: quiet_unless must be file-exists:PATH`);
+    // unblocked_by: the way can set one of the entry's knobs so this hook stops blocking on
+    // the listed harnesses (it still blocks everywhere else).
+    const u = hook.unblocked_by;
+    if (u != null) {
+      if (typeof u !== "object" || Array.isArray(u)) { problems.push(`${w}.unblocked_by: must be {setting, value, harness}`); continue; }
+      unknown(u, UNBLOCK_KEYS, `${w}.unblocked_by`, problems);
+      if (!hook.blocking) problems.push(`${w}.unblocked_by: only a blocking hook can be unblocked`);
+      const knob = (entry.knobs ?? []).find(k => k.key === u.setting);
+      if (!knob) problems.push(`${w}.unblocked_by: setting "${u.setting}" is not a knob of ${entry.id}`);
+      if (!isScalar(u.value)) problems.push(`${w}.unblocked_by: value must be a scalar`);
+      else if (Array.isArray(knob?.values) && !knob.values.includes(u.value)) problems.push(`${w}.unblocked_by: value ${JSON.stringify(u.value)} is not one of the knob's values`);
+      if (!Array.isArray(u.harness) || !u.harness.length || u.harness.some(h => !HARNESSES.includes(h))) problems.push(`${w}.unblocked_by: harness must list one or more of ${HARNESSES.join(", ")}`);
+    }
   }
-  for (const [i, knob] of (entry.knobs ?? []).entries()) unknown(knob, KNOB_KEYS, `${where}.knobs[${i}]`, problems);
+  for (const [i, knob] of (entry.knobs ?? []).entries()) {
+    const w = `${where}.knobs[${i}]`;
+    unknown(knob, KNOB_KEYS, w, problems);
+    if (!isStr(knob.key)) problems.push(`${w}: key is required`);
+    if (knob.values != null) {
+      if (!Array.isArray(knob.values) || !knob.values.length || !knob.values.every(isScalar)) problems.push(`${w}: values must be a list of scalars`);
+      else if (knob.default != null && !knob.values.includes(knob.default)) problems.push(`${w}: default ${JSON.stringify(knob.default)} is not one of its values`);
+    }
+  }
   if (entry.harness != null) {
     for (const [h, level] of Object.entries(entry.harness)) {
       if (!HARNESSES.includes(h)) problems.push(`${where}.harness: unknown harness "${h}"`);

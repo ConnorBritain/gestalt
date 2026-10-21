@@ -8,7 +8,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseYaml } from "./yaml.mjs";
 import {
-  ALL_STAGES, HARNESSES, MECHANISMS, MODES, REF_RE, STAGES, TIERS, WHEN_RE, indexCatalog, loadCatalog,
+  ALL_STAGES, HARNESSES, MECHANISMS, MODES, REF_RE, STAGES, TIERS, WHEN_RE, indexCatalog, isScalar, loadCatalog,
 } from "./catalog.mjs";
 
 export const WAY_SCHEMA = "gestalt-way/1";
@@ -30,7 +30,7 @@ const ENV_NAME_RE = /^[A-Z_][A-Z0-9_]*$/;
 const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 const PLATFORM_RE = /^platform:[a-z0-9][a-z0-9-]*$/;
 
-const TOP_KEYS = ["schema", "person", "harnesses", "writer", "connectors", "contexts", "flow", "stop_order", "links", "reflect", "budgets", "disable", "topology", "catalog", "taste", "waive", "profiles"];
+const TOP_KEYS = ["schema", "person", "harnesses", "writer", "connectors", "contexts", "flow", "stop_order", "links", "reflect", "budgets", "disable", "topology", "catalog", "taste", "waive", "profiles", "settings"];
 const KEYS = {
   person: ["name", "roles", "goals", "pains"],
   connector: ["id", "ref", "role", "auth", "optional", "server", "note"],
@@ -224,6 +224,23 @@ export function normaliseWay(raw, { catalogDir, offer = false } = {}) {
     }
   }
 
+  // settings: knob values the way relies on, keyed "<entry id>.<knob key>" (the entry id has
+  // no dot, so the first dot splits them). Gestalt never writes them; SETUP.md lists each as a
+  // step with the owning tool's command. A setting can unblock a hook (catalog unblocked_by).
+  const settings = {};
+  if (raw.settings != null && !isMap(raw.settings)) p.add("GST-SETTING", "settings", "must be a map of \"<entry>.<knob key>\" → value");
+  else for (const [key, value] of Object.entries(raw.settings ?? {})) {
+    const w = `settings.${key}`;
+    const dot = key.indexOf(".");
+    const entry = dot > 0 ? catalog.entries.get(key.slice(0, dot)) : null;
+    const knob = entry?.knobs?.find(k => k.key === key.slice(dot + 1));
+    if (!entry) p.add("GST-SETTING", w, `"${dot > 0 ? key.slice(0, dot) : key}" is not a catalog entry; name the setting "<entry>.<knob key>"`);
+    else if (!knob) p.add("GST-SETTING", w, `${entry.id} declares no knob "${key.slice(dot + 1)}"${entry.knobs?.length ? ` (knobs: ${entry.knobs.map(k => k.key).join(", ")})` : ""}`);
+    else if (!isScalar(value)) p.add("GST-SETTING", w, "must be a single value (a string, number or boolean)");
+    else if (Array.isArray(knob.values) && !knob.values.includes(value)) p.add("GST-SETTING", w, `${JSON.stringify(value)} is not one of ${knob.values.map(v => JSON.stringify(v)).join(", ")}`);
+    else settings[key] = value;
+  }
+
   // way-level waivers: for context-level codes (budgets, the lead's load) that no single
   // step owns. Each needs the person's reason and stays visible in WAY.md.
   const waive = [];
@@ -281,7 +298,7 @@ export function normaliseWay(raw, { catalogDir, offer = false } = {}) {
   const way = {
     schema: raw.schema, person: { roles: [], pains: [], ...person, goals: list(person.goals) }, harnesses, writer,
     connectors, contexts, flow, reflect, stop_order: stopOrder, links, budgets, disable, topology, taste,
-    catalog: list(raw.catalog), waive, offer, profiles: [],
+    catalog: list(raw.catalog), waive, settings, offer, profiles: [],
   };
 
   // profiles: named variants of the way (a lean default and a fuller one, say). A profile adds
@@ -350,6 +367,49 @@ export function activeEntries(way, scenario) {
 /** Reflect items that belong to a scenario's contexts. */
 export function activeRituals(way, scenario) {
   return Object.values(way.reflect).flat().filter(r => r.in.some(c => scenario.active.includes(c)));
+}
+
+/** A way's settings with their catalog knobs (validated in normaliseWay), in the way's order. */
+export function waySettings(way, catalog) {
+  const show = v => (typeof v === "string" ? v : JSON.stringify(v));
+  return Object.entries(way.settings ?? {}).map(([key, value]) => {
+    const id = key.slice(0, key.indexOf("."));
+    const entry = catalog.entries.get(id);
+    const knob = entry.knobs.find(k => k.key === key.slice(id.length + 1));
+    return { key, id, entry, knob, value, shown: show(value), shownDefault: show(knob.default) };
+  });
+}
+
+/** The harness the lead mainly runs in: the first one the way lists. Lint counts gates there. */
+export function primaryHarness(way) {
+  return way.harnesses[0] ?? "claude";
+}
+
+/** The value a way gives one of an entry's knobs, or the knob's default when it sets none. */
+export function settingValue(way, entry, knobKey) {
+  const key = `${entry.id}.${knobKey}`;
+  if (Object.hasOwn(way.settings ?? {}, key)) return way.settings[key];
+  return (entry.knobs ?? []).find(k => k.key === knobKey)?.default ?? null;
+}
+
+/**
+ * Whether a hook blocks the turn on a harness. A blocking hook stops blocking where the way
+ * sets the knob its `unblocked_by` names to the value it names, on the harnesses it lists;
+ * everywhere else it still blocks. `harness` defaults to the lead's primary harness; "any"
+ * asks whether it blocks on at least one of the way's harnesses (the block is shared by all
+ * of them, so its Stop order keeps a gate that still blocks somewhere).
+ */
+export function hookBlocks(way, entry, hook, harness = primaryHarness(way)) {
+  if (!hook.blocking) return false;
+  const u = hook.unblocked_by;
+  if (!u) return true;
+  if (harness === "any") return blockingHarnesses(way, entry, hook).length > 0;
+  return !(settingValue(way, entry, u.setting) === u.value && u.harness.includes(harness));
+}
+
+/** The way's harnesses on which a hook still blocks, leaving out those the entry does not run on. */
+export function blockingHarnesses(way, entry, hook) {
+  return way.harnesses.filter(h => (entry.harness?.[h] ?? "none") !== "none" && hookBlocks(way, entry, hook, h));
 }
 
 /** Which worker (if any) performs a step. */

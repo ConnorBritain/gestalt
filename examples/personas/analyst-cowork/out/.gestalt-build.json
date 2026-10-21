@@ -14,6 +14,8 @@
     "kit/kit.rfp.yaml",
     "kit/loadouts/gestalt-flow.yaml",
     "kit/loadouts/gestalt-pricing.yaml",
-    "kit/loadouts/gestalt-rfp.yaml"
+    "kit/loadouts/gestalt-rfp.yaml",
+    "kit/primitives/agents/library.yaml",
+    "kit/primitives/agents/library/claude.md"
   ]
 }

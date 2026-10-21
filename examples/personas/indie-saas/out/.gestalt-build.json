@@ -11,6 +11,8 @@
     "kit/gaps.md",
     "kit/kit.app.yaml",
     "kit/loadouts/gestalt-app.yaml",
-    "kit/loadouts/gestalt-flow.yaml"
+    "kit/loadouts/gestalt-flow.yaml",
+    "kit/primitives/agents/linear.yaml",
+    "kit/primitives/agents/linear/claude.md"
   ]
 }

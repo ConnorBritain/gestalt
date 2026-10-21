@@ -44,6 +44,7 @@ Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gest
 - [ ] Leave off (the step is not hook-enforced in this way): `settings capture_hook=true` for cairn capture (Stop), everywhere.
 - [ ] Create: `.claude/gates.json` for verification-gate gates (Stop, blocks), in plugin, roadmap, app, site repos.
 - [ ] Create: `.claude/elonify.json` for elonify diff-review (Stop, blocks), in plugin, roadmap, app, site repos.
+- [ ] Set `rules.stop_mode` to `context` in ~/.compounder/charter.json with /compounder:update (compounder).
 - [ ] Leave `rules.stop_nudge` at true (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with /compounder:update (that tool treats it as loosening).
 - [ ] Leave `rules.stop_nudge_min_edits` at 3 (compounder). The Stop order handles the overlap; if the taste test shows it does not, change it with /compounder:update (that tool treats it as loosening).
 
@@ -52,6 +53,7 @@ Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gest
 kitctl writes native config; Gestalt only emitted the loadouts.
 
 - [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.
+- [ ] Copy `kit/primitives/` into the warehouse too (`~/kits/primitives/`): each subagent worker is an `agent:` primitive there, with its agent files beside it.
 - [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).
 - [ ] In each matching repo, on a branch: copy `kit/kit.app.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
 - [ ] In each matching repo, on a branch: copy `kit/kit.plugin.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
@@ -70,7 +72,7 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 
 - [ ] `critics`: uses the plugin's own agent; nothing to place.
 - [ ] `prose`: keep `workers/prose.sh` at `~/.gestalt/build/workers/` and export `GESTALT_PLUGIN_PROSE_AUTHOR` (the plugin directory). The lead's loadout disables the plugin so only the worker loads it. Check once that the worker still sees it (`sh workers/prose.sh "list your skills"`); if it does not, run the worker from a directory outside the repo.
-- [ ] `linear`: `gestalt write --agents ~/.claude/agents` places `agents/claude/linear.md` (a user agent, not a plugin agent, so its mcpServers apply). For Codex, `gestalt write --agents ~/.codex/agents` places `agents/codex/linear.toml`.
+- [ ] `linear`: nothing to place by hand. `gestalt-flow` lists `agent:linear`, so kitctl writes `.claude/agents/linear.md` and `.codex/agents/linear.toml` with the rest of the loadout (under `~/` with `kitctl use gestalt-flow --user`). It is a standalone agent file, not a plugin agent, so its mcpServers apply.
 - [ ] Codex: headless workers carry a `codex exec` line in their script.
 
 ## 6. Cursor and harnesses kitctl does not reach

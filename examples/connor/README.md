@@ -41,12 +41,14 @@ code, not its README) and measured from the real plugin checkouts.
 - **Four Stop gates, one order.** Claude Code runs Stop hooks together, so Gestalt orders
   the model's answer instead: tests, then elonify's verdict, then compounder's three lines,
   then the cloud's commit-and-push check. It shares one line with the check order in the
-  code-repo blocks.
+  code-repo blocks. In Claude Code, compounder's lines no longer block at all (below); the
+  order still names them because Codex and Cursor read the same block and still block.
 - **A hand-off that did not exist.** On an elonify REFRAME, once Connor has decided, the
   block offers `/cairn` to log the decision as a choice. That is the first step toward
   calibrating elonify against outcomes (see [docs/upstream.md](../../docs/upstream.md)).
 - **The Linear connection lives in a worker.** The daily check-in runs in a `linear`
-  subagent that holds the Linear MCP inline, so the lead never lists Linear's tools.
+  subagent that holds the Linear MCP inline, so the lead never lists Linear's tools. kitctl
+  places it: `gestalt-flow` lists `agent:linear`, whose files are in `out/kit/primitives/`.
 - **The lead stays at roughly 1.8–3.6k always-on tokens**, depending on the kind of repo,
   against 7.3k if every plugin were enabled everywhere.
 
@@ -55,8 +57,11 @@ code, not its README) and measured from the real plugin checkouts.
 - Codex tiers are not filled in yet (`GST-TIER`), and every protocol gate is advisory on
   Codex (`GST-HARNESS`): written down, nothing makes it happen. Run reviewers there as a
   fresh `codex exec`.
-- compounder's Stop lines are a recorder that blocks (`GST-RECORDER-BLOCKS`). It is
-  tolerated because it is ordered after the critics; the upstream ask is a non-blocking mode.
+- compounder's Stop lines were a recorder that blocks (`GST-RECORDER-BLOCKS`). compounder
+  0.3.0's `rules.stop_mode: context`, which the way sets (`settings:`), asks for them
+  mid-session as context instead, so Claude Code no longer blocks and the warning is gone.
+  Codex and Cursor still block at Stop as the fallback; WAY.md says so as info, and the
+  Stop order keeps the lines after the critics for those harnesses.
 - **Budgets per measure** (Connor's decision), with no waivers. Five always-on rules by
   choice: each is a gate the model would otherwise skip. Session-start lines fit (5, or 8 in
   roadmap repos) since compounder's brief went to three lines, and listed skills fit (10–11)

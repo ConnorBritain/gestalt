@@ -54,7 +54,8 @@ export function blockLines(way, catalog, scenario, base = null) {
   // Ordering lines: per stage with a protocol step, gates in the same stage shown in order.
   // A line that orders a single step carries no order; it is kept only when no tool snippet
   // already tells the model to run that step (a way-local step, say).
-  const stop = stopGates(way, scenario);
+  // Every harness reads this block, so a gate that still blocks on any of them keeps its place.
+  const stop = stopGates(way, scenario, "any");
   const order = stop.length >= 2 ? way.stop_order.filter(id => id.startsWith("platform:") || stop.includes(id)) : [];
   let stopPlaced = false;
   for (const stage of STAGES) {

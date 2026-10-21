@@ -59,9 +59,10 @@ export function compileWay(way, catalog, { survey = null, problems = [], wayText
     files[`profiles/${pr.name}/block.md`] = pr.blocks.base.text;
     for (const b of pr.blocks.contexts) files[`profiles/${pr.name}/block.${b.context}.md`] = b.text;
   }
-  const kit = emitKit(way, blocks, profiles);
-  for (const [p, t] of Object.entries(kit.files)) files[`kit/${p}`] = t;
+  // Agent files first: kitctl's agent primitives carry the same bytes.
   const agentFiles = emitAgents(way, catalog);
+  const kit = emitKit(way, blocks, profiles, agentFiles);
+  for (const [p, t] of Object.entries(kit.files)) files[`kit/${p}`] = t;
   Object.assign(files, agentFiles);
   files["WAY.md"] = renderWay(way, catalog, { lint, blocks, survey, profiles });
   files["SETUP.md"] = renderSetup(way, catalog, { blocks, kit, agentFiles, survey, profiles });

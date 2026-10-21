@@ -2,8 +2,8 @@
 
 Things Gestalt found in sibling tools while composing them. They are filed here, not
 changed from this repo: each tool's owner decides. Every item names what Gestalt saw and
-the smallest change that would fix it. **Done** marks an ask with an open PR from the
-portability session (2026-10-20); it is done when that PR merges.
+the smallest change that would fix it. **Done** marks an ask with an open PR (from the
+portability session, 2026-10-20, or later); it is done when that PR merges.
 
 ## kitctl
 
@@ -14,12 +14,15 @@ portability session (2026-10-20); it is done when that PR merges.
 - **Done** ([kitctl#8](https://github.com/ConnorBritain/kitctl/pull/8)), unverified on a real
   Cursor: **No Cursor harness.** Gestalt's ways name Cursor, and SETUP.md falls back to manual
   steps.
-- **An `agent` primitive kind.** Gestalt emits worker agent files (`.claude/agents/<id>.md`,
+- **Done** (kitctl 0.1.0): **An `agent` primitive kind.** Gestalt emits worker agent files (`.claude/agents/<id>.md`,
   `~/.codex/agents/<id>.toml`) and places them with its own `write --agents`. kitctl owning
-  them would keep one writer for all native config.
-- **Always-on cost in `inventory`.** `gestalt survey --json` measures listing tokens per
+  them would keep one writer for all native config. Gestalt now emits each subagent worker
+  as `kit/primitives/agents/<id>.yaml` with its files beside it, listed on `gestalt-flow`;
+  `write --agents` stays for ways without kitctl.
+- **Done** (kitctl 0.1.0): **Always-on cost in `inventory`.** `gestalt survey --json` measures listing tokens per
   plugin. kitctl could read it, or adopt the same `ceil(chars/4)` estimate, so `doctor` can
-  flag a loadout over its budget.
+  flag a loadout over its budget. Loadouts take `budget: {tokens, skills}`, and Gestalt puts
+  the way's `always_on_tokens` and `skills_per_context` on `gestalt-flow`.
 
 ## roadmap
 
@@ -27,15 +30,17 @@ portability session (2026-10-20); it is done when that PR merges.
   `codex mcp add`: **`roadmap init --client codex --apply` appends raw text to `~/.codex/config.toml`.**
   That collides with kitctl's ownership ledger. Publishing the graph server as a kitctl
   `mcp:` primitive would let kitctl write it.
-- **Thirteen skills list in every roadmap repo.** Splitting them by profile (`engineering`
+- **Done** ([roadmap#59](https://github.com/ConnorBritain/roadmap/pull/59), 0.8.0, which hides its six rituals instead of splitting by profile: 7 listed skills): **Thirteen skills list in every roadmap repo.** Splitting them by profile (`engineering`
   vs `general`) would halve the lead's skill count in roadmap repos. Connor's way lists 24
   skills there against a limit of 12 (a warning he chose to keep visible, 2026-10-20).
 
 ## compounder
 
-- **Its Stop lines are a recorder that blocks the turn.** A non-blocking mode (a
+- **Done** ([compounder#2](https://github.com/ConnorBritain/compounder/pull/2), 0.3.0; Claude Code only): **Its Stop lines are a recorder that blocks the turn.** A non-blocking mode (a
   `systemMessage` instead of `decision: block`), or `stop_nudge` per lane, would remove the
-  last `GST-RECORDER-BLOCKS` in Connor's way.
+  last `GST-RECORDER-BLOCKS` in Connor's way. `rules.stop_mode: context` asks for the lines
+  as context mid-session instead; Connor's way sets it (`settings:`). Codex and Cursor still
+  block at Stop as the fallback, which WAY.md states.
 - **Done** ([compounder#1](https://github.com/ConnorBritain/compounder/pull/1)): **Its session-start brief is about 13 lines in a focus session** (a status line plus the
   brief from `scripts/lib/brief.mjs`), more than an 8-line session-start budget by itself.
   A three-line default (focus, next move, ship clock), with the rest on `/compounder:checkin`,

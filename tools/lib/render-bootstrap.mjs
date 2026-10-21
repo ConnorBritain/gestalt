@@ -2,7 +2,7 @@
 // Hand it to any coding agent in a fresh session. It carries the way itself (path A: compile
 // it with Gestalt) and every generated file in full with its target path (path B: no Gestalt
 // needed), so the setup is copied, never improvised. Generated, so it never drifts from the way.
-import { activeEntries, scenarios } from "./way.mjs";
+import { activeEntries, scenarios, waySettings } from "./way.mjs";
 import { pilotTaste } from "./render-taste.mjs";
 
 const fence = (lang, text) => {
@@ -75,16 +75,32 @@ export function renderBootstrap(way, catalog, files, { wayText = null } = {}) {
   }
 
   const kit = Object.keys(files).filter(f => f.startsWith("kit/loadouts/")).sort();
+  const agentPrims = Object.keys(files).filter(f => /^kit\/primitives\/agents\/[^/]+\.yaml$/.test(f)).sort();
+  const kitAgents = way.writer === "kitctl" && kit.length > 0 && agentPrims.length > 0;
+  let n = 3;
+  const settings = waySettings(way, catalog);
+  if (settings.length) {
+    L.push(`### ${n++}. Settings in other tools`, "");
+    L.push("Change each with the owning tool's own command, never by editing its file from here:", "");
+    for (const s of settings) L.push(`- ${s.id}: set \`${s.knob.key}\` to \`${s.shown}\` in ${s.knob.file} with ${s.knob.change_with}.`);
+    L.push("");
+  }
   if (way.writer === "kitctl" && kit.length) {
-    L.push("### 3. kitctl loadouts", "");
-    L.push("If kitctl is installed, these replace step 2's hand placement: save each loadout to `~/kits/loadouts/`, run `kitctl validate`, then in each repo `kitctl use gestalt-flow` plus that repo's context loadout. kitctl writes the native config and the blocks.", "");
+    L.push(`### ${n++}. kitctl loadouts`, "");
+    L.push(`If kitctl is installed, these replace step 2's hand placement: save each loadout to \`~/kits/loadouts/\`${agentPrims.length ? ", each agent primitive to `~/kits/primitives/agents/`" : ""}, run \`kitctl validate\`, then in each repo \`kitctl use gestalt-flow\` plus that repo's context loadout. kitctl writes the native config and the blocks${agentPrims.length ? ", and the subagent workers' files" : ""}.`, "");
     for (const f of kit) L.push(`\`~/kits/loadouts/${f.split("/").pop()}\``, "", fence("yaml", files[f]), "");
+    for (const f of agentPrims) {
+      const id = f.split("/").pop().slice(0, -5);
+      const assets = [["claude.md", `agents/claude/${id}.md`], ["codex.toml", `agents/codex/${id}.toml`]].filter(([a]) => files[`kit/primitives/agents/${id}/${a}`]);
+      L.push(`\`~/kits/primitives/agents/${id}.yaml\`${assets.length ? `, with ${assets.map(([a, src]) => `\`~/kits/primitives/agents/${id}/${a}\` (the text of \`${src}\` under Workers)`).join(" and ")}` : ""}`, "", fence("yaml", files[f]), "");
+    }
   }
 
   const workers = Object.keys(files).filter(f => f.startsWith("agents/") || f.startsWith("workers/")).sort();
   if (workers.length) {
-    L.push(`### ${way.writer === "kitctl" && kit.length ? 4 : 3}. Workers`, "");
-    L.push("Subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`); worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).", "");
+    L.push(`### ${n++}. Workers`, "");
+    if (kitAgents) L.push("With kitctl, skip the subagent files below: kitctl places them with `gestalt-flow`. Without it, subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`). Worker scripts and their prompts go in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code and Codex for subagents; anything with a shell for headless scripts).", "");
+    else L.push("Subagent files go in `~/.claude/agents/` (Codex agents in `~/.codex/agents/`); worker scripts and their prompts in `~/.gestalt/build/workers/` (make the `.sh` executable). Only on harnesses that run them (Claude Code for subagents; anything with a shell for headless scripts).", "");
     for (const f of workers) {
       const target = f.startsWith("agents/claude/") ? `~/.claude/agents/${f.split("/").pop()}` : f.startsWith("agents/codex/") ? `~/.codex/agents/${f.split("/").pop()}` : `~/.gestalt/build/${f}`;
       const lang = f.endsWith(".sh") ? "sh" : f.endsWith(".json") ? "json" : f.endsWith(".toml") ? "toml" : "markdown";

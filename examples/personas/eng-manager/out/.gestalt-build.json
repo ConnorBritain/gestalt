@@ -15,6 +15,9 @@
     "kit/kit.service.yaml",
     "kit/loadouts/gestalt-flow.yaml",
     "kit/loadouts/gestalt-rfc.yaml",
-    "kit/loadouts/gestalt-service.yaml"
+    "kit/loadouts/gestalt-service.yaml",
+    "kit/primitives/agents/reporter.yaml",
+    "kit/primitives/agents/reporter/claude.md",
+    "kit/primitives/agents/reporter/codex.toml"
   ]
 }

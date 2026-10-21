@@ -1,7 +1,7 @@
 // SETUP.md: everything Gestalt will not do itself, as one ordered checklist. Installs,
 // wiring snippets, knob changes (with the owning tool's command), the kitctl commands or the
 // manual writes, worker placement, and the harnesses kitctl cannot reach.
-import { activeEntries, activeSteps, scenarios } from "./way.mjs";
+import { activeEntries, activeSteps, scenarios, waySettings } from "./way.mjs";
 import { label } from "./block.mjs";
 import { pilotTaste } from "./render-taste.mjs";
 
@@ -76,12 +76,14 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
     const where = contexts.size === Object.keys(way.contexts).length ? "everywhere" : `in ${[...contexts].join(", ")} repos`;
     L.push(`- [ ] ${wanted ? "Create" : "Leave off (the step is not hook-enforced in this way)"}: \`${h.opt_in}\` for ${label(f.use, catalog)} (${h.event}${h.blocking ? ", blocks" : ""}), ${where}.`);
   }
+  const settings = waySettings(way, catalog);
+  for (const s of settings) L.push(`- [ ] Set \`${s.knob.key}\` to \`${s.shown}\` in ${s.knob.file} with ${s.knob.change_with} (${s.id}).`);
   for (const e of all.values()) for (const k of e.knobs ?? []) {
     if (!k.loosening) continue;
     const step = way.flow.find(f => f.entry.id === e.id && way.stop_order.includes(f.use));
     if (step) L.push(`- [ ] Leave \`${k.key}\` at ${JSON.stringify(k.default)} (${e.id}). The Stop order handles the overlap; if the taste test shows it does not, change it with ${k.change_with} (that tool treats it as loosening).`);
   }
-  if (!opt.size) L.push("- No opt-in hooks.");
+  if (!opt.size && !settings.length) L.push("- No opt-in hooks.");
   L.push("");
 
   // 4. Apply
@@ -89,6 +91,7 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
   if (way.writer === "kitctl") {
     L.push("kitctl writes native config; Gestalt only emitted the loadouts.", "");
     L.push("- [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.");
+    if (Object.keys(kit.files).some(f => f.startsWith("primitives/"))) L.push("- [ ] Copy `kit/primitives/` into the warehouse too (`~/kits/primitives/`): each subagent worker is an `agent:` primitive there, with its agent files beside it.");
     L.push("- [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).");
     for (const name of Object.keys(kit.files).filter(f => f.startsWith("kit.")).sort()) L.push(`- [ ] In each matching repo, on a branch: copy \`kit/${name}\` to \`kit.yaml\`, then \`kitctl apply\` (it shows the plan and asks first).`);
     L.push("- [ ] For repos with no other context: `kitctl use gestalt-flow`.", "- [ ] `kitctl off <loadout>` is the undo; it restores the original bytes. Kit warns, and does not refuse, on main or a dirty tree (kitctl's docs/apply.md#writing).");
@@ -113,7 +116,10 @@ export function renderSetup(way, catalog, { blocks, kit, agentFiles, survey = nu
   L.push("## 5. Workers", "");
   if (!way.topology.workers.length) L.push("- No workers.");
   for (const w of way.topology.workers) {
-    if (w.mechanism === "subagent") L.push(`- [ ] \`${w.id}\`: \`gestalt write --agents ~/.claude/agents\` places \`agents/claude/${w.id}.md\` (a user agent, not a plugin agent, so its mcpServers apply).${way.harnesses.includes("codex") ? ` For Codex, \`gestalt write --agents ~/.codex/agents\` places \`agents/codex/${w.id}.toml\`.` : ""}`);
+    if (w.mechanism === "subagent" && way.writer === "kitctl" && kit.files[`primitives/agents/${w.id}.yaml`]) {
+      const files = [agentFiles[`agents/claude/${w.id}.md`] ? `\`.claude/agents/${w.id}.md\`` : null, agentFiles[`agents/codex/${w.id}.toml`] ? `\`.codex/agents/${w.id}.toml\`` : null].filter(Boolean);
+      L.push(`- [ ] \`${w.id}\`: nothing to place by hand. \`gestalt-flow\` lists \`agent:${w.id}\`, so kitctl writes ${files.join(" and ")} with the rest of the loadout (under \`~/\` with \`kitctl use gestalt-flow --user\`). It is a standalone agent file, not a plugin agent, so its mcpServers apply.`);
+    } else if (w.mechanism === "subagent") L.push(`- [ ] \`${w.id}\`: \`gestalt write --agents ~/.claude/agents\` places \`agents/claude/${w.id}.md\` (a user agent, not a plugin agent, so its mcpServers apply).${way.harnesses.includes("codex") ? ` For Codex, \`gestalt write --agents ~/.codex/agents\` places \`agents/codex/${w.id}.toml\`.` : ""}`);
     if (w.mechanism === "headless") {
       const plugins = [...new Set(w.uses.map(u => catalog.steps.get(u)?.entry).filter(e => e?.ref.startsWith("plugin:")).map(e => e.id))];
       L.push(`- [ ] \`${w.id}\`: keep \`workers/${w.id}.sh\` at \`~/.gestalt/build/workers/\`${plugins.length ? ` and export ${plugins.map(id => `\`GESTALT_PLUGIN_${id.toUpperCase().replace(/[^A-Z0-9]/g, "_")}\``).join(", ")} (the plugin directory). The lead's loadout disables the plugin so only the worker loads it. Check once that the worker still sees it (\`sh workers/${w.id}.sh "list your skills"\`); if it does not, run the worker from a directory outside the repo` : ""}.`);

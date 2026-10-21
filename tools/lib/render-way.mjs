@@ -1,7 +1,7 @@
 // WAY.md: the person's way, readable. What runs, in what order, in which kind of repo, on
 // which harness and how honestly, what the lead carries and what it delegates.
 import { HARNESSES, STAGES } from "./catalog.mjs";
-import { activeSteps, scenarios, workerFor } from "./way.mjs";
+import { activeSteps, primaryHarness, scenarios, waySettings, workerFor } from "./way.mjs";
 import { label, how } from "./block.mjs";
 import { leadLoad, protocolRules, sessionStartLines, stopGates } from "./lint.mjs";
 
@@ -41,7 +41,14 @@ export function renderWay(way, catalog, { lint, blocks, survey = null, profiles 
     const chain = STAGES.map(s => [s, steps.filter(f => f.stage === s)]).filter(([, x]) => x.length).map(([s, x]) => `**${s}** ${x.map(f => label(f.use, catalog)).join(", ")}`);
     L.push(chain.length ? chain.join(" → ") : "_Nothing runs in session here beyond the defaults._", "");
     const stop = stopGates(way, sc);
-    if (stop.length) L.push(`- Stop gates: ${stop.length >= 2 ? way.stop_order.filter(id => id.startsWith("platform:") || stop.includes(id)).map(id => label(id, catalog)).join(" → ") : label(stop[0], catalog)}.`);
+    // Gates a way setting unblocks on the primary harness but that still block elsewhere.
+    const elsewhere = stopGates(way, sc, "any").filter(id => !stop.includes(id)).map(id => {
+      const entry = catalog.steps.get(id)?.entry;
+      const on = way.harnesses.filter(h => (entry?.harness?.[h] ?? "none") !== "none" && stopGates(way, sc, h).includes(id));
+      return `${label(id, catalog)} still blocks on ${on.join(", ")}`;
+    });
+    const shown = stop.length >= 2 ? way.stop_order.filter(id => id.startsWith("platform:") || stop.includes(id)).map(id => label(id, catalog)).join(" → ") : stop.length ? label(stop[0], catalog) : "none";
+    if (stop.length || elsewhere.length) L.push(`- Stop gates${elsewhere.length ? ` on ${primaryHarness(way)}` : ""}: ${shown}${elsewhere.length ? `; ${elsewhere.join("; ")}` : ""}.`);
     const load = leadLoad(way, sc, survey);
     L.push(`- Lead always-on ≈${load.tokens} tokens (budget ${way.budgets.always_on_tokens}), ${load.skills} skills (budget ${way.budgets.skills_per_context}).`);
     const ss = sessionStartLines(way, sc).reduce((n, x) => n + x.lines, 0);
@@ -85,6 +92,17 @@ export function renderWay(way, catalog, { lint, blocks, survey = null, profiles 
   }
   if (!anyReflect) L.push("- No rituals yet. A weekly `/gestalt:trim` is the cheapest one to start with.");
   L.push("", "Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).", "");
+
+  const settings = waySettings(way, catalog);
+  if (settings.length) {
+    L.push("## Settings", "");
+    L.push("Knobs this way sets in other tools. Each tool changes its own (SETUP.md §3); Gestalt only counts what they change.", "");
+    for (const s of settings) {
+      const unblocks = (s.entry.hooks ?? []).filter(h => h.unblocked_by?.setting === s.knob.key && h.unblocked_by.value === s.value);
+      L.push(`- ${s.id} \`${s.knob.key}\`: \`${s.shown}\`${s.knob.default != null ? ` (default \`${s.shownDefault}\`)` : ""}${unblocks.length ? `. Its ${unblocks.map(h => h.event).join("/")} hook stops blocking on ${[...new Set(unblocks.flatMap(h => h.unblocked_by.harness))].join(", ")}` : ""}.`);
+    }
+    L.push("");
+  }
 
   L.push("## The block", "");
   L.push(`Base block ≈${blocks.base.tokens} tokens (budget ${way.budgets.block_tokens})${blocks.contexts.length ? `; context blocks: ${blocks.contexts.map(b => `${b.context} ≈${b.tokens}`).join(", ")}` : ""}.`, "");

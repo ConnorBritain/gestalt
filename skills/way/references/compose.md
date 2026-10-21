@@ -16,7 +16,9 @@ one experience says matters; cite the reason when you explain a choice.
    model is tempted to skip. Keep `protocol_rules` within budget.
 5. **Order the gates.** Deterministic gates first (tests), then reviewers in parallel,
    then recorders. If two blocking Stop hooks share a context, write `stop_order`.
-   Recorders should not block; if one does, put it last and say so.
+   Recorders should not block; if one does, put it last and say so, or set the knob that
+   unblocks it when its catalog entry has one (`settings:`, e.g.
+   `compounder.rules.stop_mode: context`).
 6. **Hand-offs forward only.** A reviewer may hand to a recorder or to the user, never
    back to a generator. A REFRAME goes to the user.
 7. **The lead stays small.** Set tiers per harness (lead on the strongest model). Move

@@ -8,8 +8,8 @@ runs and what it costs.
 | Field | Meaning |
 |---|---|
 | `steps[]` | What the primitive does at a stage: `id` (`entry.step`), `stage`, `kind`, `mode`, `invoke`, optional `wiring_marker` and per-harness `fallback` instruction |
-| `hooks[]` | Hooks it registers: `event`, `blocking`, `mechanism`, `opt_in`, `serves` (the step it enforces), `lines` for SessionStart injectors, `quiet_unless` |
-| `knobs[]` | Settings Gestalt may recommend changing, with the command that changes them; `loosening: true` when the owning tool treats a change as loosening |
+| `hooks[]` | Hooks it registers: `event`, `blocking`, `mechanism`, `opt_in`, `serves` (the step it enforces), `lines` for SessionStart injectors, `quiet_unless`, and `unblocked_by: {setting, value, harness[]}` when setting one of the entry's knobs to that value stops a blocking hook from blocking on those harnesses (a way does it with `settings:`) |
+| `knobs[]` | Settings Gestalt may recommend changing, with the command that changes them; `values` when only some values are allowed; `loosening: true` when the owning tool treats a change as loosening |
 | `harness` | Enforcement per harness: `enforced`, `partial`, `advisory` or `none` (vonnegut's portability labels) |
 | `cost` | Always-on cost: skills, agents, commands and their listing tokens (`ceil(chars/4)`), SessionStart lines, and the commit it was measured from |
 | `feeds[]` | Hand-offs to other steps; `proposed` until both tools support it |

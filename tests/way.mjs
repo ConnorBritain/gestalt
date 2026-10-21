@@ -60,6 +60,25 @@ check("waivers need a reason", "an unexplained waiver is how a gate quietly disa
   assert.match(messages(raw), /stated reason/);
 });
 
+group("settings");
+check("a setting names a catalog knob and a value it allows", "a typo in a setting would leave a hook blocking while WAY.md says it does not", () => {
+  const ok = normaliseWay({ ...base(), settings: { "compounder.rules.stop_mode": "context" } });
+  assert.deepEqual(ok.problems, []);
+  assert.deepEqual(ok.way.settings, { "compounder.rules.stop_mode": "context" });
+  const bad = settings => normaliseWay({ ...base(), settings }).problems.filter(p => p.code === "GST-SETTING").map(p => p.message).join("\n");
+  assert.match(bad({ "nope.rules.stop_mode": "context" }), /"nope" is not a catalog entry/);
+  assert.match(bad({ stop_mode: "context" }), /"stop_mode" is not a catalog entry/);
+  assert.match(bad({ "compounder.rules.stop_moad": "context" }), /compounder declares no knob "rules.stop_moad" \(knobs: .*rules\.stop_mode/);
+  assert.match(bad({ "compounder.rules.stop_mode": "nag" }), /"nag" is not one of "block", "context"/);
+  assert.match(bad({ "compounder.rules.stop_mode": ["context"] }), /a single value/);
+  assert.match(bad(["compounder.rules.stop_mode"]), /must be a map/);
+  assert.deepEqual(normaliseWay({ ...base(), settings: { "compounder.rules.stop_nudge_min_edits": 5 } }).problems, [], "a knob without values takes any scalar");
+});
+check("a profile inherits the way's settings", "a profile is the way plus additions; its lint must see the same unblocked hooks", () => {
+  const raw = { ...base(), settings: { "compounder.rules.stop_mode": "context" }, profiles: { full: { description: "More." } } };
+  assert.deepEqual(normaliseWay(raw).way.profiles[0].way.settings, raw.settings);
+});
+
 group("scenarios and the lead");
 check("scenarios are the always-contexts plus one other at a time", "lint and compile evaluate each kind of repo separately", () => {
   const { way } = readWay(minimalPath);

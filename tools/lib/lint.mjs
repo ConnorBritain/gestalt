@@ -16,12 +16,18 @@
 //   GST-WORKER             a worker that cannot deliver what it claims
 //   GST-TRIGGER            an aggressive description that will fire on everything (survey)
 //   GST-PROFILE            a profile that loads a primitive the base way does not
+//   GST-SETTING            a way setting no catalog knob declares, or a value it does not allow (from way.mjs)
+//
+// Blocking is judged on the lead's primary harness (the first the way lists): that is where
+// GST-GATE and GST-RECORDER-BLOCKS count. A hook a way setting unblocks there no longer
+// counts; where it still blocks on another harness, lint says so as info, and the block keeps
+// it in its Stop order because the block is shared by every harness.
 import { CHECKER_KINDS, GENERATOR_KINDS, STAGES } from "./catalog.mjs";
-import { activeEntries, activeSteps, leadEntries, scenarios, workerFor } from "./way.mjs";
+import { activeEntries, activeSteps, blockingHarnesses, hookBlocks, leadEntries, primaryHarness, scenarios, settingValue, workerFor } from "./way.mjs";
 
 const stageIndex = s => (s === "reflect" ? STAGES.length : STAGES.indexOf(s));
 
-export const CODES = ["GST-SCHEMA", "GST-REF", "GST-ORDER", "GST-INVOKE", "GST-LINK", "GST-RECORDER-BLOCKS", "GST-GATE", "GST-SLOT", "GST-PROTOCOL", "GST-BUDGET", "GST-LEAD", "GST-HARNESS", "GST-TIER", "GST-WORKER", "GST-TRIGGER", "GST-PROFILE"];
+export const CODES = ["GST-SCHEMA", "GST-REF", "GST-ORDER", "GST-INVOKE", "GST-LINK", "GST-RECORDER-BLOCKS", "GST-GATE", "GST-SLOT", "GST-PROTOCOL", "GST-BUDGET", "GST-LEAD", "GST-HARNESS", "GST-TIER", "GST-WORKER", "GST-TRIGGER", "GST-PROFILE", "GST-SETTING"];
 
 /**
  * Whether a hook fires in a scenario. A hook with no opt-in fires wherever its plugin is
@@ -37,14 +43,17 @@ export function hookFires(hook, active) {
   return Boolean(f && (f.enforce === "hook" || f.mode === "ambient"));
 }
 
-/** User-owned blocking hooks of the active entries in a scenario, by event. */
-export function blockingHooks(way, scenario) {
+/**
+ * User-owned blocking hooks of the active entries in a scenario, by event, on one harness
+ * (the lead's primary harness by default; "any" for those that block on at least one).
+ */
+export function blockingHooks(way, scenario, harness = primaryHarness(way)) {
   const steps = activeSteps(way, scenario);
   const active = new Map(steps.map(f => [f.use, f]));
   const out = {};
   for (const entry of activeEntries(way, scenario)) {
     for (const hook of entry.hooks ?? []) {
-      if (!hook.blocking) continue;
+      if (!hookBlocks(way, entry, hook, harness)) continue;
       if (!hookFires(hook, active)) continue;
       if (hook.quiet_unless && !scenario.active.some(c => way.contexts[c].when === hook.quiet_unless)) continue;
       (out[hook.event] ??= []).push({ entry: entry.id, serves: hook.serves ?? null, mechanism: hook.mechanism, opt_in: hook.opt_in ?? null, implicit: Boolean(hook.serves && !active.has(hook.serves)) });
@@ -85,15 +94,16 @@ export function protocolRules(way, scenario) {
   }
   const ids = new Set(steps.map(s => s.use));
   for (const l of way.links.filter(x => x.via === "instruction")) if (ids.has(l.from)) rules.push({ kind: "link", ref: `${l.from}→${l.to}` });
-  const stop = stopGates(way, scenario);
+  // The block is shared by every harness, so its Stop order counts gates that block on any.
+  const stop = stopGates(way, scenario, "any");
   if (stop.length >= 2) rules.push({ kind: "stop-order", ref: "stop_order" });
   for (const f of steps) for (const h of Object.keys(f.step.fallback ?? {})) if (way.harnesses.includes(h)) rules.push({ kind: "fallback", ref: `${f.use}@${h}` });
   return rules;
 }
 
-/** Blocking Stop gates in a scenario (user-owned), as stop-order identifiers. */
-export function stopGates(way, scenario) {
-  return (blockingHooks(way, scenario).Stop ?? []).map(h => h.serves ?? h.entry);
+/** Blocking Stop gates in a scenario (user-owned), as stop-order identifiers, on one harness. */
+export function stopGates(way, scenario, harness = primaryHarness(way)) {
+  return (blockingHooks(way, scenario, harness).Stop ?? []).map(h => h.serves ?? h.entry);
 }
 
 /** Always-on load of the lead in a scenario: listing tokens and skills, from the catalog. */
@@ -209,12 +219,20 @@ export function lintWay(way, catalog, { survey = null, problems: initial = [] } 
     const at = `context ${sc.name}`;
     const steps = activeSteps(way, sc);
 
-    // GST-RECORDER-BLOCKS
+    // GST-RECORDER-BLOCKS, on the primary harness. A hook a way setting unblocks there is
+    // not counted; if it still blocks on another of the way's harnesses, that fallback is
+    // reported as info so WAY.md states it.
     for (const f of steps.filter(s => s.stage === "record")) {
-      const blocking = (f.entry.hooks ?? []).filter(h => h.blocking && h.serves === f.use);
+      const served = (f.entry.hooks ?? []).filter(h => h.serves === f.use);
+      const blocking = served.filter(h => hookBlocks(way, f.entry, h));
       if (blocking.length) {
         const sev = ordered.has(f.use) ? "warn" : "error";
         add("GST-RECORDER-BLOCKS", f.where, `${f.use} records, yet its ${blocking.map(h => h.event).join("/")} hook blocks the turn${sev === "warn" ? " (ordered last in stop_order, so tolerated)" : ""}`, sev, { scenario: sc.name });
+      }
+      for (const h of served.filter(x => x.blocking && !blocking.includes(x))) {
+        const still = blockingHarnesses(way, f.entry, h);
+        const set = `${f.entry.id}.${h.unblocked_by.setting}: ${settingValue(way, f.entry, h.unblocked_by.setting)}`;
+        add("GST-RECORDER-BLOCKS", f.where, `${f.use} records; its ${h.event} hook does not block on ${h.unblocked_by.harness.filter(x => way.harnesses.includes(x)).join(", ")} (${set})${still.length ? `, and still blocks on ${still.join(", ")} as the fallback` : ""}`, "info", { scenario: sc.name });
       }
     }
 

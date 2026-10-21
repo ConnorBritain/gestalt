@@ -41,6 +41,7 @@ Protocol steps rely on each tool's wiring snippet in CLAUDE.md / AGENTS.md. Gest
 kitctl writes native config; Gestalt only emitted the loadouts.
 
 - [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.
+- [ ] Copy `kit/primitives/` into the warehouse too (`~/kits/primitives/`): each subagent worker is an `agent:` primitive there, with its agent files beside it.
 - [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).
 - [ ] In each matching repo, on a branch: copy `kit/kit.rfc.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
 - [ ] In each matching repo, on a branch: copy `kit/kit.service.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
@@ -50,7 +51,7 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 ## 5. Workers
 
 - [ ] `critics`: uses the plugin's own agent; nothing to place.
-- [ ] `reporter`: `gestalt write --agents ~/.claude/agents` places `agents/claude/reporter.md` (a user agent, not a plugin agent, so its mcpServers apply). For Codex, `gestalt write --agents ~/.codex/agents` places `agents/codex/reporter.toml`.
+- [ ] `reporter`: nothing to place by hand. `gestalt-flow` lists `agent:reporter`, so kitctl writes `.claude/agents/reporter.md` and `.codex/agents/reporter.toml` with the rest of the loadout (under `~/` with `kitctl use gestalt-flow --user`). It is a standalone agent file, not a plugin agent, so its mcpServers apply.
 
 ## Then
 

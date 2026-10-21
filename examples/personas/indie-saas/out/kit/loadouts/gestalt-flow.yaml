@@ -5,10 +5,14 @@ name: gestalt-flow
 description: "Jordan (solo SaaS developer)'s way: what every repo gets."
 extends: []
 plugins: [plugin:compounder]
+agents: [agent:linear]
 mcp:
   github:
     primitive: mcp:github
 disable: [mcp:linear]
+budget:
+  tokens: 3000
+  skills: 8
 instructions: |
   ## Way of work   <!-- gestalt -->
 
