@@ -6,12 +6,16 @@ description: "Connor England's way: what every repo gets."
 extends: []
 plugins: [plugin:cairn, plugin:compounder, plugin:gestalt]
 skills: [skill:blader/humanizer]
+agents: [agent:linear]
 mcp:
   github:
     primitive: mcp:github
   m365:
     primitive: mcp:m365
 disable: [mcp:linear, plugin:prose-author]
+budget:
+  tokens: 12000
+  skills: 12
 instructions: |
   ## Way of work   <!-- gestalt -->
 

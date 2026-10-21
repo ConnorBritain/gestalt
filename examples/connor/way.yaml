@@ -107,6 +107,11 @@ profiles:
       weekly: [compounder.update]
       as_needed: [compounder.focus, compounder.interview]
     offer: true
+# compounder 0.3.0 (Connor, 2026-10-21): ask for the three closing lines mid-session, as
+# context once the focus session passes the edit threshold, instead of blocking at Stop.
+# Claude Code only; Codex and Cursor keep the blocking Stop, so stop_order still lists it.
+settings:
+  compounder.rules.stop_mode: context
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]

@@ -6,6 +6,7 @@ description: "Morgan (engineering manager)'s way: what every repo gets."
 extends: []
 plugins: [plugin:cairn, plugin:gestalt]
 skills: [skill:team-update]
+agents: [agent:reporter]
 mcp:
   atlassian:
     primitive: mcp:atlassian
@@ -13,6 +14,9 @@ mcp:
     primitive: mcp:github
   m365:
     primitive: mcp:m365
+budget:
+  tokens: 12000
+  skills: 12
 instructions: |
   ## Way of work   <!-- gestalt -->
 

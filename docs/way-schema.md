@@ -26,6 +26,7 @@ the [persona folders](../examples/personas/) start from nothing.
 | `disable` | `{context: [ref]}` | primitives to switch off in a context; becomes kitctl `disable:` |
 | `topology` | `{tiers, lead, workers}` | see below |
 | `catalog` | `[entry]` | way-local catalog entries for primitives Gestalt does not ship facts about (`confidence: guess`) |
+| `settings` | `{"<entry>.<knob key>": value}` | knob values the way relies on in other tools, e.g. `compounder.rules.stop_mode: context`. The entry must be in the catalog and declare that knob, and the value must be a single scalar the knob allows (`GST-SETTING` otherwise). Gestalt never writes them: SETUP.md lists each with the tool's own command. A setting can unblock a hook the catalog marks `unblocked_by` (on the harnesses it names); lint then stops counting that hook as blocking on the lead's primary harness (the first in `harnesses`), and WAY.md says where it still blocks |
 | `waive` | `[{code, reason, in?}]` | way-level waivers for codes no single step owns (`GST-BUDGET`, `GST-LEAD`, `GST-HARNESS`, `GST-TIER`), optionally per context. The reason is required and printed in WAY.md. Budgets stay limits; a waiver is a visible, dated exception |
 | `taste` | exactly 3 `{id, prompt, context, path[], expect[], expect_quiet[]}` | the taste test. `path` is the stages the prompt should travel. Hooks and protocol steps on the path are expected; a description-routed step is expected only when listed in `expect` (otherwise it "may fire"). `expect_quiet` steps must not fire |
 
@@ -40,6 +41,10 @@ the [persona folders](../examples/personas/) start from nothing.
 | `always_on_tokens` | 12000 | the lead's always-on listing cost per context (survey-measured when available) |
 | `skills_per_context` | 8 | skills the lead can see per context |
 | `index` | false | add a one-line stage → primitive index to the block (the Vercel finding, to be tested) |
+
+With kitctl, `always_on_tokens` and `skills_per_context` also travel on the `gestalt-flow`
+loadout as `budget: {tokens, skills}` (a profile that changes either carries its own), so
+`kitctl doctor` warns when what a repo actually enables lists more than the way allows.
 
 ## Topology
 
@@ -64,7 +69,7 @@ What each mechanism can and cannot isolate (Claude Code, checked against its doc
 
 | Mechanism | Model tier | MCP connection | Skill listing | Plugin hooks |
 |---|---|---|---|---|
-| `subagent` (`.claude/agents/<id>.md`, not a plugin agent) | yes (`model:`) | yes, when the connector has an inline `server` | **no**: preloaded skills must be enabled, so the lead lists them | stay in the lead |
+| `subagent` (`.claude/agents/<id>.md`, not a plugin agent; with kitctl, an `agent:` primitive on `gestalt-flow`) | yes (`model:`) | yes, when the connector has an inline `server` | **no**: preloaded skills must be enabled, so the lead lists them | stay in the lead |
 | `headless` (`claude -p --plugin-dir … --strict-mcp-config`) | yes | yes | yes | leave the lead entirely (their SessionStart and Stop hooks no longer fire there) |
 | `agent-file` (a plugin's own agent) | yes | no (plugin agents ignore `mcpServers`) | n/a | n/a |
 | `script` | no model | n/a | n/a | n/a |

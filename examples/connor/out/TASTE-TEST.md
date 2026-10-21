@@ -49,7 +49,7 @@ Add a --json flag to `cairn debt`, with a test that pins the output shape.
 - check: elonify diff-review (protocol, via the critics worker)
 - check: verification-gate critics (protocol, via the critics worker)
 - record: compounder stop-lines (hook)
-- At Stop, answered in this order: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check
+- At Stop, answered in this order: verification-gate gates → elonify diff-review → platform git-check
 
 **Workers that should spawn:** critics (critic, agent-file). Each should receive the prompt above verbatim.
 

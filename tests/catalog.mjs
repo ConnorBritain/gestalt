@@ -37,6 +37,22 @@ check("validator rejects planted defects", "a validator that accepts anything pr
   for (const want of [/not a kitctl ref/, /cannot sit at stage check/, /mode must be/, /names its mechanism/, /harness.claude/]) assert.match(problems, want);
   assert.deepEqual(validateEntry({ id: "y", ref: "plugin:y", kind: "plugin" }), ["y: harness enforcement is required (never leave portability implicit)"]);
 });
+check("knob values and unblocked_by are checked against the entry", "an unblocked_by naming a missing knob would silently unblock nothing (or everything)", () => {
+  const entry = {
+    id: "z", ref: "plugin:z", kind: "plugin", harness: { claude: "enforced" },
+    steps: [{ id: "z.r", stage: "record", kind: "recorder", mode: "ambient" }],
+    knobs: [{ key: "mode", default: "loud", values: ["block", "quiet"] }],
+    hooks: [
+      { event: "Stop", blocking: true, mechanism: "decision-block", serves: "z.r", unblocked_by: { setting: "mood", value: "quiet", harness: ["claude"] } },
+      { event: "Stop", blocking: true, mechanism: "decision-block", serves: "z.r", unblocked_by: { setting: "mode", value: "silent", harness: ["vim"], extra: 1 } },
+      { event: "PostToolUse", blocking: false, mechanism: "context", unblocked_by: { setting: "mode", value: "quiet", harness: ["claude"] } },
+    ],
+  };
+  const problems = validateEntry(entry).join("\n");
+  for (const want of [/default "loud" is not one of its values/, /setting "mood" is not a knob of z/, /value "silent" is not one of the knob's values/, /harness must list/, /unknown key "extra"/, /only a blocking hook can be unblocked/]) assert.match(problems, want);
+  const stop = cat.entries.get("compounder").hooks.find(h => h.event === "Stop");
+  assert.deepEqual(stop.unblocked_by, { setting: "rules.stop_mode", value: "context", harness: ["claude"] }, "compounder 0.3.0's stop_mode context unblocks Claude Code only");
+});
 check("a way-local entry may override a shipped one", "the user's installed version can differ from what the catalog last saw", () => {
   const e = cat.entries.get("cairn");
   const idx = indexCatalog([{ ...e, origin: "catalog/cairn.yaml" }, { ...e, version_seen: "9.9.9", origin: "way" }]);

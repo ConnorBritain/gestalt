@@ -12,6 +12,9 @@ mcp:
   newsletter:
     primitive: mcp:newsletter
 disable: [plugin:prose-research, plugin:quickwrite]
+budget:
+  tokens: 5000
+  skills: 12
 instructions: |
   ## Way of work   <!-- gestalt -->
 

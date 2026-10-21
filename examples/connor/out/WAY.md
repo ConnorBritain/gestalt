@@ -54,7 +54,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **make** humanizer strip, prose-author draft → **record** compounder stop-lines, compounder ship, cairn capture
 
-- Stop gates: compounder stop-lines.
+- Stop gates on claude: none; compounder stop-lines still blocks on codex, cursor.
 - Lead always-on ≈1103 tokens (budget 12000), 10 skills (budget 12).
 - Session-start lines 5 (budget 8); always-on protocol rules 1 (budget 5).
 
@@ -62,7 +62,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture
 
-- Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
+- Stop gates on claude: verification-gate gates → elonify diff-review → platform git-check; compounder stop-lines still blocks on codex, cursor.
 - Lead always-on ≈1547 tokens (budget 12000), 11 skills (budget 12).
 - Session-start lines 5 (budget 8); always-on protocol rules 5 (budget 5).
 
@@ -70,7 +70,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt, compounder brief, roadmap ready-wave → **intend** compounder guard, roadmap slice → **plan** elonify plan-review → **make** humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics → **record** compounder stop-lines, compounder ship, cairn capture, roadmap journal
 
-- Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
+- Stop gates on claude: verification-gate gates → elonify diff-review → platform git-check; compounder stop-lines still blocks on codex, cursor.
 - Lead always-on ≈2855 tokens (budget 12000), 24 skills (budget 12).
 - Session-start lines 8 (budget 8); always-on protocol rules 5 (budget 5).
 
@@ -78,7 +78,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review, ui-magic foundation → **make** ui-magic build, humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics, ui-magic audit → **record** compounder stop-lines, compounder ship, cairn capture
 
-- Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
+- Stop gates on claude: verification-gate gates → elonify diff-review → platform git-check; compounder stop-lines still blocks on codex, cursor.
 - Lead always-on ≈2637 tokens (budget 12000), 18 skills (budget 12).
 - Session-start lines 5 (budget 8); always-on protocol rules 5 (budget 5).
 - kitctl loadouts: app-studio.
@@ -88,7 +88,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **plan** elonify plan-review, brand-builder foundation → **make** brand-builder build, humanizer strip, prose-author draft → **check** verification-gate gates, elonify diff-review, verification-gate critics, brand-builder audit → **record** compounder stop-lines, compounder ship, cairn capture
 
-- Stop gates: verification-gate gates → elonify diff-review → compounder stop-lines → platform git-check.
+- Stop gates on claude: verification-gate gates → elonify diff-review → platform git-check; compounder stop-lines still blocks on codex, cursor.
 - Lead always-on ≈2398 tokens (budget 12000), 17 skills (budget 12).
 - Session-start lines 5 (budget 8); always-on protocol rules 5 (budget 5).
 - kitctl loadouts: brand-studio.
@@ -98,7 +98,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 
 **orient** cairn debt, compounder brief → **intend** compounder guard → **make** humanizer strip, prose-author draft → **check** prose-tell-scan scan, prose-review review → **record** compounder stop-lines, compounder ship, cairn capture
 
-- Stop gates: compounder stop-lines.
+- Stop gates on claude: none; compounder stop-lines still blocks on codex, cursor.
 - Lead always-on ≈2154 tokens (budget 12000), 11 skills (budget 12).
 - Session-start lines 5 (budget 8); always-on protocol rules 2 (budget 5).
 
@@ -128,6 +128,12 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 - **monthly**: gestalt trim (/gestalt:trim, monthly or when the harness feels noisy); gestalt taste (/gestalt:taste after any change to the way); prose-author style-tune (prose-style-tune, turning accepted edits into profile changes)
 
 Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).
+
+## Settings
+
+Knobs this way sets in other tools. Each tool changes its own (SETUP.md §3); Gestalt only counts what they change.
+
+- compounder `rules.stop_mode`: `context` (default `block`). Its Stop hook stops blocking on claude.
 
 ## The block
 
@@ -219,7 +225,7 @@ Order: orient → intend → plan → make → check → record. Checkers report
 - warn **GST-HARNESS** flow.check[1]: elonify.diff-review is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-HARNESS** flow.check[2]: verification-gate.critics is advisory on codex: the rule is written down there but nothing makes it happen
 - warn **GST-HARNESS** flow.check[6]: prose-review.review is advisory on codex: the rule is written down there but nothing makes it happen
-- warn **GST-RECORDER-BLOCKS** flow.record[0]: compounder.stop-lines records, yet its Stop hook blocks the turn (ordered last in stop_order, so tolerated)
+- info **GST-RECORDER-BLOCKS** flow.record[0]: compounder.stop-lines records; its Stop hook does not block on claude (compounder.rules.stop_mode: context), and still blocks on codex, cursor as the fallback
 - warn **GST-LEAD** context roadmap: lead sees 24 skills (budget 12)
 - warn **GST-LEAD** context app: lead sees 18 skills (budget 12)
 - warn **GST-LEAD** context site: lead sees 17 skills (budget 12)

@@ -5,9 +5,11 @@ import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { check, finish, group, run, FIXTURES } from "./harness.mjs";
-import { readWay } from "../tools/lib/way.mjs";
-import { CODES, lintWay, blockingHooks, protocolRules, leadLoad } from "../tools/lib/lint.mjs";
+import { hookBlocks, normaliseWay, readWay } from "../tools/lib/way.mjs";
+import { CODES, lintWay, blockingHooks, protocolRules, leadLoad, stopGates } from "../tools/lib/lint.mjs";
 import { scenarios } from "../tools/lib/way.mjs";
+import { parseYaml } from "../tools/lib/yaml.mjs";
+import { blockLines } from "../tools/lib/block.mjs";
 
 const lintFile = path => {
   const { way, catalog, problems } = readWay(path);
@@ -91,6 +93,60 @@ check("a way-level waiver turns a context code into info, scoped and with its re
   const waived = lintWay(way, catalog, { problems }).problems.find(p => p.code === "GST-BUDGET");
   assert.equal(waived.severity, "info");
   assert.match(waived.waived, /merges upstream/);
+});
+
+group("settings that unblock a hook");
+const recorder = (harnesses, settings) => {
+  const raw = parseYaml(readFileSync(join(dir, "GST-RECORDER-BLOCKS.way.yaml"), "utf8"));
+  raw.harnesses = harnesses;
+  if (settings) raw.settings = settings;
+  const { way, catalog, problems } = normaliseWay(raw);
+  return { way, catalog, result: lintWay(way, catalog, { problems }) };
+};
+const stopMode = { "compounder.rules.stop_mode": "context" };
+check("hookBlocks follows unblocked_by: only the named harnesses, only at the named value", "a setting that unblocks Claude Code must not be read as unblocking Codex", () => {
+  const { way, catalog } = recorder(["claude", "codex"], stopMode);
+  const entry = catalog.entries.get("compounder");
+  const stop = entry.hooks.find(h => h.event === "Stop");
+  assert.equal(hookBlocks(way, entry, stop, "claude"), false);
+  assert.equal(hookBlocks(way, entry, stop, "codex"), true);
+  assert.equal(hookBlocks(way, entry, stop), false, "the primary harness is the first listed");
+  assert.equal(hookBlocks(way, entry, stop, "any"), true);
+  assert.equal(hookBlocks({ ...way, settings: {} }, entry, stop, "claude"), true, "the knob's default (block) keeps it blocking");
+  assert.equal(hookBlocks({ ...way, settings: { "compounder.rules.stop_mode": "block" } }, entry, stop, "claude"), true);
+});
+check("a recorder unblocked on the primary harness is not GST-RECORDER-BLOCKS; the fallback is info", "compounder's stop_mode context removes the block in Claude Code, and WAY.md must still say Codex blocks", () => {
+  const { result } = recorder(["claude", "codex"], stopMode);
+  const hits = result.problems.filter(p => p.code === "GST-RECORDER-BLOCKS");
+  assert.deepEqual(hits.map(p => p.severity), ["info"]);
+  assert.match(hits[0].message, /does not block on claude \(compounder\.rules\.stop_mode: context\), and still blocks on codex as the fallback/);
+  const alone = recorder(["claude"], stopMode).result.problems.filter(p => p.code === "GST-RECORDER-BLOCKS");
+  assert.ok(alone.length === 1 && alone[0].severity === "info" && !/fallback/.test(alone[0].message), "no fallback to state on a Claude-only way");
+});
+check("unblocked on Claude Code but led from Codex: still GST-RECORDER-BLOCKS", "lint counts gates where the lead mainly runs", () => {
+  const { result } = recorder(["codex", "claude"], stopMode);
+  assert.ok(result.problems.some(p => p.code === "GST-RECORDER-BLOCKS" && p.severity === "warn"));
+});
+check("Stop gates drop an unblocked hook on the primary harness; the shared block keeps its order", "Claude Code no longer blocks, but Codex reads the same block and still blocks", () => {
+  const { way, catalog } = recorder(["claude", "codex"], stopMode);
+  const code = scenarios(way)[1];
+  assert.deepEqual(stopGates(way, code), ["verification-gate.gates"]);
+  assert.deepEqual(stopGates(way, code, "codex"), ["verification-gate.gates", "compounder.stop-lines"]);
+  assert.deepEqual(blockingHooks(way, code, "any").Stop.map(h => h.serves), ["verification-gate.gates", "compounder.stop-lines"]);
+  assert.ok(blockLines(way, catalog, code).some(l => /compounder stop-lines/.test(l.text)), "the block keeps compounder in the Stop order for Codex");
+  assert.ok(protocolRules(way, code).some(r => r.kind === "stop-order"), "and still counts that line against the rule budget");
+  const claudeOnly = recorder(["claude"], stopMode);
+  assert.ok(!blockLines(claudeOnly.way, claudeOnly.catalog, scenarios(claudeOnly.way)[1]).some(l => /compounder/.test(l.text)), "on a Claude-only way nothing blocks beside the gates, so no order line names compounder");
+});
+check("GST-GATE no longer counts a hook a setting unblocks", "two Stop blockers become one, so the order is no longer required", () => {
+  const raw = parseYaml(readFileSync(join(dir, "GST-RECORDER-BLOCKS.way.yaml"), "utf8"));
+  raw.stop_order = ["verification-gate.gates"];
+  raw.flow.record[0].waive = { code: "GST-RECORDER-BLOCKS", reason: "the hook is unblocked in this test, or not" };
+  let { way, catalog, problems } = normaliseWay(raw);
+  assert.ok(lintWay(way, catalog, { problems }).problems.some(p => p.code === "GST-GATE"), "two unordered Stop blockers without the setting");
+  raw.settings = stopMode;
+  ({ way, catalog, problems } = normaliseWay(raw));
+  assert.ok(!lintWay(way, catalog, { problems }).problems.some(p => p.code === "GST-GATE"), "one blocker with it");
 });
 
 group("cli");

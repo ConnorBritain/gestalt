@@ -32,6 +32,8 @@ checklist and the version pin.
 - Cloud bootstrap: a Claude Code cloud setup script and SessionStart install hook, and a
   Codex Cloud setup script, as documentation or a kitctl target.
 - Validate emitted loadouts against the real kitctl warehouse.
-- Verify the Codex custom-agent fields against the installed CLI, then emit Codex worker
-  agents (held back in 0.1.0).
+- Codex worker agents: done after 0.1.0. Their fields were checked against Codex 0.163.0
+  (2026-10-20, [harness-facts.md](harness-facts.md)), compile emits `agents/codex/<id>.toml`,
+  and with kitctl they travel as `agent:` primitives. Re-check when Codex changes its agent
+  format.
 - Run the eval ([docs/eval.md](eval.md)) once its spend is authorised.

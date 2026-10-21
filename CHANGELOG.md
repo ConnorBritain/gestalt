@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **Worker agents go through kitctl**: each subagent worker is also a kitctl `agent:`
+  primitive (`kit/primitives/agents/<id>.yaml`, with the same `claude.md` / `codex.toml`
+  bytes as `agents/`), listed on `gestalt-flow`. With `writer: kitctl`, SETUP.md and
+  BOOTSTRAP.md let kitctl place them; `gestalt write --agents` stays for manual ways. Cursor
+  has no agent file (a line in `kit/gaps.md`).
+- **The lead's budget travels to kitctl**: `gestalt-flow` carries
+  `budget: {tokens, skills}` from `always_on_tokens` and `skills_per_context`, and a profile
+  that changes either carries its own, for `kitctl doctor`.
+- **Way `settings:`** (`"<entry>.<knob key>": value`), validated against the catalog's knobs
+  (new `values` list) under a new code, `GST-SETTING`. SETUP.md lists each with the owning
+  tool's command; WAY.md shows them. A catalog hook can be `unblocked_by` a setting on named
+  harnesses: lint (`GST-RECORDER-BLOCKS`, `GST-GATE`) judges blocking on the lead's primary
+  harness, reports where the hook still blocks as info, and the shared block keeps it in its
+  Stop order.
+- **Catalog**: compounder 0.3.0 (`rules.stop_mode`: `context` unblocks its Stop hook in
+  Claude Code; its PostToolUse hook adds the closing-lines ask as context).
+- **Connor's way** sets `compounder.rules.stop_mode: context`: no `GST-RECORDER-BLOCKS`
+  warning for Claude Code; WAY.md says the Stop lines still block on Codex and Cursor.
 - **Portability session** ([docs/followups/portability-session.md](docs/followups/portability-session.md)):
   dated Codex, Cursor and Trail facts in [docs/harness-facts.md](docs/harness-facts.md).
 - **Codex worker agents are back**: a subagent worker also compiles to

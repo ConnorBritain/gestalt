@@ -4,12 +4,16 @@ schema_version: 2
 name: gestalt-flow
 description: "Sam (bid analyst)'s way: what every repo gets."
 extends: []
+agents: [agent:library]
 mcp:
   atlassian:
     primitive: mcp:atlassian
   m365:
     primitive: mcp:m365
 disable: [plugin:org-hr, plugin:org-legal, plugin:org-travel]
+budget:
+  tokens: 4000
+  skills: 14
 instructions: |
   ## Way of work   <!-- gestalt -->
 
