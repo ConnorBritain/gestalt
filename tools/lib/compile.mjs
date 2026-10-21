@@ -27,6 +27,22 @@ export function compileWay(way, catalog, { survey = null, problems = [], wayText
     lint.ok = false;
   }
   const profiles = way.profiles.map(pr => ({ ...pr, blocks: renderBlocks(pr.way, catalog) }));
+  // kitctl profiles can only append to a loadout's block, so a profile that changes a line
+  // the default already renders (a check order it extends, say) cannot be expressed.
+  const changed = (base, mine) => {
+    const have = new Set((mine ?? "").split("\n"));
+    return (base ?? "").split("\n").filter(l => l.startsWith("- ") && !have.has(l));
+  };
+  for (const pr of profiles) {
+    const pairs = [["way", blocks.base.body, pr.blocks.base.body], ...blocks.contexts.map(b => [b.context, b.body, pr.blocks.contexts.find(x => x.context === b.context)?.body])];
+    for (const [where, base, mine] of pairs) {
+      for (const line of changed(base, mine)) {
+        lint.problems.push({ code: "GST-PROFILE", severity: "error", where: `profile ${pr.name}: block ${where}`, message: `the profile changes a line the default block already has, and kitctl profiles can only add lines: "${line.slice(2, 80)}"; move the step into the base way or out of the profile` });
+        lint.errors += 1;
+        lint.ok = false;
+      }
+    }
+  }
   for (const pr of profiles) {
     const most = Math.max(pr.blocks.base.tokens, ...pr.blocks.contexts.map(b => pr.blocks.base.tokens + b.tokens));
     if (most > pr.way.budgets.block_tokens) {

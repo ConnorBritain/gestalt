@@ -261,4 +261,21 @@ check("a profile is held to its own block budget", "a fuller profile must not qu
   assert.ok(r.lint.problems.some(p => p.code === "GST-BUDGET" && p.where === "profile full: block"));
 });
 
+check("a profile that changes a line the default block has is refused (GST-PROFILE)", "kitctl profiles only append; a second, longer check line would leave two orders", () => {
+  const raw = parseYaml(readFileSync(minimalPath, "utf8"));
+  raw.flow.plan = [{ use: "elonify.plan-review", in: ["code"] }]; // elonify is loaded by default
+  raw.profiles = { full: { description: "Adds the diff review.", flow: { check: [{ use: "elonify.diff-review", in: ["code"], after: ["verification-gate.gates"] }] } } };
+  const { way, catalog, problems } = normaliseWay(raw);
+  const r = compileWay(way, catalog, { problems });
+  assert.equal(r.ok, false);
+  assert.ok(r.lint.problems.some(p => p.code === "GST-PROFILE" && p.where === "profile full: block code"), JSON.stringify(r.lint.problems));
+});
+check("SETUP tells a context repo to switch every Gestalt loadout", "switching only gestalt-flow leaves the context block on the old profile", () => {
+  const { raw } = withProfile();
+  raw.writer = "kitctl";
+  const { way, catalog, problems } = normaliseWay(raw);
+  const r = compileWay(way, catalog, { problems });
+  assert.match(r.files["SETUP.md"], /gestalt-<context>:full/);
+});
+
 finish();
