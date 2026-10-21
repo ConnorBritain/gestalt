@@ -25,6 +25,17 @@
     "kit/loadouts/gestalt-roadmap.yaml",
     "kit/loadouts/gestalt-site.yaml",
     "kit/loadouts/gestalt-writing.yaml",
+    "kit/profiles/full/kit.app.yaml",
+    "kit/profiles/full/kit.plugin.yaml",
+    "kit/profiles/full/kit.roadmap.yaml",
+    "kit/profiles/full/kit.site.yaml",
+    "kit/profiles/full/kit.writing.yaml",
+    "profiles/full/block.app.md",
+    "profiles/full/block.md",
+    "profiles/full/block.plugin.md",
+    "profiles/full/block.roadmap.md",
+    "profiles/full/block.site.md",
+    "profiles/full/block.writing.md",
     "workers/prose.prompt.md",
     "workers/prose.sh"
   ]

@@ -98,4 +98,19 @@ check("exactly one of --block or --agents", "an ambiguous write must not guess",
   assert.equal(run(["write", "--from", build]).status, 2);
 });
 
+check("--profile writes the profile's block under the same marker, and switches back without it", "one block per file: changing profile rewrites it in place", () => {
+  const dir = tempDir();
+  const way = join(dir, "way.yaml");
+  writeFileSync(way, `${readFileSync(full, "utf8")}\nprofiles:\n  full:\n    description: Offer the rituals by name.\n    reflect:\n      as_needed: [compounder.focus]\n    offer: true\n`);
+  const out = join(dir, "build");
+  assert.equal(run(["compile", "--way", way, "--out", out]).status, 0);
+  const target = join(dir, "AGENTS.md");
+  assert.equal(run(["write", "--block", target, "--profile", "full", "--from", out, "--yes"]).status, 0);
+  assert.match(readFileSync(target, "utf8"), /\/compounder:focus/);
+  assert.equal(run(["write", "--block", target, "--from", out, "--yes"]).status, 0);
+  const text = readFileSync(target, "utf8");
+  assert.ok(!text.includes("/compounder:focus"));
+  assert.equal(text.match(/gestalt:begin way -->/g).length, 1);
+});
+
 finish();

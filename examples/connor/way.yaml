@@ -94,6 +94,19 @@ budgets:
   # Model-routable skills per repo. Ritual skills called by name should not list at all.
   skills_per_context: 12
   index: false
+# Profiles (Connor, 2026-10-21): the way above is the lean default. `full` adds parking and
+# compounder's rituals, and names them in the block so the lead offers them when they are due;
+# the rituals still run only by name. Same plugins and budgets: only the block grows.
+# Apply with `kitctl use gestalt-flow:full`, or kit/profiles/full/kit.<context>.yaml.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
+    flow:
+      intend: [{ use: compounder.park }]
+    reflect:
+      weekly: [compounder.update]
+      as_needed: [compounder.focus, compounder.interview]
+    offer: true
 disable:
   app: [plugin:anthropic/frontend-design]
   site: [plugin:anthropic/frontend-design]

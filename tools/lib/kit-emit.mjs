@@ -25,11 +25,26 @@ function loadoutFor(name, description, entries, way, disable, instructions) {
 }
 
 /**
+ * Each way profile becomes a kitctl profile of every Gestalt loadout, so `<loadout>:<profile>`
+ * works for all of them. kitctl profiles narrow and never add, so a profile carries only the
+ * block lines it adds (`instructions_append`); lint (GST-PROFILE) keeps it from needing more.
+ */
+function withProfiles(doc, baseBody, profileBodies) {
+  if (!profileBodies.length) return;
+  const have = new Set(baseBody.split("\n"));
+  doc.profiles = {};
+  for (const [pr, body] of profileBodies) {
+    const extra = body.split("\n").filter(l => l.startsWith("- ") && !have.has(l));
+    doc.profiles[pr.name] = { description: pr.description, ...(extra.length ? { instructions_append: `${extra.join("\n")}\n` } : {}) };
+  }
+}
+
+/**
  * Returns { files: {relativePath: text}, gaps: [string] }.
  * gestalt-flow: what applies everywhere (always-on entries, connectors, the base block).
  * gestalt-<ctx>: what a context adds on top, plus its disables and its block lines.
  */
-export function emitKit(way, blocks) {
+export function emitKit(way, blocks, profiles = []) {
   const files = {};
   const gaps = [];
   const docs = [];
@@ -44,6 +59,7 @@ export function emitKit(way, blocks) {
   const baseEntries = [...leadEntries(way, base), ...connectorEntries.filter(c => !isolated.has(c.ref))];
   const baseDisable = [...new Set([...base.active.flatMap(c => way.disable[c] ?? []), ...workerOwned(base), ...isolated])];
   const flow = loadoutFor("gestalt-flow", `${way.person.name}'s way: what every repo gets.`, baseEntries, way, baseDisable, blocks.base.body);
+  withProfiles(flow, blocks.base.body, profiles.map(pr => [pr, pr.blocks.base.body]));
   files["loadouts/gestalt-flow.yaml"] = emitYaml(flow, { header: HEADER });
   docs.push(flow);
   const baseIds = new Set(baseEntries.map(e => e.id));
@@ -54,14 +70,21 @@ export function emitKit(way, blocks) {
     const block = blocks.contexts.find(b => b.context === ctx);
     const own = way.contexts[ctx].loadouts;
     const loadouts = ["gestalt-flow"];
-    if (added.length || disable.length || block) {
+    const profileBlocks = profiles.map(pr => [pr, pr.blocks.contexts.find(b => b.context === ctx)?.body ?? ""]);
+    if (added.length || disable.length || block || profileBlocks.some(([, body]) => body)) {
       const doc = loadoutFor(`gestalt-${ctx}`, `${way.person.name}'s way in ${ctx} repos (${way.contexts[ctx].when}).`, added, way, disable, block?.body);
+      withProfiles(doc, block?.body ?? "", profileBlocks);
       files[`loadouts/gestalt-${ctx}.yaml`] = emitYaml(doc, { header: HEADER });
       docs.push(doc);
       loadouts.push(`gestalt-${ctx}`);
     }
     for (const name of own) { loadouts.push(name); gaps.push(`${ctx}: loadout "${name}" is referenced, not generated; it must exist in the warehouse.`); }
-    files[`kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}.`, "Copy into the repo as kit.yaml on a branch, add live: true and commit it, then: kitctl plan && kitctl apply --live --yes."] });
+    const intent = "Copy into the repo as kit.yaml on a branch, add live: true and commit it, then: kitctl plan && kitctl apply --live --yes.";
+    files[`kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}.`, intent] });
+    for (const pr of profiles) {
+      const named = loadouts.map(l => (l.startsWith("gestalt-") ? `${l}:${pr.name}` : l));
+      files[`profiles/${pr.name}/kit.${ctx}.yaml`] = emitYaml({ schema_version: 1, loadouts: named, harnesses }, { header: [`kit.yaml for repos where ${way.contexts[ctx].when}, profile ${pr.name}.`, intent] });
+    }
   }
   // Missing warehouse primitives are kitctl validate's to report ("missing primitive"); not
   // repeated here. A slot is different: kitctl rejects it unless the primitive declares it.

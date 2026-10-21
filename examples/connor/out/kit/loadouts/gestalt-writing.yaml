@@ -8,3 +8,8 @@ plugins: [plugin:prose-review, plugin:prose-tell-scan]
 instructions: |
   ### In writing (WRITING.md present)   <!-- gestalt -->
   - Before calling non-trivial work done: prose-tell-scan scan → prose-review review.
+profiles:
+  full:
+    description: "More of compounder: park new ideas, and offer the rituals by name when they are due."
+    instructions_append: |
+      - Added here, by name: /tell-scan.

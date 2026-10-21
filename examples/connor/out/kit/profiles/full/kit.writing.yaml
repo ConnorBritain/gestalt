@@ -1,0 +1,5 @@
+# kit.yaml for repos where file-exists:WRITING.md, profile full.
+# Copy into the repo as kit.yaml on a branch, add live: true and commit it, then: kitctl plan && kitctl apply --live --yes.
+schema_version: 1
+loadouts: [gestalt-flow:full, gestalt-writing:full]
+harnesses: [claude, codex]

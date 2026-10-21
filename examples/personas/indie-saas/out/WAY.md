@@ -63,7 +63,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 - **daily**: compounder checkin (/compounder:checkin, daily; one move in a real free block)
 - **weekly**: compounder review (/compounder:review, weekly; sets next week's mode)
 
-Rituals never go in the always-on block; they live here and in your calendar.
+Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).
 
 ## The block
 

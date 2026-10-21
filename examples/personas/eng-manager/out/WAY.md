@@ -76,7 +76,7 @@ Harness columns are enforcement: **enforced** (the harness makes it happen), **p
 - **weekly**: cairn review (/cairn-review, the weekly forced-choice review); team-update send (draft Friday's update from this week's Jira changes)
 - **monthly**: cairn resolve (/cairn-resolve when a prediction comes due); gestalt trim (/gestalt:trim, monthly or when the harness feels noisy)
 
-Rituals never go in the always-on block; they live here and in your calendar.
+Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).
 
 ## The block
 

@@ -26,19 +26,48 @@ export function compileWay(way, catalog, { survey = null, problems = [], wayText
     lint.errors += 1;
     lint.ok = false;
   }
+  const profiles = way.profiles.map(pr => ({ ...pr, blocks: renderBlocks(pr.way, catalog) }));
+  // kitctl profiles can only append to a loadout's block, so a profile that changes a line
+  // the default already renders (a check order it extends, say) cannot be expressed.
+  const changed = (base, mine) => {
+    const have = new Set((mine ?? "").split("\n"));
+    return (base ?? "").split("\n").filter(l => l.startsWith("- ") && !have.has(l));
+  };
+  for (const pr of profiles) {
+    const pairs = [["way", blocks.base.body, pr.blocks.base.body], ...blocks.contexts.map(b => [b.context, b.body, pr.blocks.contexts.find(x => x.context === b.context)?.body])];
+    for (const [where, base, mine] of pairs) {
+      for (const line of changed(base, mine)) {
+        lint.problems.push({ code: "GST-PROFILE", severity: "error", where: `profile ${pr.name}: block ${where}`, message: `the profile changes a line the default block already has, and kitctl profiles can only add lines: "${line.slice(2, 80)}"; move the step into the base way or out of the profile` });
+        lint.errors += 1;
+        lint.ok = false;
+      }
+    }
+  }
+  for (const pr of profiles) {
+    const most = Math.max(pr.blocks.base.tokens, ...pr.blocks.contexts.map(b => pr.blocks.base.tokens + b.tokens));
+    if (most > pr.way.budgets.block_tokens) {
+      lint.problems.push({ code: "GST-BUDGET", severity: "error", where: `profile ${pr.name}: block`, message: `the managed block is ≈${most} tokens in its largest context (budget ${pr.way.budgets.block_tokens}); cut what the profile adds or raise its budget` });
+      lint.errors += 1;
+      lint.ok = false;
+    }
+  }
   if (!lint.ok) return { ok: false, lint, files: {} };
   const files = {};
   files["block.md"] = blocks.base.text;
   for (const b of blocks.contexts) files[`block.${b.context}.md`] = b.text;
-  const kit = emitKit(way, blocks);
+  for (const pr of profiles) {
+    files[`profiles/${pr.name}/block.md`] = pr.blocks.base.text;
+    for (const b of pr.blocks.contexts) files[`profiles/${pr.name}/block.${b.context}.md`] = b.text;
+  }
+  const kit = emitKit(way, blocks, profiles);
   for (const [p, t] of Object.entries(kit.files)) files[`kit/${p}`] = t;
   const agentFiles = emitAgents(way, catalog);
   Object.assign(files, agentFiles);
-  files["WAY.md"] = renderWay(way, catalog, { lint, blocks, survey });
-  files["SETUP.md"] = renderSetup(way, catalog, { blocks, kit, agentFiles, survey });
+  files["WAY.md"] = renderWay(way, catalog, { lint, blocks, survey, profiles });
+  files["SETUP.md"] = renderSetup(way, catalog, { blocks, kit, agentFiles, survey, profiles });
   files["TASTE-TEST.md"] = renderTaste(way, catalog);
   files["BOOTSTRAP.md"] = renderBootstrap(way, catalog, files, { wayText });
-  return { ok: true, lint, files, blocks };
+  return { ok: true, lint, files, blocks, profiles };
 }
 
 export function writeBuild(out, files) {

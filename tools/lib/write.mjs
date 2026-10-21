@@ -56,12 +56,14 @@ function blockName(text) {
   return m[1];
 }
 
-export function writeBlock(target, buildDir, { context = null, yes = false } = {}) {
+export function writeBlock(target, buildDir, { context = null, profile = null, yes = false } = {}) {
   const file = resolve(target);
   if (!INSTRUCTION_FILES.includes(basename(file))) {
     throw new WriteError(`refusing ${basename(file)}: gestalt write only edits ${INSTRUCTION_FILES.join(", ")}. Native config (settings.json, config.toml) belongs to kitctl or to you.`);
   }
-  const source = join(buildDir, context ? `block.${context}.md` : "block.md");
+  // A profile's blocks are whole blocks under the same marker names, so switching profile
+  // rewrites the block in place.
+  const source = join(buildDir, ...(profile ? ["profiles", profile] : []), context ? `block.${context}.md` : "block.md");
   if (!existsSync(source)) throw new WriteError(`no ${basename(source)} in ${buildDir}; run gestalt compile${context ? ` (does context "${context}" add any lines?)` : ""}`);
   const block = readFileSync(source, "utf8");
   const name = blockName(block);
@@ -101,12 +103,12 @@ export function writeAgents(targetDir, buildDir, { yes = false } = {}) {
 }
 
 export function runWrite(argv, { parseArgs }) {
-  const a = parseArgs(argv, { block: "value", agents: "value", context: "value", from: "value", yes: "flag" });
+  const a = parseArgs(argv, { block: "value", agents: "value", context: "value", profile: "value", from: "value", yes: "flag" });
   if (!a.block === !a.agents) throw Object.assign(new Error("give exactly one of --block FILE or --agents DIR"), { name: "UsageError" });
   const buildDir = resolve(a.from ?? join(gestaltHome(), "build"));
   try {
     if (a.block) {
-      const r = writeBlock(a.block, buildDir, { context: a.context ?? null, yes: a.yes });
+      const r = writeBlock(a.block, buildDir, { context: a.context ?? null, profile: a.profile ?? null, yes: a.yes });
       console.log(r.message);
       if (r.changed && !a.yes) console.log(`\n${r.preview}\nDry run. Add --yes to write.`);
     } else {

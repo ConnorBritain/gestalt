@@ -7,7 +7,7 @@ import { leadLoad, protocolRules, sessionStartLines, stopGates } from "./lint.mj
 
 const cell = s => String(s ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
 
-export function renderWay(way, catalog, { lint, blocks, survey = null }) {
+export function renderWay(way, catalog, { lint, blocks, survey = null, profiles = [] }) {
   const L = [];
   const p = way.person;
   L.push(`# ${p.name}'s way`, "");
@@ -81,15 +81,35 @@ export function renderWay(way, catalog, { lint, blocks, survey = null }) {
     anyReflect = true;
     const where = r => (r.in.length < Object.keys(way.contexts).length ? ` [in ${r.in.join(", ")} repos]` : "");
     if (cadence === "on_enter") L.push(`- **on entering a repo, in order**: ${items.map((r, i) => `${i + 1}. ${label(r.use, catalog)} (${r.step.invoke})${where(r)}`).join(" ")}`);
-    else L.push(`- **${cadence}**: ${items.map(r => `${label(r.use, catalog)} (${r.step.invoke})${where(r)}`).join("; ")}`);
+    else L.push(`- **${cadence.replace("_", " ")}**: ${items.map(r => `${label(r.use, catalog)} (${r.step.invoke})${where(r)}`).join("; ")}`);
   }
   if (!anyReflect) L.push("- No rituals yet. A weekly `/gestalt:trim` is the cheapest one to start with.");
-  L.push("", "Rituals never go in the always-on block; they live here and in your calendar.", "");
+  L.push("", "Rituals stay out of the always-on block; they live here and in your calendar (a profile with `offer: true` names them in the block).", "");
 
   L.push("## The block", "");
   L.push(`Base block ≈${blocks.base.tokens} tokens (budget ${way.budgets.block_tokens})${blocks.contexts.length ? `; context blocks: ${blocks.contexts.map(b => `${b.context} ≈${b.tokens}`).join(", ")}` : ""}.`, "");
   L.push("```markdown", blocks.base.text.trimEnd(), "```", "");
   for (const b of blocks.contexts) L.push("```markdown", b.text.trimEnd(), "```", "");
+
+  if (profiles.length) {
+    L.push("## Profiles", "");
+    L.push("The way above is the default. A profile is the same way with more added; kitctl applies it as `<loadout>:<profile>` (the loadouts stay the same, only the block grows).", "");
+    for (const pr of profiles) {
+      L.push(`### ${pr.name}`, "", pr.description, "");
+      const baseFlow = new Set(way.flow.map(f => f.use));
+      const steps = pr.way.flow.filter(f => !baseFlow.has(f.use));
+      if (steps.length) L.push(`- Adds in session: ${steps.map(f => `${label(f.use, catalog)} (${f.stage}, ${f.mode})`).join(", ")}.`);
+      for (const [cadence, items] of Object.entries(pr.way.reflect)) {
+        const extra = items.filter(r => !way.reflect[cadence].some(x => x.use === r.use));
+        if (extra.length) L.push(`- Adds ${cadence.replace("_", " ")}: ${extra.map(r => `${label(r.use, catalog)}: ${r.step.invoke}`).join("; ")}.`);
+      }
+      if (pr.way.offer) L.push("- `offer`: the block names what runs by slash command, so the lead can offer the rituals when they are due.");
+      const changed = Object.keys(way.budgets).filter(k => pr.way.budgets[k] !== way.budgets[k]);
+      if (changed.length) L.push(`- Budgets: ${changed.map(k => `${k} ${pr.way.budgets[k]} (default ${way.budgets[k]})`).join(", ")}.`);
+      L.push(`- Block ≈${pr.blocks.base.tokens} tokens (budget ${pr.way.budgets.block_tokens})${pr.blocks.contexts.length ? `; context blocks: ${pr.blocks.contexts.map(b => `${b.context} ≈${b.tokens}`).join(", ")}` : ""}.`, "");
+      L.push("```markdown", pr.blocks.base.text.trimEnd(), "```", "");
+    }
+  }
 
   L.push("## Lint", "");
   const shown = lint.problems.filter(x => x.severity !== "error");

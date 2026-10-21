@@ -15,12 +15,13 @@
 //   GST-TIER               a tier with no model on a harness that needs one
 //   GST-WORKER             a worker that cannot deliver what it claims
 //   GST-TRIGGER            an aggressive description that will fire on everything (survey)
+//   GST-PROFILE            a profile that loads a primitive the base way does not
 import { CHECKER_KINDS, GENERATOR_KINDS, STAGES } from "./catalog.mjs";
 import { activeEntries, activeSteps, leadEntries, scenarios, workerFor } from "./way.mjs";
 
 const stageIndex = s => (s === "reflect" ? STAGES.length : STAGES.indexOf(s));
 
-export const CODES = ["GST-SCHEMA", "GST-REF", "GST-ORDER", "GST-INVOKE", "GST-LINK", "GST-RECORDER-BLOCKS", "GST-GATE", "GST-SLOT", "GST-PROTOCOL", "GST-BUDGET", "GST-LEAD", "GST-HARNESS", "GST-TIER", "GST-WORKER", "GST-TRIGGER"];
+export const CODES = ["GST-SCHEMA", "GST-REF", "GST-ORDER", "GST-INVOKE", "GST-LINK", "GST-RECORDER-BLOCKS", "GST-GATE", "GST-SLOT", "GST-PROTOCOL", "GST-BUDGET", "GST-LEAD", "GST-HARNESS", "GST-TIER", "GST-WORKER", "GST-TRIGGER", "GST-PROFILE"];
 
 /**
  * Whether a hook fires in a scenario. A hook with no opt-in fires wherever its plugin is
@@ -277,6 +278,20 @@ export function lintWay(way, catalog, { survey = null, problems: initial = [] } 
       if (w.in.length && !(ctx && w.in.includes(ctx))) continue;
       pr.severity = "info";
       pr.waived = w.reason;
+    }
+  }
+  // Profiles: each is a whole way, linted under its own budgets; only what it adds is reported.
+  // kitctl profiles narrow a loadout and never add to it, so a profile may not load a
+  // primitive the base way does not.
+  const seen = new Set(problems.map(x => `${x.code}|${x.where}|${x.message}`));
+  for (const pr of way.profiles ?? []) {
+    for (const x of lintWay(pr.way, catalog, { survey }).problems) {
+      if (!seen.has(`${x.code}|${x.where}|${x.message}`)) problems.push({ ...x, where: `profile ${pr.name}: ${x.where}`, profile: pr.name });
+    }
+    for (const sc of scenarios(way)) {
+      const base = new Set(leadEntries(way, sc).map(e => e.id));
+      const extra = leadEntries(pr.way, sc).filter(e => !base.has(e.id)).map(e => e.id);
+      if (extra.length) add("GST-PROFILE", `profiles.${pr.name}`, `${extra.join(", ")} load only in this profile (context ${sc.name}); kitctl profiles cannot add to a loadout, so put a step of it in the base way or drop it here`, "error", { scenario: sc.name });
     }
   }
   return summarise(dedupe(problems));
