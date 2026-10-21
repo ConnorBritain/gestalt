@@ -28,7 +28,7 @@ assert.equal(market.plugins[0].version, version, "marketplace entry version");
 assert.equal(market.plugins[0].source, "./");
 const codexMarket = json(".agents/plugins/marketplace.json");
 assert.equal(codexMarket.plugins[0].name, "gestalt");
-assert.equal(json(".codex-plugin/plugin.json").skills, "skills");
+assert.equal(json(".codex-plugin/plugin.json").skills, "./skills/", "Codex component paths are plugin-relative (./)");
 
 // CLAUDE.md is a pointer, so the two instruction files cannot drift.
 assert.equal(read("CLAUDE.md"), "@AGENTS.md\n", "CLAUDE.md must be exactly @AGENTS.md");
