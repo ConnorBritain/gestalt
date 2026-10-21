@@ -1,0 +1,114 @@
+# A tabula-rasa enterprise analyst in Claude Cowork. None of the author's tools: the org's
+# synced plugins (described here as way-local catalog entries, confidence: guess) plus the
+# Microsoft 365 and Atlassian connectors. The work is mostly trimming: twenty org plugins,
+# two used.
+schema: gestalt-way/1
+person:
+  name: Sam (bid analyst)
+  roles: [bid analyst, pricing]
+  goals:
+    - { id: draft-fast, text: "First-draft RFP response, with citations, in a day." }
+    - { id: clean-models, text: Financial models that stay financial; no brand rewrites. }
+  pains:
+    - The brand skill fires on everything.
+    - Twenty org plugins, two used.
+harnesses: [claude]
+writer: manual
+connectors:
+  - { id: atlassian, ref: mcp:atlassian, role: docs, note: "Confluence proposal library: the source of truth" }
+  - { id: m365, ref: mcp:m365, role: files, note: SharePoint past proposals and Outlook }
+contexts:
+  everywhere: { when: always }
+  rfp: { when: "file-exists:RFP.md" }
+  pricing: { when: "file-exists:MODEL.md" }
+flow:
+  plan:
+    - { use: org-rfp.extract, in: [rfp] }
+  make:
+    - { use: org-rfp.draft, in: [rfp], after: [org-rfp.extract] }
+    - { use: org-finance.model, in: [pricing] }
+  check:
+    - { use: org-rfp.score, in: [rfp] }
+    - { use: org-finance.check, in: [pricing] }
+    - { use: org-brand.voice, in: [rfp], mode: explicit }
+reflect:
+  weekly: [{ use: org-rfp.triage, in: [rfp] }]
+disable:
+  # The brand plugin's description grabs every turn: off everywhere except RFP folders,
+  # where it is asked for by name. The admin's other seventeen plugins stay off by default;
+  # list each one here as the admin pushes it.
+  everywhere: [plugin:org-hr, plugin:org-legal, plugin:org-travel]
+  pricing: [plugin:org-brand, plugin:org-rfp]
+  rfp: [plugin:org-finance]
+budgets:
+  always_on_tokens: 4000
+  # org-brand's six skills stay listed in RFP folders: client-facing answers need it by name.
+  skills_per_context: 14
+topology:
+  tiers:
+    claude: { lead: opus, worker: sonnet, critic: sonnet }
+  workers:
+    - id: library
+      tier: worker
+      mechanism: subagent
+      uses: [org-rfp.draft]
+      mcp: [atlassian]
+      route: "searching past proposals in Confluence and drafting cited answers"
+      returns: "Each answer with its [N] citations and a HIGH / MEDIUM / INSUFFICIENT tag."
+    - id: reviewer
+      tier: critic
+      mechanism: agent-file
+      uses: [org-rfp.score, org-finance.check]
+      route: checking a draft's citations or a model's assumptions
+catalog:
+  - id: org-rfp
+    ref: plugin:org-rfp
+    kind: plugin
+    title: org-rfp (synced)
+    summary: The org's RFP plugin; extract requirements, draft cited answers, score confidence.
+    confidence: guess
+    steps:
+      - { id: org-rfp.extract, stage: plan, kind: planner, mode: dispatcher, invoke: "extract the RFP's requirements into a matrix" }
+      - { id: org-rfp.draft, stage: make, kind: author, mode: dispatcher, invoke: draft citation-backed answers from the proposal library }
+      - { id: org-rfp.score, stage: check, kind: reviewer, mode: protocol, invoke: "score every answer's evidence before it leaves the folder" }
+      - { id: org-rfp.triage, stage: reflect, kind: ritual, mode: explicit, invoke: Monday bid triage }
+    harness: { claude: enforced }
+    cost: { skills: 7, agents: 1, listing_tokens: 610 }
+  - id: org-finance
+    ref: plugin:org-finance
+    kind: plugin
+    title: org-finance (synced)
+    summary: The org's pricing-model plugin, with Excel and M365 servers.
+    confidence: guess
+    steps:
+      - { id: org-finance.model, stage: make, kind: author, mode: dispatcher, invoke: build or update the pricing model }
+      - { id: org-finance.check, stage: check, kind: reviewer, mode: protocol, invoke: "check the model's formulas against MODEL.md's assumptions" }
+    harness: { claude: enforced }
+    cost: { skills: 9, agents: 0, listing_tokens: 760 }
+  - id: org-brand
+    ref: plugin:org-brand
+    kind: plugin
+    title: org-brand (synced)
+    summary: Brand voice and templates; its description claims every document.
+    confidence: guess
+    steps:
+      - { id: org-brand.voice, stage: check, kind: reviewer, mode: explicit, invoke: "brand-voice pass on client-facing text, by name only" }
+    harness: { claude: enforced }
+    cost: { skills: 6, agents: 0, listing_tokens: 560 }
+taste:
+  - id: cost-table
+    prompt: "Build a cost table for 3 years at 4% inflation from the assumptions in MODEL.md."
+    context: pricing
+    path: [make, check]
+    expect: [org-finance.model]
+    expect_quiet: [org-brand.voice]
+  - id: rfp-section
+    prompt: "Draft the answer to requirement 4.2 (data residency) with citations."
+    context: rfp
+    path: [plan, make, check]
+    expect: [org-rfp.draft]
+  - id: plain-question
+    prompt: "What's in this folder? Two lines."
+    context: everywhere
+    path: []
+    expect_quiet: [org-rfp.score, org-finance.check]

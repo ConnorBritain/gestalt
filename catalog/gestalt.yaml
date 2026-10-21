@@ -1,0 +1,36 @@
+schema: gestalt-catalog/1
+id: gestalt
+ref: plugin:gestalt
+kind: manager
+title: gestalt
+summary: Surveys, composes and sequences the harness; compiles WAY.md, the managed block and the taste test.
+version_seen: 0.1.0
+source: https://github.com/ConnorBritain/gestalt
+install:
+  claude: "/plugin marketplace add ConnorBritain/gestalt && /plugin install gestalt@gestalt"
+  codex: "Codex marketplace .agents/plugins/marketplace.json"
+steps:
+  - id: gestalt.way
+    stage: reflect
+    kind: planner
+    mode: explicit
+    invoke: /gestalt:way, when goals, tools or contexts change
+  - id: gestalt.block
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: "place the repo's context block (`kitctl use gestalt-<context>`, or `gestalt write --block AGENTS.md --context <context>`)"
+  - id: gestalt.trim
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /gestalt:trim, monthly or when the harness feels noisy
+  - id: gestalt.taste
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /gestalt:taste after any change to the way
+harness: { claude: enforced, codex: partial, cursor: partial, agents-md: advisory }
+cost: { skills: 3, agents: 0, commands: 0, listing_tokens: 280, session_start_lines: 0, measured_from: gestalt@0.1.0 }
+worker: { tier: lead, mechanism: script }
+notes: Can be disabled after setup; nothing it compiles needs it loaded.

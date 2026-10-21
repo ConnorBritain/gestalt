@@ -1,0 +1,42 @@
+# Planted defect for GST-ORDER: a reviewer placed in the plan stage.
+# Generated from ways/minimal.way.yaml; lint must report exactly this code.
+schema: gestalt-way/1
+person:
+  name: Test Person
+  roles: [developer]
+  goals:
+    - id: ship
+      text: Ship the change with tests that still mean something.
+harnesses: [claude]
+writer: manual
+connectors:
+  - id: github
+    ref: mcp:github
+    role: code
+contexts:
+  everywhere:
+    when: always
+  code:
+    when: file-exists:package.json
+flow:
+  check:
+    - use: verification-gate.gates
+      in: [code]
+  plan:
+    - use: verification-gate.critics
+      in: [code]
+stop_order: [verification-gate.gates]
+taste:
+  - id: fix
+    prompt: Fix the failing test in src/sum.js without touching the test.
+    context: code
+    path: [make, check]
+  - id: question
+    prompt: What does this repo do? Two lines.
+    context: everywhere
+    path: []
+    expect_quiet: [verification-gate.critics]
+  - id: refactor
+    prompt: Rename sum to add everywhere.
+    context: code
+    path: [make, check]

@@ -1,0 +1,453 @@
+{
+  "schema": "gestalt-survey/1",
+  "generated_at": "2026-10-20T12:00:00.000Z",
+  "token_method": "estimate: ceil(chars / 4)",
+  "harnesses": {
+    "claude": true,
+    "codex": true,
+    "cursor": true
+  },
+  "totals": {
+    "always_on_tokens": 228,
+    "by_kind": {
+      "instructions": 66,
+      "skills": 136,
+      "agents": 26,
+      "commands": 0
+    },
+    "plugins": 4,
+    "skills": 11,
+    "hidden_skills": 1,
+    "agents": 2,
+    "commands": 0,
+    "mcp_servers": 2
+  },
+  "instructions_tokens": 66,
+  "plugins": [
+    {
+      "name": "acme-guard",
+      "version": "1.2.0",
+      "scope": "user",
+      "path": "~/.claude/plugins/cache/acme/acme-guard/1.2.0",
+      "catalog": null,
+      "skills": 1,
+      "hidden_skills": 0,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 15,
+      "hooks": [
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "guard.py",
+          "origin": "plugin:acme-guard",
+          "blocking": "unknown"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "acme-guard@acme",
+      "enabled": true,
+      "ref": "plugin:acme-guard",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "guard",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/acme/acme-guard/1.2.0/skills/guard/SKILL.md",
+          "listing_tokens": 15
+        }
+      ]
+    },
+    {
+      "name": "compounder",
+      "version": "0.1.0",
+      "scope": "user",
+      "path": "~/.claude/plugins/cache/compounder/compounder/0.1.0",
+      "catalog": "compounder",
+      "skills": 4,
+      "hidden_skills": 0,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 67,
+      "hooks": [
+        {
+          "event": "SessionStart",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": false
+        },
+        {
+          "event": "UserPromptSubmit",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": true
+        },
+        {
+          "event": "PostToolUse",
+          "matcher": "Write|Edit|MultiEdit",
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": false
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "hook.mjs",
+          "origin": "plugin:compounder",
+          "blocking": true
+        }
+      ],
+      "mcp_servers": [],
+      "id": "compounder@compounder",
+      "enabled": true,
+      "ref": "plugin:compounder",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "checkin",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/compounder/compounder/0.1.0/skills/checkin/SKILL.md",
+          "listing_tokens": 17
+        },
+        {
+          "kind": "skill",
+          "name": "interview",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/compounder/compounder/0.1.0/skills/interview/SKILL.md",
+          "listing_tokens": 18
+        },
+        {
+          "kind": "skill",
+          "name": "park",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/compounder/compounder/0.1.0/skills/park/SKILL.md",
+          "listing_tokens": 16
+        },
+        {
+          "kind": "skill",
+          "name": "ship",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/compounder/compounder/0.1.0/skills/ship/SKILL.md",
+          "listing_tokens": 16
+        }
+      ]
+    },
+    {
+      "name": "elonify",
+      "version": "0.1.0",
+      "scope": "user",
+      "path": "~/.claude/plugins/cache/elonify/elonify/0.1.0",
+      "catalog": "elonify",
+      "skills": 1,
+      "hidden_skills": 0,
+      "agents": 1,
+      "commands": 0,
+      "listing_tokens": 35,
+      "hooks": [
+        {
+          "event": "PostToolUse",
+          "matcher": "Write|Edit",
+          "script": "elonify-hook.mjs",
+          "origin": "plugin:elonify",
+          "blocking": false,
+          "opt_in": ".claude/elonify.json"
+        },
+        {
+          "event": "SubagentStop",
+          "matcher": "elonify-critic",
+          "script": "elonify-hook.mjs",
+          "origin": "plugin:elonify",
+          "blocking": false,
+          "opt_in": ".claude/elonify.json"
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "elonify-hook.mjs",
+          "origin": "plugin:elonify",
+          "blocking": true,
+          "opt_in": ".claude/elonify.json"
+        }
+      ],
+      "mcp_servers": [],
+      "id": "elonify@elonify",
+      "enabled": true,
+      "ref": "plugin:elonify",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "review",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/elonify/elonify/0.1.0/skills/review/SKILL.md",
+          "listing_tokens": 17
+        },
+        {
+          "kind": "agent",
+          "name": "elonify-critic",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/elonify/elonify/0.1.0/agents/elonify-critic.md",
+          "listing_tokens": 18,
+          "model": "sonnet"
+        }
+      ]
+    },
+    {
+      "name": "roadmap",
+      "version": "0.7.2",
+      "scope": "user",
+      "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2",
+      "catalog": "roadmap",
+      "skills": 4,
+      "hidden_skills": 1,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 25,
+      "hooks": [
+        {
+          "event": "SessionStart",
+          "matcher": null,
+          "script": "session-start.mjs",
+          "origin": "plugin:roadmap",
+          "blocking": false
+        },
+        {
+          "event": "Stop",
+          "matcher": null,
+          "script": "journal-post.mjs",
+          "origin": "plugin:roadmap",
+          "blocking": false
+        }
+      ],
+      "mcp_servers": [
+        "graph"
+      ],
+      "id": "roadmap@roadmap",
+      "enabled": true,
+      "ref": "plugin:roadmap",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "cycle",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/cycle/SKILL.md",
+          "listing_tokens": 6
+        },
+        {
+          "kind": "skill",
+          "name": "fanout",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/fanout/SKILL.md",
+          "listing_tokens": 6
+        },
+        {
+          "kind": "skill",
+          "name": "gauntlet",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/gauntlet/SKILL.md",
+          "listing_tokens": 7
+        },
+        {
+          "kind": "skill",
+          "name": "retro",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/retro/SKILL.md",
+          "listing_tokens": 0,
+          "hidden": true
+        },
+        {
+          "kind": "skill",
+          "name": "slice",
+          "scope": "user",
+          "path": "~/.claude/plugins/cache/roadmap/roadmap/0.7.2/skills/slice/SKILL.md",
+          "listing_tokens": 6
+        }
+      ]
+    }
+  ],
+  "loose": [
+    {
+      "kind": "rule",
+      "name": "db.mdc",
+      "scope": "cursor-project",
+      "path": "<repo>/.cursor/rules/db.mdc",
+      "listing_tokens": 14
+    },
+    {
+      "kind": "agent",
+      "name": "scribe",
+      "scope": "user",
+      "path": "~/.claude/agents/scribe.md",
+      "listing_tokens": 8,
+      "model": "haiku"
+    },
+    {
+      "kind": "skill",
+      "name": "loose-notes",
+      "scope": "user",
+      "path": "~/.claude/skills/loose-notes/SKILL.md",
+      "listing_tokens": 12
+    }
+  ],
+  "instructions": [
+    {
+      "path": "~/.claude/CLAUDE.md",
+      "harness": "claude",
+      "scope": "user",
+      "tokens": 7,
+      "markers": []
+    },
+    {
+      "path": "~/.codex/AGENTS.md",
+      "harness": "codex",
+      "scope": "user",
+      "tokens": 32,
+      "markers": [
+        "trail:start",
+        "trail:end"
+      ]
+    },
+    {
+      "path": "<repo>/CLAUDE.md",
+      "harness": "claude",
+      "scope": "project",
+      "tokens": 3,
+      "markers": []
+    },
+    {
+      "path": "<repo>/AGENTS.md",
+      "harness": "claude",
+      "scope": "project",
+      "tokens": 56,
+      "markers": [
+        "elonify",
+        "elonify"
+      ],
+      "imported_by": "<repo>/CLAUDE.md"
+    },
+    {
+      "path": "<repo>/.cursor/rules/style.mdc",
+      "harness": "cursor",
+      "scope": "project",
+      "tokens": 16,
+      "markers": []
+    }
+  ],
+  "mcp": [
+    {
+      "name": "linear",
+      "harness": "claude",
+      "scope": "project",
+      "origin": "<repo>/.mcp.json"
+    },
+    {
+      "name": "linear",
+      "harness": "claude",
+      "scope": "user",
+      "origin": "~/.claude.json"
+    },
+    {
+      "name": "docs.search",
+      "harness": "codex",
+      "scope": "user",
+      "origin": "~/.codex/config.toml",
+      "enabled": false
+    },
+    {
+      "name": "linear",
+      "harness": "codex",
+      "scope": "user",
+      "origin": "~/.codex/config.toml",
+      "enabled": true
+    }
+  ],
+  "hooks": {
+    "settings": [
+      {
+        "event": "SessionStart",
+        "matcher": null,
+        "script": "hello.sh",
+        "origin": "user:~/.claude/settings.json",
+        "blocking": false,
+        "class": "user"
+      }
+    ],
+    "platform": [
+      {
+        "event": "Stop",
+        "matcher": null,
+        "script": "stop-hook-git-check.sh",
+        "origin": "platform:~/.claude/launcher-settings.json",
+        "blocking": "unknown",
+        "class": "platform"
+      }
+    ]
+  },
+  "stop_blockers": [
+    "elonify",
+    "compounder",
+    "acme-guard",
+    "platform:stop-hook-git-check"
+  ],
+  "collisions": [
+    {
+      "code": "GST-C-STOP",
+      "severity": "warn",
+      "message": "4 Stop hooks can block the same turn: elonify [opt-in .claude/elonify.json], compounder, acme-guard (unknown), platform:~/.claude/launcher-settings.json (platform) (unknown). They run together; nothing orders them."
+    },
+    {
+      "code": "GST-C-START",
+      "severity": "info",
+      "message": "3 SessionStart hooks inject context: compounder, roadmap, user:~/.claude/settings.json"
+    },
+    {
+      "code": "GST-C-COUNTER",
+      "severity": "info",
+      "message": "2 PostToolUse hooks watch edits: elonify, compounder"
+    },
+    {
+      "code": "GST-C-MARKER",
+      "severity": "warn",
+      "message": "<repo>/AGENTS.md carries \"elonify\" more than once"
+    },
+    {
+      "code": "GST-C-MCP",
+      "severity": "info",
+      "message": "MCP server linear (claude) is defined in user and project scope"
+    }
+  ],
+  "triggers": [
+    {
+      "where": "~/.claude/plugins/cache/acme/acme-guard/1.2.0/skills/guard/SKILL.md",
+      "match": "MANDATORY"
+    }
+  ],
+  "usage": {
+    "plugin_counters": {
+      "elonify@elonify": 12,
+      "compounder@compounder": 40,
+      "acme-guard@acme": 0
+    },
+    "transcripts": {
+      "days": 30,
+      "skills": {
+        "compounder:checkin": 2
+      },
+      "agents": {
+        "elonify-critic": 1
+      },
+      "mcp": {
+        "linear": 1
+      },
+      "commands": {
+        "elonify:review": 1
+      },
+      "sessions": 1
+    }
+  },
+  "notes": [
+    "ghost@acme: installed but its directory is missing",
+    "MCP tool definitions are not counted: the survey never starts a server. Claude Code defers them by default (tool search); harnesses that load them up front pay for them every turn."
+  ]
+}

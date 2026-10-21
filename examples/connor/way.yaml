@@ -1,0 +1,139 @@
+# Connor's way: the stack this repo was built for, in the order he described it.
+# Gestalt (sequence) → kitctl (what is on, per repo) → roadmap (the plan of record) →
+# compounder (stay on the one thing) → cairn (judgment record) → elonify ∥ verification-gate
+# (check) → humanizer → vonnegut (voice) → ui-magic / brand-builder (per kind of repo).
+schema: gestalt-way/1
+person:
+  name: Connor England
+  roles: [plugin author, indie builder, enterprise consultant, writer]
+  goals:
+    - { id: ship, text: Finish and ship the focus project before starting the next one. }
+    - { id: lean, text: "Keep every harness lean enough that what is installed actually fires, in the right order." }
+    - { id: voice, text: "Publish writing that sounds like me, not like a model." }
+  pains:
+    - Up to four Stop hooks can block the same turn and nothing orders them.
+    - Three tools inject text at session start.
+    - Linear, judgment records and critics live in separate tools that never hand off.
+harnesses: [claude, codex, cursor]
+writer: kitctl
+connectors:
+  - { id: linear, ref: mcp:linear, role: tracker, auth: LINEAR_API_KEY, server: { type: http, url: "https://mcp.linear.app/mcp" } }
+  - { id: github, ref: mcp:github, role: code }
+  - { id: m365, ref: mcp:m365, role: mail, optional: true, note: Enterprise mail and calendar for client work }
+contexts:
+  everywhere: { when: always }
+  plugin: { when: "file-exists:.claude-plugin/plugin.json", note: The agent-primitives family repos }
+  roadmap: { when: "file-exists:docs/roadmap/roadmap.yaml" }
+  app: { when: "file-exists:.ui-magic.json", loadouts: [app-studio] }
+  site: { when: "file-exists:BRAND.md", loadouts: [brand-studio] }
+  writing: { when: "file-exists:WRITING.md", note: "Marker file for essay, newsletter and book folders" }
+flow:
+  orient:
+    - { use: cairn.debt }
+    - { use: compounder.brief }
+    - { use: roadmap.ready-wave, in: [roadmap] }
+  intend:
+    - { use: compounder.guard }
+    - { use: roadmap.slice, in: [roadmap] }
+  plan:
+    - { use: elonify.plan-review, in: [plugin, roadmap, app, site] }
+    - { use: ui-magic.foundation, in: [app] }
+    - { use: brand-builder.foundation, in: [site] }
+  make:
+    - { use: ui-magic.build, in: [app] }
+    - { use: brand-builder.build, in: [site] }
+    - { use: humanizer.strip }
+    - { use: prose-author.draft, after: [humanizer.strip] }
+  check:
+    - { use: verification-gate.gates, in: [plugin, roadmap, app, site] }
+    - { use: elonify.diff-review, in: [plugin, roadmap, app, site], enforce: hook, after: [verification-gate.gates] }
+    - { use: verification-gate.critics, in: [plugin, roadmap, app, site], parallel_with: [elonify.diff-review], after: [verification-gate.gates] }
+    - { use: ui-magic.audit, in: [app] }
+    - { use: brand-builder.audit, in: [site] }
+    - { use: prose-tell-scan.scan, in: [writing] }
+    - { use: prose-review.review, in: [writing], after: [prose-tell-scan.scan] }
+  record:
+    - { use: compounder.stop-lines }
+    - { use: compounder.ship }
+    - { use: cairn.capture }
+    - { use: roadmap.journal, in: [roadmap] }
+# Tests first (a red gate is already "not done"), then the critics' verdicts, then what
+# moved, then the platform's commit-and-push check.
+stop_order: [verification-gate.gates, elonify.diff-review, compounder.stop-lines, platform:git-check]
+links:
+  - { from: elonify.diff-review, on: REFRAME, to: cairn.capture, as: choice, via: instruction }
+  - { from: compounder.stop-lines, on: shareable, to: compounder.ship, as: receipt, via: manual }
+  - { from: humanizer.strip, on: done, to: prose-author.draft, as: neutral draft, via: manual }
+reflect:
+  # Once per repo: the repo's native config. kitctl writes here, so the loadouts already carry
+  # the context block (gestalt.block is for ways without kitctl). Trail (trail.init, after
+  # kitctl.use) waits on a pilot (Connor, 2026-10-20): its SessionStart
+  # hook adds 29 lines against the 8-line budget and its Stop hook is another blocking gate
+  # (catalog/trail.yaml). The first run is in trail-pilot.md.
+  on_enter: [kitctl.use]
+  daily: [compounder.checkin]
+  weekly:
+    - cairn.review
+    - compounder.review
+    - { use: roadmap.cycle, in: [roadmap] }
+    - kitctl.doctor
+  monthly: [gestalt.trim, gestalt.taste, prose-author.style-tune]
+# Budgets per measure (Connor's decision, 2026-10-20). Each number is a limit with a reason.
+# No waivers: compounder's brief is three lines and the ritual skills run by name (portability
+# session, 2026-10-20). Listed skills in roadmap (24), app (18) and site (17) repos stay over
+# 12, from those tools' own skills; Connor chose to keep that visible as a warning (2026-10-20).
+budgets:
+  block_tokens: 450
+  # Five always-on rules in code repos, each a gate the model would otherwise skip: elonify's
+  # snippet, the verification snippet, the Stop order, the REFRAME hand-off to cairn, and the
+  # Codex reminder to check cairn's debt. This is the sequencing; it is worth its lines.
+  protocol_rules: 5
+  unordered_blocking_per_event: 1
+  session_start_lines: 8
+  always_on_tokens: 12000
+  # Model-routable skills per repo. Ritual skills called by name should not list at all.
+  skills_per_context: 12
+  index: false
+disable:
+  app: [plugin:anthropic/frontend-design]
+  site: [plugin:anthropic/frontend-design]
+topology:
+  # Codex: fill in your model ids (you named a GPT-6 "Astra" lead and a 5.6 "Terra" worker);
+  # until then lint warns GST-TIER for Codex.
+  tiers:
+    claude: { lead: opus, worker: sonnet, critic: sonnet }
+  workers:
+    - id: critics
+      tier: critic
+      mechanism: agent-file
+      uses: [elonify.plan-review, elonify.diff-review, verification-gate.critics, prose-review.review]
+      route: reviewing a plan, a finished diff or a draft
+    - id: prose
+      tier: worker
+      mechanism: headless
+      uses: [prose-author.draft, prose-author.style-tune]
+      route: drafting or revising prose in my voice, in any repo
+      returns: The draft's path and three lines on what changed and why.
+    - id: linear
+      tier: worker
+      mechanism: subagent
+      uses: [compounder.checkin]
+      mcp: [linear]
+      route: the daily check-in, or anything that reads or updates Linear
+      returns: Open issues for the focus project, scope added since the focus began, and done/total.
+taste:
+  - id: temptation
+    prompt: "New idea: a tool that syncs my loadouts to every laptop. Let's scaffold it in a fresh repo."
+    context: everywhere
+    path: [orient, intend]
+    expect_quiet: [elonify.diff-review, verification-gate.critics]
+  - id: build
+    prompt: "Add a --json flag to `cairn debt`, with a test that pins the output shape."
+    context: plugin
+    path: [plan, make, check, record]
+  - id: voice
+    prompt: "Draft a 200-word changelog post announcing Gestalt 0.1."
+    context: writing
+    path: [make, check]
+    expect: [prose-author.draft]
+    expect_quiet: [verification-gate.gates]

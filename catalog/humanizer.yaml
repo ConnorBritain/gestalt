@@ -1,0 +1,24 @@
+schema: gestalt-catalog/1
+id: humanizer
+ref: skill:blader/humanizer
+kind: skill
+title: humanizer (blader)
+summary: Rewrites AI-sounding text so it reads like a writer, not a chatbot; removes the default patterns.
+version_seen: 8c307f3
+source: https://github.com/blader/humanizer
+install:
+  claude: "Install the humanizer skill from github.com/blader/humanizer into ~/.claude/skills (MIT)."
+  codex: "Copy SKILL.md into a Codex skills directory."
+steps:
+  - id: humanizer.strip
+    stage: make
+    kind: transformer
+    mode: explicit
+    invoke: humanizer on a draft, before voice tuning; it strips the default, voice adds the person
+harness: { claude: partial, codex: partial, cursor: partial, agents-md: advisory }
+cost: { skills: 1, agents: 0, commands: 0, listing_tokens: 60, session_start_lines: 0 }
+feeds:
+  - { on: done, to: prose-author.draft, as: neutral draft, status: proposed }
+worker: { tier: worker, mechanism: subagent }
+confidence: guess
+notes: Cost is an estimate (not measured from a checkout). brand-builder vendors it at 8c307f3 inside copy-voice.

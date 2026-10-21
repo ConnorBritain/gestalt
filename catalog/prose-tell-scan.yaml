@@ -1,0 +1,19 @@
+schema: gestalt-catalog/1
+id: prose-tell-scan
+ref: plugin:prose-tell-scan
+kind: plugin
+title: prose-tell-scan (vonnegut)
+summary: Deterministic scan for AI-writing tells, by register (essay, technical, narration, correspondence).
+version_seen: 0.1.1
+source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-tell-scan
+install:
+  claude: "/plugin install prose-tell-scan@vonnegut"
+steps:
+  - id: prose-tell-scan.scan
+    stage: check
+    kind: gate
+    mode: explicit
+    invoke: /tell-scan before the prose critics, so they spend tokens on judgment, not counting
+harness: { claude: enforced, codex: partial, cursor: partial, agents-md: advisory }
+cost: { skills: 1, agents: 0, commands: 1, listing_tokens: 180, session_start_lines: 0, measured_from: vonnegut@402bb35 }
+worker: { tier: script, mechanism: script }

@@ -6,7 +6,7 @@
   "bin": { "gestalt": "tools/cli.mjs" },
   "engines": { "node": ">=18.15" },
   "scripts": { "check": "node tools/check.mjs" },
-  "files": ["tools/", "catalog/", "skills/", "README.md", "DESIGN.md", "LICENSE"],
+  "files": ["tools/", "catalog/", "skills/", "docs/way-schema.md", "README.md", "DESIGN.md", "LICENSE"],
   "repository": "https://github.com/ConnorBritain/gestalt",
   "author": "Connor England",
   "license": "MIT"

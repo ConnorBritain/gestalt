@@ -1,0 +1,58 @@
+schema: gestalt-way/1
+person:
+  name: Full Fixture
+  roles: [builder, writer]
+  goals:
+    - { id: ship, text: Ship one thing at a time. }
+    - { id: voice, text: Write like myself. }
+  pains: [Two Stop nudges on one turn.]
+harnesses: [claude, codex]
+writer: kitctl
+connectors:
+  - { id: linear, ref: mcp:linear, role: tracker, auth: LINEAR_API_KEY, server: { type: http, url: "https://mcp.linear.app/mcp" } }
+  - { id: github, ref: mcp:github, role: code }
+contexts:
+  everywhere: { when: always }
+  code: { when: "file-exists:package.json", loadouts: [brand-studio] }
+  writing: { when: "file-exists:.prose/voice.json" }
+flow:
+  orient:
+    - { use: cairn.debt }
+    - { use: compounder.brief }
+  intend:
+    - { use: compounder.guard }
+  plan:
+    - { use: elonify.plan-review, in: [code] }
+  make:
+    - { use: humanizer.strip, in: [writing] }
+    - { use: prose-author.draft, in: [writing], after: [humanizer.strip] }
+  check:
+    - { use: verification-gate.gates, in: [code] }
+    - { use: elonify.diff-review, in: [code], enforce: hook, after: [verification-gate.gates] }
+    - { use: verification-gate.critics, in: [code], parallel_with: [elonify.diff-review], after: [verification-gate.gates] }
+    - { use: prose-review.review, in: [writing] }
+  record:
+    - { use: compounder.stop-lines }
+    - { use: cairn.capture }
+stop_order: [verification-gate.gates, elonify.diff-review, compounder.stop-lines, platform:git-check]
+links:
+  - { from: elonify.diff-review, on: REFRAME, to: cairn.capture, as: choice, via: instruction }
+reflect:
+  daily: [compounder.checkin]
+  weekly: [cairn.review, gestalt.trim]
+budgets: { protocol_rules: 6, session_start_lines: 16, index: true }
+disable:
+  writing: [plugin:ui-magic]
+topology:
+  tiers:
+    claude: { lead: opus, worker: sonnet, critic: sonnet }
+    codex: { lead: gpt-lead, worker: gpt-worker, critic: gpt-worker }
+  lead: { keeps: [elonify.diff-review] }
+  workers:
+    - { id: prose, tier: worker, mechanism: headless, uses: [prose-author.draft], route: drafting prose in my voice, returns: The draft path and three lines on what changed. }
+    - { id: tracker, tier: worker, mechanism: subagent, uses: [cairn.capture], mcp: [linear, github], route: logging a decision and linking its Linear issue }
+    - { id: critics, tier: critic, mechanism: agent-file, uses: [verification-gate.critics, prose-review.review], route: reviewing a finished diff or draft }
+taste:
+  - { id: orient, prompt: "What should I work on right now? Three lines.", context: everywhere, path: [orient, intend], expect_quiet: [compounder.stop-lines] }
+  - { id: build, prompt: "Add a --json flag to the status command, with tests.", context: code, path: [plan, make, check, record] }
+  - { id: write, prompt: "Draft a 150-word update for the newsletter about this week's release.", context: writing, path: [make, check], expect: [prose-author.draft] }

@@ -1,0 +1,16 @@
+{
+  "generator": "gestalt compile",
+  "files": [
+    "BOOTSTRAP.md",
+    "SETUP.md",
+    "TASTE-TEST.md",
+    "WAY.md",
+    "agents/claude/linear.md",
+    "block.app.md",
+    "block.md",
+    "kit/gaps.md",
+    "kit/kit.app.yaml",
+    "kit/loadouts/gestalt-app.yaml",
+    "kit/loadouts/gestalt-flow.yaml"
+  ]
+}

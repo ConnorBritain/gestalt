@@ -1,0 +1,73 @@
+# A tabula-rasa solo developer. Gestalt recommends only what the goals need: a test gate and
+# two clean-context critics (verification-gate), a focus guard (compounder), and Linear
+# held by a worker. Two plugins.
+schema: gestalt-way/1
+person:
+  name: Jordan (solo SaaS developer)
+  roles: [developer, founder]
+  goals:
+    - { id: beta, text: Ship the clinic beta to ten paying clinics by March. }
+    - { id: focus, text: Stop starting side projects every Saturday. }
+  pains:
+    - Tests that get weakened to pass.
+    - "Two plugins, maybe; not five."
+harnesses: [claude, cursor]
+writer: manual
+connectors:
+  - { id: linear, ref: mcp:linear, role: tracker, auth: LINEAR_API_KEY, server: { type: http, url: "https://mcp.linear.app/mcp" } }
+  - { id: github, ref: mcp:github, role: code }
+contexts:
+  everywhere: { when: always }
+  app: { when: "file-exists:package.json" }
+flow:
+  orient:
+    - { use: compounder.brief }
+  intend:
+    - { use: compounder.guard }
+  check:
+    - { use: verification-gate.gates, in: [app] }
+    - { use: verification-gate.critics, in: [app], after: [verification-gate.gates] }
+  record:
+    - { use: compounder.stop-lines }
+    - { use: compounder.ship }
+stop_order: [verification-gate.gates, compounder.stop-lines]
+reflect:
+  daily: [compounder.checkin]
+  weekly: [compounder.review]
+budgets:
+  always_on_tokens: 3000
+  skills_per_context: 8
+  # compounder's focus brief is about 13 lines at session start; Jordan takes that in
+  # exchange for the Saturday guard.
+  session_start_lines: 13
+topology:
+  tiers:
+    claude: { lead: opus, worker: sonnet, critic: sonnet }
+  workers:
+    - id: critics
+      tier: critic
+      mechanism: agent-file
+      uses: [verification-gate.critics]
+      route: reviewing a finished diff before calling it done
+    - id: linear
+      tier: worker
+      mechanism: subagent
+      uses: [compounder.checkin]
+      mcp: [linear]
+      route: the morning check-in, or any question about the beta's issues
+      returns: Open beta issues, what was added since last week, and done/total.
+taste:
+  - id: weakened-test
+    prompt: "The signup test is failing. Fix it."
+    context: app
+    path: [make, check, record]
+  - id: saturday
+    prompt: "Let's start a Chrome extension version of the app this weekend."
+    context: everywhere
+    path: [orient, intend]
+    expect_quiet: [verification-gate.critics]
+  - id: beta-status
+    prompt: "How close is the beta? Three lines."
+    context: everywhere
+    path: [orient]
+    expect_quiet: [verification-gate.gates, compounder.stop-lines]

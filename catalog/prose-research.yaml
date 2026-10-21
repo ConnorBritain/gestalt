@@ -1,0 +1,19 @@
+schema: gestalt-catalog/1
+id: prose-research
+ref: plugin:prose-research
+kind: plugin
+title: prose-research (vonnegut)
+summary: Research notes with sources, stored per project beside the voice registry.
+version_seen: 0.1.0
+source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-research
+install:
+  claude: "/plugin install prose-research@vonnegut"
+steps:
+  - id: prose-research.research
+    stage: make
+    kind: investigator
+    mode: dispatcher
+    invoke: prose-research, gather and file sources before drafting
+harness: { claude: partial, codex: advisory, cursor: partial, agents-md: advisory }
+cost: { skills: 1, agents: 0, commands: 0, listing_tokens: 144, session_start_lines: 0, measured_from: vonnegut@402bb35 }
+worker: { tier: worker, mechanism: headless }

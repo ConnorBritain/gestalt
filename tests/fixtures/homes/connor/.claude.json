@@ -1,0 +1,33 @@
+{
+  "oauthAccount": {
+    "emailAddress": "SECRET_EMAIL@example.com"
+  },
+  "pluginUsage": {
+    "elonify@elonify": {
+      "usageCount": 12,
+      "lastUsedAt": 1
+    },
+    "compounder@compounder": {
+      "usageCount": 40,
+      "lastUsedAt": 1
+    },
+    "acme-guard@acme": {
+      "usageCount": 0,
+      "lastUsedAt": 1
+    }
+  },
+  "mcpServers": {
+    "linear": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "linear-mcp",
+        "--token",
+        "SECRET_LINEAR_ARG"
+      ],
+      "env": {
+        "LINEAR_API_KEY": "lin_api_SECRET_VALUE"
+      }
+    }
+  }
+}

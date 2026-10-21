@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "excel": {
+      "command": "uvx",
+      "args": [
+        "excel-mcp"
+      ]
+    },
+    "m365": {
+      "type": "http",
+      "url": "https://m365.example/mcp"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+schema: gestalt-catalog/1
+id: linear
+ref: mcp:linear
+kind: connector
+title: linear
+summary: Linear issues, projects and cycles.
+harness: { claude: enforced, codex: enforced, cursor: enforced, agents-md: none }
+cost: { skills: 0, agents: 0, commands: 0, listing_tokens: 0, session_start_lines: 0 }
+mcp: { note: "Tool definitions are deferred by default in Claude Code (tool search); count them where a harness loads them up front." }
+worker: { tier: worker, mechanism: subagent }
+notes: "Connector role: tracker. Credentials are env references only; a subagent can hold the connection so the lead never loads its tools."

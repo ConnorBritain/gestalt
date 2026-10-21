@@ -1,0 +1,64 @@
+schema: gestalt-catalog/1
+id: compounder
+ref: plugin:compounder
+kind: plugin
+title: compounder
+summary: Keeps AI time on the one focus project until it ships; earned modes, receipts, follow-through.
+version_seen: 0.2.0
+source: https://github.com/ConnorBritain/compounder
+install:
+  claude: "/plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview"
+  codex: "codex plugin marketplace add ConnorBritain/compounder, install compounder from /plugins, then trust its hooks (/hooks)"
+  cursor: "add ConnorBritain/compounder as a plugin marketplace and install compounder (reads .cursor-plugin)"
+steps:
+  - id: compounder.brief
+    stage: orient
+    kind: orienter
+    mode: ambient
+    invoke: a three-line brief (mode, focus with next move and ship clock, one line of steering), plus a status line for the user; quiet in work, paid and neutral lanes
+  - id: compounder.guard
+    stage: intend
+    kind: guard
+    mode: ambient
+    invoke: parks new-project talk and blocks off-lane work in focus or lockdown; asks before scaffolds
+  - id: compounder.park
+    stage: intend
+    kind: guard
+    mode: explicit
+    invoke: /compounder:park (or !park) to capture an idea without starting it
+  - id: compounder.stop-lines
+    stage: record
+    kind: recorder
+    mode: ambient
+    invoke: "once per focus session with >= 3 edits: what moved, the next step, shareable now?"
+  - id: compounder.ship
+    stage: record
+    kind: recorder
+    mode: explicit
+    invoke: /compounder:ship, the smallest shareable cut plus a receipt
+  - id: compounder.checkin
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /compounder:checkin, daily; one move in a real free block
+  - id: compounder.review
+    stage: reflect
+    kind: ritual
+    mode: explicit
+    invoke: /compounder:review, weekly; sets next week's mode
+hooks:
+  - { event: SessionStart, blocking: false, mechanism: context, serves: compounder.brief, lines: 3, note: "three lines of context in focus sessions (scripts/lib/brief.mjs sessionBrief), 2 in work, paid and neutral lanes; the one-line status goes to the user as systemMessage, not to the model" }
+  - { event: UserPromptSubmit, blocking: true, mechanism: decision-block, serves: compounder.guard, note: "!park, off-lane repos and new-project talk in focus or lockdown" }
+  - { event: PreToolUse, blocking: true, mechanism: permission-decision, serves: compounder.guard, note: "scaffolds and project-creating MCP calls (Linear save_project, Todoist add-projects)" }
+  - { event: PostToolUse, blocking: false, mechanism: none, note: counts edits }
+  - { event: Stop, blocking: true, mechanism: decision-block, honours_stop_hook_active: true, once_per_session: true, serves: compounder.stop-lines }
+  - { event: SessionEnd, blocking: false, mechanism: none, note: ledger event }
+knobs:
+  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge, default: true, change_with: /compounder:update, loosening: true }
+  - { file: ~/.compounder/charter.json, scope: user, key: rules.stop_nudge_min_edits, default: 3, change_with: /compounder:update, loosening: true }
+harness: { claude: enforced, codex: partial, cursor: partial, agents-md: none }
+cost: { skills: 4, agents: 0, commands: 0, listing_tokens: 341, session_start_lines: 3, measured_from: compounder@b8df5d9 }
+feeds:
+  - { on: shareable, to: compounder.ship, as: receipt, status: built }
+worker: { tier: script, mechanism: script }
+notes: "Rules that loosen live in code, so the model cannot talk past a cooldown. interview, review, update and focus run by name only. Codex reads the same hooks once trusted (apply_patch, exec_command matched; not yet watched firing). Cursor runs edit counting and the Stop lines as hooks; the brief and the guard are an alwaysApply rule (advisory)."

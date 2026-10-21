@@ -1,0 +1,279 @@
+{
+  "schema": "gestalt-survey/1",
+  "generated_at": "2026-10-20T12:00:00.000Z",
+  "token_method": "estimate: ceil(chars / 4)",
+  "harnesses": {
+    "claude": true,
+    "codex": false,
+    "cursor": false
+  },
+  "totals": {
+    "always_on_tokens": 569,
+    "by_kind": {
+      "instructions": 0,
+      "skills": 569,
+      "agents": 0,
+      "commands": 0
+    },
+    "plugins": 3,
+    "skills": 22,
+    "hidden_skills": 0,
+    "agents": 0,
+    "commands": 0,
+    "mcp_servers": 2
+  },
+  "instructions_tokens": 0,
+  "plugins": [
+    {
+      "name": "org-brand",
+      "version": "0001",
+      "scope": "synced",
+      "path": "~/.claude/plugins/synced/org_bucket2/org-brand",
+      "catalog": null,
+      "skills": 6,
+      "hidden_skills": 0,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 158,
+      "hooks": [],
+      "mcp_servers": [],
+      "id": "org-brand@synced",
+      "enabled": true,
+      "ref": "plugin:org-brand",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "org-brand-skill-0",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-0/SKILL.md",
+          "listing_tokens": 28
+        },
+        {
+          "kind": "skill",
+          "name": "org-brand-skill-1",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-1/SKILL.md",
+          "listing_tokens": 26
+        },
+        {
+          "kind": "skill",
+          "name": "org-brand-skill-2",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-2/SKILL.md",
+          "listing_tokens": 26
+        },
+        {
+          "kind": "skill",
+          "name": "org-brand-skill-3",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-3/SKILL.md",
+          "listing_tokens": 26
+        },
+        {
+          "kind": "skill",
+          "name": "org-brand-skill-4",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-4/SKILL.md",
+          "listing_tokens": 26
+        },
+        {
+          "kind": "skill",
+          "name": "org-brand-skill-5",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-5/SKILL.md",
+          "listing_tokens": 26
+        }
+      ]
+    },
+    {
+      "name": "org-finance",
+      "version": "0001",
+      "scope": "synced",
+      "path": "~/.claude/plugins/synced/org_bucket1/org-finance",
+      "catalog": null,
+      "skills": 9,
+      "hidden_skills": 0,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 243,
+      "hooks": [],
+      "mcp_servers": [
+        "excel",
+        "m365"
+      ],
+      "id": "org-finance@synced",
+      "enabled": true,
+      "ref": "plugin:org-finance",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-0",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-0/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-1",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-1/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-2",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-2/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-3",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-3/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-4",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-4/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-5",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-5/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-6",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-6/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-7",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-7/SKILL.md",
+          "listing_tokens": 27
+        },
+        {
+          "kind": "skill",
+          "name": "org-finance-skill-8",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket1/org-finance/skills/org-finance-skill-8/SKILL.md",
+          "listing_tokens": 27
+        }
+      ]
+    },
+    {
+      "name": "org-rfp",
+      "version": "0001",
+      "scope": "synced",
+      "path": "~/.claude/plugins/synced/org_bucket0/org-rfp",
+      "catalog": null,
+      "skills": 7,
+      "hidden_skills": 0,
+      "agents": 0,
+      "commands": 0,
+      "listing_tokens": 168,
+      "hooks": [],
+      "mcp_servers": [],
+      "id": "org-rfp@synced",
+      "enabled": true,
+      "ref": "plugin:org-rfp",
+      "units": [
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-0",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-0/SKILL.md",
+          "listing_tokens": 24
+        },
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-1",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-1/SKILL.md",
+          "listing_tokens": 24
+        },
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-2",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-2/SKILL.md",
+          "listing_tokens": 24
+        },
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-3",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-3/SKILL.md",
+          "listing_tokens": 24
+        },
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-4",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-4/SKILL.md",
+          "listing_tokens": 24
+        },
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-5",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-5/SKILL.md",
+          "listing_tokens": 24
+        },
+        {
+          "kind": "skill",
+          "name": "org-rfp-skill-6",
+          "scope": "synced",
+          "path": "~/.claude/plugins/synced/org_bucket0/org-rfp/skills/org-rfp-skill-6/SKILL.md",
+          "listing_tokens": 24
+        }
+      ]
+    }
+  ],
+  "loose": [],
+  "instructions": [],
+  "mcp": [],
+  "hooks": {
+    "settings": [],
+    "platform": [
+      {
+        "event": "Stop",
+        "matcher": null,
+        "script": "stop-hook-git-check.sh",
+        "origin": "platform:~/.claude/launcher-settings.json",
+        "blocking": "unknown",
+        "class": "platform"
+      }
+    ]
+  },
+  "stop_blockers": [
+    "platform:stop-hook-git-check"
+  ],
+  "collisions": [],
+  "triggers": [
+    {
+      "where": "~/.claude/plugins/synced/org_bucket2/org-brand/skills/org-brand-skill-0/SKILL.md",
+      "match": "ALWAYS USE"
+    }
+  ],
+  "usage": {
+    "plugin_counters": {
+      "org-rfp@synced": 3,
+      "org-finance@synced": 0,
+      "org-brand@synced": 0
+    },
+    "transcripts": null
+  },
+  "notes": [
+    "MCP tool definitions are not counted: the survey never starts a server. Claude Code defers them by default (tool search); harnesses that load them up front pay for them every turn."
+  ]
+}

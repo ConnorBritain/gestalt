@@ -1,0 +1,9 @@
+{
+  "schema": "gestalt-survey/1",
+  "triggers": [
+    {
+      "where": "plugin:acme-everything/skills/do-it/SKILL.md",
+      "match": "MANDATORY"
+    }
+  ]
+}
