@@ -7,7 +7,7 @@ Gestalt writes only its own block and its own generated files. Everything else i
 - [ ] Install cairn, compounder, elonify, verification-gate (agent-primitives), kitctl (commands in §1).
 - [ ] Wire elonify's `<!-- elonify -->` and verification-gate (agent-primitives)'s `## Self-verification gate` snippets into that repo's instruction file (§2).
 - [ ] Create `.claude/gates.json` and `.claude/elonify.json` there.
-- [ ] Place the block: on a branch there, commit `live: true` in its kit.yaml, then `kitctl use gestalt-flow --live --yes` and `kitctl use gestalt-plugin --live --yes`, committing after each.
+- [ ] Place the block: on a branch there, `kitctl use gestalt-flow` and `kitctl use gestalt-plugin` (each shows its plan and asks first).
 - [ ] Run taste prompt 2 (build) from TASTE-TEST.md in a fresh chat there, and score it from the transcript.
 
 When it passes, roll out the rest below. When it fails, run /gestalt:taste on the result before changing anything else.
@@ -53,14 +53,14 @@ kitctl writes native config; Gestalt only emitted the loadouts.
 
 - [ ] Copy `kit/loadouts/*.yaml` into your warehouse (`~/kits/loadouts/`). Read `kit/gaps.md` for referenced loadouts.
 - [ ] `kitctl validate`, and add a primitive for each one it reports missing (kitctl's docs/model.md).
-- [ ] In each matching repo, on a branch: copy `kit/kit.app.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] In each matching repo, on a branch: copy `kit/kit.plugin.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] In each matching repo, on a branch: copy `kit/kit.roadmap.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] In each matching repo, on a branch: copy `kit/kit.site.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] In each matching repo, on a branch: copy `kit/kit.writing.yaml` to `kit.yaml`, add `live: true` and commit it, then `kitctl plan` and `kitctl apply --live --yes`.
-- [ ] For repos with no other context: the same opt-in, then `kitctl use gestalt-flow --live --yes`.
-- [ ] Live apply refuses on main, on a dirty tree or without the committed opt-in (kitctl's docs/apply.md#live-apply). `kitctl off <loadout> --live --yes` is the undo.
-- [ ] Profile **full** (More of compounder: park new ideas, and offer the rituals by name when they are due): use `kit/profiles/full/kit.<context>.yaml` instead of `kit/kit.<context>.yaml`; it names every Gestalt loadout with `:full`. With commands, switch each Gestalt loadout the repo uses: `kitctl use gestalt-flow:full --live --yes` and `kitctl use gestalt-<context>:full --live --yes`. Switch back the same way without `:full`, or by copying `kit/kit.<context>.yaml` back.
+- [ ] In each matching repo, on a branch: copy `kit/kit.app.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] In each matching repo, on a branch: copy `kit/kit.plugin.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] In each matching repo, on a branch: copy `kit/kit.roadmap.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] In each matching repo, on a branch: copy `kit/kit.site.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] In each matching repo, on a branch: copy `kit/kit.writing.yaml` to `kit.yaml`, then `kitctl apply` (it shows the plan and asks first).
+- [ ] For repos with no other context: `kitctl use gestalt-flow`.
+- [ ] `kitctl off <loadout>` is the undo; it restores the original bytes. Kit warns, and does not refuse, on main or a dirty tree (kitctl's docs/apply.md#writing).
+- [ ] Profile **full** (More of compounder: park new ideas, and offer the rituals by name when they are due): use `kit/profiles/full/kit.<context>.yaml` instead of `kit/kit.<context>.yaml`; it names every Gestalt loadout with `:full`. With commands, switch each Gestalt loadout the repo uses: `kitctl use gestalt-flow:full` and `kitctl use gestalt-<context>:full`. Switch back the same way without `:full`, or by copying `kit/kit.<context>.yaml` back.
 
 ### Then, in each repo you start working in, in order
 

@@ -1,5 +1,5 @@
 # kit.yaml for repos where file-exists:RFP.md.
-# Copy into the repo as kit.yaml on a branch, add live: true and commit it, then: kitctl plan && kitctl apply --live --yes.
+# Copy into the repo as kit.yaml, then: kitctl apply (it shows the plan and asks first).
 schema_version: 1
 loadouts: [gestalt-flow, gestalt-rfp]
 harnesses: [claude]
