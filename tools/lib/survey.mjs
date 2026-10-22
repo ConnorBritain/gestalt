@@ -3,7 +3,7 @@
 // plugin script (some SessionStart hooks write state), and it never serializes a value that
 // could hold a secret: only names, counts, booleans and paths relative to a root.
 import { existsSync, lstatSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { CATALOG_DIR, loadCatalog } from "./catalog.mjs";
 import { estimateTokens, frontmatter, listingCost, TOKEN_METHOD } from "./tokens.mjs";
 import { scanToml } from "./toml-scan.mjs";
@@ -46,10 +46,13 @@ class Paths {
   constructor(home, repos) { this.home = home; this.repos = repos; }
   show(path) {
     const abs = resolve(path);
+    // Root-relative and always "/", so a Windows survey reads the same as any other.
+    const under = root => abs === root || abs.startsWith(`${root}${sep}`);
+    const rel = root => relative(root, abs).split(sep).join("/");
     for (const [i, r] of this.repos.entries()) {
-      if (abs === r || abs.startsWith(`${r}/`)) return `<repo${this.repos.length > 1 ? i + 1 : ""}>/${relative(r, abs)}`.replace(/\/$/, "");
+      if (under(r)) return `<repo${this.repos.length > 1 ? i + 1 : ""}>/${rel(r)}`.replace(/\/$/, "");
     }
-    if (abs === this.home || abs.startsWith(`${this.home}/`)) return `~/${relative(this.home, abs)}`.replace(/\/$/, "");
+    if (under(this.home)) return `~/${rel(this.home)}`.replace(/\/$/, "");
     return abs;
   }
 }
