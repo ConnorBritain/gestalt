@@ -335,6 +335,7 @@ schema_version: 2
 name: gestalt-app
 description: Connor England's way in app repos (file-exists:.ui-magic.json).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify, marketplace:ui-magic]
 plugins: [plugin:elonify, plugin:ui-magic, plugin:verification-gate]
 slots:
   ui.generator: plugin:ui-magic
@@ -357,6 +358,7 @@ schema_version: 2
 name: gestalt-flow
 description: "Connor England's way: what every repo gets."
 extends: []
+marketplaces: [marketplace:cairn, marketplace:compounder, marketplace:gestalt]
 plugins: [plugin:cairn, plugin:compounder, plugin:gestalt]
 skills: [skill:blader/humanizer]
 agents: [agent:linear]
@@ -393,6 +395,7 @@ schema_version: 2
 name: gestalt-plugin
 description: Connor England's way in plugin repos (file-exists:.claude-plugin/plugin.json).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify]
 plugins: [plugin:elonify, plugin:verification-gate]
 instructions: |
   ### In plugin (.claude-plugin/plugin.json present)   <!-- gestalt -->
@@ -412,6 +415,7 @@ schema_version: 2
 name: gestalt-roadmap
 description: Connor England's way in roadmap repos (file-exists:docs/roadmap/roadmap.yaml).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify, marketplace:roadmap]
 plugins: [plugin:elonify, plugin:roadmap, plugin:verification-gate]
 instructions: |
   ### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->
@@ -433,6 +437,7 @@ schema_version: 2
 name: gestalt-site
 description: Connor England's way in site repos (file-exists:BRAND.md).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:brand-builder, marketplace:elonify]
 plugins: [plugin:brand-builder, plugin:elonify, plugin:verification-gate]
 slots:
   design.generator: plugin:brand-builder
@@ -455,6 +460,7 @@ schema_version: 2
 name: gestalt-writing
 description: Connor England's way in writing repos (file-exists:WRITING.md).
 extends: []
+marketplaces: [marketplace:vonnegut]
 plugins: [plugin:prose-review, plugin:prose-tell-scan]
 instructions: |
   ### In writing (WRITING.md present)   <!-- gestalt -->

@@ -6,6 +6,7 @@ title: cairn
 summary: Append-only decision and prediction ledger; scripts compute calibration, roles never recommend.
 version_seen: 0.3.0
 source: https://github.com/ConnorBritain/cairn
+marketplace: marketplace:cairn
 install:
   claude: "/plugin marketplace add ConnorBritain/cairn && /plugin install cairn@cairn"
   codex: "node install-cairn-codex.mjs (verify with --check); trust the plugin's hooks (/hooks)"

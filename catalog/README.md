@@ -7,6 +7,7 @@ runs and what it costs.
 
 | Field | Meaning |
 |---|---|
+| `marketplace` | On an entry whose ref is `plugin:`, the kitctl ref of the marketplace that ships it (`marketplace:vonnegut`). A loadout that enables the plugin lists it under `marketplaces`, so kitctl also registers where to install it from |
 | `steps[]` | What the primitive does at a stage: `id` (`entry.step`), `stage`, `kind`, `mode`, `invoke`, optional `wiring_marker` and per-harness `fallback` instruction |
 | `hooks[]` | Hooks it registers: `event`, `blocking`, `mechanism`, `opt_in`, `serves` (the step it enforces), `lines` for SessionStart injectors, `quiet_unless`, and `unblocked_by: {setting, value, harness[]}` when setting one of the entry's knobs to that value stops a blocking hook from blocking on those harnesses (a way does it with `settings:`) |
 | `knobs[]` | Settings Gestalt may recommend changing, with the command that changes them; `values` when only some values are allowed; `loosening: true` when the owning tool treats a change as loosening |

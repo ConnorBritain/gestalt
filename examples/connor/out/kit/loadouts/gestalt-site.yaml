@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-site
 description: Connor England's way in site repos (file-exists:BRAND.md).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:brand-builder, marketplace:elonify]
 plugins: [plugin:brand-builder, plugin:elonify, plugin:verification-gate]
 slots:
   design.generator: plugin:brand-builder

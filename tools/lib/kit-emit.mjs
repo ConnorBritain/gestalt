@@ -22,12 +22,14 @@ function budgetOf(budgets) {
 
 function loadoutFor(name, description, entries, way, disable, instructions, { agents = [], budget = {} } = {}) {
   const plugins = [...new Set(entries.filter(e => e.ref.startsWith("plugin:")).map(e => e.ref))].sort();
+  // kitctl enables a plugin only; Claude Code and Codex find it through the marketplace the loadout also lists.
+  const marketplaces = [...new Set(entries.filter(e => e.ref.startsWith("plugin:") && e.marketplace).map(e => e.marketplace))].sort();
   const skills = [...new Set(entries.filter(e => e.ref.startsWith("skill:")).map(e => e.ref))].sort();
   const mcp = {};
   for (const e of entries.filter(x => x.ref.startsWith("mcp:"))) mcp[e.ref.slice(4)] = { primitive: e.ref };
   const slots = {};
   for (const e of entries) if (e.slot) slots[e.slot] = e.ref;
-  const doc = { schema_version: 2, name, description, extends: [], plugins, skills, agents: [...agents].sort(), mcp, slots, disable: [...disable].sort(), budget };
+  const doc = { schema_version: 2, name, description, extends: [], marketplaces, plugins, skills, agents: [...agents].sort(), mcp, slots, disable: [...disable].sort(), budget };
   if (instructions) doc.instructions = instructions;
   for (const k of Object.keys(doc)) {
     if (Array.isArray(doc[k]) && doc[k].length === 0 && k !== "extends") delete doc[k];

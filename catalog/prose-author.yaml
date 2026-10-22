@@ -6,6 +6,7 @@ title: prose-author (vonnegut)
 summary: Drafts in a person's voice from a revisioned voice profile; style tuning from feedback.
 version_seen: 0.9.0
 source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-author
+marketplace: marketplace:vonnegut
 install:
   claude: "/plugin marketplace add ConnorBritain/vonnegut && /plugin install prose-author@vonnegut"
   codex: "node install-prose-codex.mjs"

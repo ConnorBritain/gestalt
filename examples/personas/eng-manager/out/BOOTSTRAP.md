@@ -201,6 +201,7 @@ schema_version: 2
 name: gestalt-flow
 description: "Morgan (engineering manager)'s way: what every repo gets."
 extends: []
+marketplaces: [marketplace:cairn, marketplace:gestalt]
 plugins: [plugin:cairn, plugin:gestalt]
 skills: [skill:team-update]
 agents: [agent:reporter]
@@ -231,6 +232,7 @@ schema_version: 2
 name: gestalt-rfc
 description: Morgan (engineering manager)'s way in rfc repos (file-exists:RFC.md).
 extends: []
+marketplaces: [marketplace:elonify]
 plugins: [plugin:elonify]
 instructions: |
   ### In rfc (RFC.md present)   <!-- gestalt -->
@@ -246,6 +248,7 @@ schema_version: 2
 name: gestalt-service
 description: Morgan (engineering manager)'s way in service repos (file-exists:Makefile).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify]
 plugins: [plugin:elonify, plugin:verification-gate]
 disable: [plugin:code-review-extra]
 instructions: |

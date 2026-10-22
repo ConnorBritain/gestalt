@@ -4,4 +4,5 @@ schema_version: 2
 name: gestalt-book
 description: Ade (newsletter writer)'s way in book repos (file-exists:BOOK.md).
 extends: []
+marketplaces: [marketplace:vonnegut]
 plugins: [plugin:prose-outline]

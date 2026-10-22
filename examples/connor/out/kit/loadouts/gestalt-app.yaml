@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-app
 description: Connor England's way in app repos (file-exists:.ui-magic.json).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify, marketplace:ui-magic]
 plugins: [plugin:elonify, plugin:ui-magic, plugin:verification-gate]
 slots:
   ui.generator: plugin:ui-magic

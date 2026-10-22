@@ -6,6 +6,7 @@ title: ui-magic
 summary: Builds and repairs web apps that work in every state, from an object model and a screen manifest.
 version_seen: 0.8.0
 source: https://github.com/ConnorBritain/ui-magic
+marketplace: marketplace:ui-magic
 slot: ui.generator
 install:
   claude: "/plugin marketplace add ConnorBritain/ui-magic && /plugin install ui-magic@ui-magic"

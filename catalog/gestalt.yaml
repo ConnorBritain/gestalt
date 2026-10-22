@@ -6,6 +6,7 @@ title: gestalt
 summary: Surveys, composes and sequences the harness; compiles WAY.md, the managed block and the taste test.
 version_seen: 0.1.0
 source: https://github.com/ConnorBritain/gestalt
+marketplace: marketplace:gestalt
 install:
   claude: "/plugin marketplace add ConnorBritain/gestalt && /plugin install gestalt@gestalt"
   codex: "Codex marketplace .agents/plugins/marketplace.json"

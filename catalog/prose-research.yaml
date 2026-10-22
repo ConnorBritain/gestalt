@@ -6,6 +6,7 @@ title: prose-research (vonnegut)
 summary: Research notes with sources, stored per project beside the voice registry.
 version_seen: 0.1.0
 source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-research
+marketplace: marketplace:vonnegut
 install:
   claude: "/plugin install prose-research@vonnegut"
 steps:

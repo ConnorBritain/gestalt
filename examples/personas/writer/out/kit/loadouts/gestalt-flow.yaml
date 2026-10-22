@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-flow
 description: "Ade (newsletter writer)'s way: what every repo gets."
 extends: []
+marketplaces: [marketplace:cairn, marketplace:vonnegut]
 plugins: [plugin:cairn, plugin:prose-author, plugin:prose-review, plugin:prose-tell-scan]
 skills: [skill:blader/humanizer]
 mcp:

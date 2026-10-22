@@ -6,6 +6,7 @@ title: elonify
 summary: First-principles critic for plans and diffs; verdict PROCEED, CUT FIRST or REFRAME.
 version_seen: 0.1.0
 source: https://github.com/ConnorBritain/elonify
+marketplace: marketplace:elonify
 install:
   claude: "/plugin marketplace add ConnorBritain/elonify && /plugin install elonify@elonify"
   codex: "Paste wiring/agents-md.md into AGENTS.md; run the critic as a fresh `codex exec`."
