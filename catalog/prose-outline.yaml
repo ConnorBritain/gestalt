@@ -6,6 +6,7 @@ title: prose-outline (vonnegut)
 summary: Outlines with a revision history, before drafting.
 version_seen: 0.1.1
 source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-outline
+marketplace: marketplace:vonnegut
 install:
   claude: "/plugin install prose-outline@vonnegut"
 steps:

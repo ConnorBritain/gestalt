@@ -6,6 +6,7 @@ title: verification-gate (agent-primitives)
 summary: Tier-1 gates as a Stop hook, then verification-critic and architecture-reviewer in parallel, clean context.
 version_seen: 0.1.0
 source: https://github.com/ConnorBritain/agent-primitives/tree/main/bundles/verification-gate
+marketplace: marketplace:agent-primitives
 install:
   claude: "Install the verification-gate bundle from agent-primitives; paste wiring/claude-md.md; add .claude/gates.json per repo."
   codex: "Paste wiring/agents-md.md; run each reviewer as a fresh `codex exec`."

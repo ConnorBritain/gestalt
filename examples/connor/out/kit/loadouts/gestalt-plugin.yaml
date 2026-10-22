@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-plugin
 description: Connor England's way in plugin repos (file-exists:.claude-plugin/plugin.json).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify]
 plugins: [plugin:elonify, plugin:verification-gate]
 instructions: |
   ### In plugin (.claude-plugin/plugin.json present)   <!-- gestalt -->

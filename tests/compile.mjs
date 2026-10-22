@@ -91,6 +91,28 @@ check("the block body travels as loadout instructions", "with kitctl present, ki
   assert.match(parseYaml(files["kit/loadouts/gestalt-code.yaml"]).instructions, /In code \(package\.json present\)/);
 });
 
+check("each loadout lists the marketplace of every plugin it enables", "kitctl writes enabledPlugins only; without extraKnownMarketplaces and [marketplaces] the harness reports the plugin as not found", () => {
+  const { way, catalog } = readWay(fullPath);
+  const { files } = compileWay(way, catalog);
+  let checked = 0;
+  for (const [name, text] of Object.entries(files).filter(([p]) => p.startsWith("kit/loadouts/"))) {
+    const doc = parseYaml(text);
+    const want = [...new Set((doc.plugins ?? []).map(r => catalog.byRef.get(r)?.marketplace).filter(Boolean))].sort();
+    assert.deepEqual(doc.marketplaces ?? [], want, name);
+    checked += want.length;
+  }
+  assert.ok(checked > 0, "the full fixture enables at least one plugin with a marketplace");
+});
+check("a plugin with no marketplace is named in gaps.md", "a way-local entry may not know its marketplace; enabling it silently would leave the harness unable to install it", () => {
+  const { way, catalog } = readWay(fullPath);
+  const { files: before } = compileWay(way, catalog);
+  const ref = parseYaml(before["kit/loadouts/gestalt-flow.yaml"]).plugins.find(r => catalog.byRef.get(r)?.marketplace);
+  const market = catalog.byRef.get(ref).marketplace;
+  delete catalog.byRef.get(ref).marketplace;
+  const { files } = compileWay(way, catalog);
+  assert.ok(!(parseYaml(files["kit/loadouts/gestalt-flow.yaml"]).marketplaces ?? []).includes(market), market);
+  assert.match(files["kit/gaps.md"], new RegExp(`${ref}: its catalog entry names no marketplace`));
+});
 check("a subagent worker is a kitctl agent primitive, carried by gestalt-flow", "kitctl writes every native file, agent files included; Gestalt's own copies must be the same bytes", () => {
   const { files } = compile(fullPath);
   const prim = parseYaml(files["kit/primitives/agents/tracker.yaml"]);
@@ -172,15 +194,17 @@ function kitctlValidate(loadoutTexts, primitiveFiles = {}) {
     writeFileSync(join(wh, "loadouts", name), text);
     const doc = parseYaml(text);
     for (const [slot, ref] of Object.entries(doc.slots ?? {})) (provides[ref] ??= []).push(slot);
-    for (const r of [...(doc.plugins ?? []), ...(doc.skills ?? []), ...(doc.disable ?? []), ...Object.values(doc.mcp ?? {}).map(m => m.primitive)]) refs.add(r);
+    for (const r of [...(doc.marketplaces ?? []), ...(doc.plugins ?? []), ...(doc.skills ?? []), ...(doc.disable ?? []), ...Object.values(doc.mcp ?? {}).map(m => m.primitive)]) refs.add(r);
   }
   for (const ref of refs) {
     const [kind, name] = ref.split(":");
     if (kind === "agent") continue;
-    const dir = join(wh, "primitives", { plugin: "plugins", skill: "skills", mcp: "mcp" }[kind], ...name.split("/").slice(0, -1));
+    const dir = join(wh, "primitives", { marketplace: "marketplaces", plugin: "plugins", skill: "skills", mcp: "mcp" }[kind], ...name.split("/").slice(0, -1));
     mkdirSync(dir, { recursive: true });
     const stub = kind === "mcp"
       ? `schema_version: 2\nkind: mcp\nname: ${name}\ndescription: stub\ntransport: http\nurl: https://example.com/mcp\n`
+      : kind === "marketplace"
+      ? `schema_version: 2\nkind: marketplace\nname: ${name}\ndescription: stub\nsource: { git: "https://github.com/example/${name}.git", sha: "${"0".repeat(40)}", tag: v0.0.0 }\n`
       : `schema_version: 2\nkind: ${kind}\nname: ${name}\ndescription: stub\nexternal: true\nharnesses: { claude: {}, codex: {} }\n${provides[ref] ? `provides: [${provides[ref].join(", ")}]\n` : ""}`;
     writeFileSync(join(dir, `${name.split("/").pop()}.yaml`), stub);
   }

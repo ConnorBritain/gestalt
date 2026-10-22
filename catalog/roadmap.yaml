@@ -6,6 +6,7 @@ title: roadmap
 summary: Program increments, slices and the Gauntlet (worker, fresh critic, repair); Linear journal at session end.
 version_seen: 0.8.0
 source: https://github.com/ConnorBritain/roadmap
+marketplace: marketplace:roadmap
 install:
   claude: "claude plugin marketplace add ConnorBritain/roadmap && claude plugin install roadmap@roadmap; npm i -D @connorbritain/roadmap"
   codex: "codex plugin marketplace add ConnorBritain/roadmap and install roadmap; register the MCP server with `roadmap init --client codex --apply` (runs codex mcp add) or a kitctl mcp: primitive"

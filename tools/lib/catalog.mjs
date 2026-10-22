@@ -50,7 +50,7 @@ export const WHEN_RE = /^file-exists:(.+)$/;
 export const STEP_ID_RE = /^[a-z0-9][a-z0-9-]*\.[a-z0-9][a-z0-9-]*$/;
 export const ENTRY_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
-const ENTRY_KEYS = new Set(["schema", "id", "ref", "kind", "title", "summary", "version_seen", "source", "install", "slot", "steps", "hooks", "knobs", "harness", "cost", "mcp", "feeds", "worker", "exclusive_of", "confidence", "notes"]);
+const ENTRY_KEYS = new Set(["schema", "id", "ref", "kind", "title", "summary", "version_seen", "source", "install", "marketplace", "slot", "steps", "hooks", "knobs", "harness", "cost", "mcp", "feeds", "worker", "exclusive_of", "confidence", "notes"]);
 const STEP_KEYS = new Set(["id", "stage", "kind", "mode", "invoke", "wiring_marker", "fallback", "when", "note"]);
 const HOOK_KEYS = new Set(["event", "matcher", "blocking", "mechanism", "opt_in", "honours_stop_hook_active", "serves", "lines", "quiet_unless", "once_per_session", "unblocked_by", "note"]);
 const KNOB_KEYS = new Set(["file", "scope", "key", "default", "values", "change_with", "loosening"]);
@@ -76,6 +76,8 @@ export function validateEntry(entry, where = entry?.id ?? "entry") {
   if (!isStr(entry.ref) || !REF_RE.test(entry.ref)) problems.push(`${where}: ref "${entry.ref}" is not a kitctl ref (kind:name)`);
   if (!ENTRY_KINDS.includes(entry.kind)) problems.push(`${where}: kind must be one of ${ENTRY_KINDS.join(", ")}`);
   if (entry.slot != null && !SLOT_RE.test(entry.slot)) problems.push(`${where}: slot "${entry.slot}" is not a kitctl slot name`);
+  // A plugin's marketplace ref: the loadout that enables the plugin lists it, so kitctl registers it.
+  if (entry.marketplace != null && (!String(entry.ref).startsWith("plugin:") || !isStr(entry.marketplace) || !entry.marketplace.startsWith("marketplace:") || !REF_RE.test(entry.marketplace))) problems.push(`${where}: marketplace must be a marketplace:<name> ref on an entry whose ref is plugin:`);
   if (entry.confidence != null && !["verified", "guess"].includes(entry.confidence)) problems.push(`${where}: confidence must be verified or guess`);
 
   const stepIds = new Set();

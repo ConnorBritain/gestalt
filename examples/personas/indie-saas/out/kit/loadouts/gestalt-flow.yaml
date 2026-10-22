@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-flow
 description: "Jordan (solo SaaS developer)'s way: what every repo gets."
 extends: []
+marketplaces: [marketplace:compounder]
 plugins: [plugin:compounder]
 agents: [agent:linear]
 mcp:

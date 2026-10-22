@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Loadouts list their plugins' marketplaces**: a catalog entry whose ref is `plugin:` names
+  its `marketplace` (a kitctl `marketplace:` ref), and each emitted loadout lists the
+  marketplaces of the plugins it enables. kitctl only writes `enabledPlugins` for a plugin;
+  without the marketplace in the same loadout, Claude Code and Codex could not find it
+  (found on the first real apply). `verification-gate` names `marketplace:agent-primitives`,
+  which the warehouse must provide.
+- **Survey on Windows**: display paths are `~/…` and `<repo>/…` with `/` on every platform
+  (they were absolute, with `\`, so both goldens and the `@AGENTS.md` import check failed).
+  The symlink test makes a junction on Windows, which needs no admin rights.
 - **Worker agents go through kitctl**: each subagent worker is also a kitctl `agent:`
   primitive (`kit/primitives/agents/<id>.yaml`, with the same `claude.md` / `codex.toml`
   bytes as `agents/`), listed on `gestalt-flow`. With `writer: kitctl`, SETUP.md and

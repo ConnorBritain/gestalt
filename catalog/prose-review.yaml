@@ -6,6 +6,7 @@ title: prose-review (vonnegut)
 summary: Clean-context prose critics (voice, fidelity, structure, medium, reader) and a bounded reviser.
 version_seen: 0.7.0
 source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-review
+marketplace: marketplace:vonnegut
 install:
   claude: "/plugin install prose-review@vonnegut; paste wiring/claude-md.md"
   codex: "node install-prose-codex.mjs; paste wiring/agents-md.md"

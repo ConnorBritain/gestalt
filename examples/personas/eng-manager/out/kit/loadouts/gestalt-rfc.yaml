@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-rfc
 description: Morgan (engineering manager)'s way in rfc repos (file-exists:RFC.md).
 extends: []
+marketplaces: [marketplace:elonify]
 plugins: [plugin:elonify]
 instructions: |
   ### In rfc (RFC.md present)   <!-- gestalt -->

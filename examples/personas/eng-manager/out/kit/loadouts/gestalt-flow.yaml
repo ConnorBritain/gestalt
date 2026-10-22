@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-flow
 description: "Morgan (engineering manager)'s way: what every repo gets."
 extends: []
+marketplaces: [marketplace:cairn, marketplace:gestalt]
 plugins: [plugin:cairn, plugin:gestalt]
 skills: [skill:team-update]
 agents: [agent:reporter]

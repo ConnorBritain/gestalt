@@ -6,6 +6,7 @@ title: compounder
 summary: Keeps AI time on the one focus project until it ships; earned modes, receipts, follow-through.
 version_seen: 0.3.0
 source: https://github.com/ConnorBritain/compounder
+marketplace: marketplace:compounder
 install:
   claude: "/plugin marketplace add ConnorBritain/compounder && /plugin install compounder@compounder, then /compounder:interview"
   codex: "codex plugin marketplace add ConnorBritain/compounder, install compounder from /plugins, then trust its hooks (/hooks)"

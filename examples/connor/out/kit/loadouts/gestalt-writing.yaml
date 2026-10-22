@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-writing
 description: Connor England's way in writing repos (file-exists:WRITING.md).
 extends: []
+marketplaces: [marketplace:vonnegut]
 plugins: [plugin:prose-review, plugin:prose-tell-scan]
 instructions: |
   ### In writing (WRITING.md present)   <!-- gestalt -->

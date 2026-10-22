@@ -38,7 +38,8 @@ check("symlinked skills and plugin dirs are skipped", "a symlink can point outsi
   cpSync(join(homes, "connor"), home, { recursive: true });
   mkdirSync(join(home, "elsewhere", "evil"), { recursive: true });
   writeFileSync(join(home, "elsewhere", "evil", "SKILL.md"), "---\nname: evil\ndescription: should not be read\n---\n");
-  symlinkSync(join(home, "elsewhere", "evil"), join(home, ".claude", "skills", "evil"));
+  // A junction on Windows: it is a link to lstat like a symlink, and needs no admin rights.
+  symlinkSync(join(home, "elsewhere", "evil"), join(home, ".claude", "skills", "evil"), process.platform === "win32" ? "junction" : "dir");
   const s = survey({ home, now: NOW });
   assert.ok(!JSON.stringify(s).includes("should not be read"));
   assert.ok(!s.loose.some(u => u.name === "evil"));

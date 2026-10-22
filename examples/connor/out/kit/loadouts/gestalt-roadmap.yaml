@@ -4,6 +4,7 @@ schema_version: 2
 name: gestalt-roadmap
 description: Connor England's way in roadmap repos (file-exists:docs/roadmap/roadmap.yaml).
 extends: []
+marketplaces: [marketplace:agent-primitives, marketplace:elonify, marketplace:roadmap]
 plugins: [plugin:elonify, plugin:roadmap, plugin:verification-gate]
 instructions: |
   ### In roadmap (docs/roadmap/roadmap.yaml present)   <!-- gestalt -->

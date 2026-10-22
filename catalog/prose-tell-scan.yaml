@@ -6,6 +6,7 @@ title: prose-tell-scan (vonnegut)
 summary: Deterministic scan for AI-writing tells, by register (essay, technical, narration, correspondence).
 version_seen: 0.1.1
 source: https://github.com/ConnorBritain/vonnegut/tree/main/bundles/prose-tell-scan
+marketplace: marketplace:vonnegut
 install:
   claude: "/plugin install prose-tell-scan@vonnegut"
 steps:

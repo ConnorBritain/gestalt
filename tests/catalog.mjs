@@ -19,6 +19,15 @@ check("refs are kitctl refs and unique", "compile emits these refs into kitctl l
   for (const e of cat.entries.values()) assert.match(e.ref, REF_RE, e.id);
   assert.equal(cat.byRef.size, cat.entries.size);
 });
+check("every plugin entry names its marketplace", "kitctl only enables a plugin; without its marketplace in the same loadout, Claude Code and Codex cannot find what was enabled", () => {
+  for (const e of cat.entries.values()) if (e.ref.startsWith("plugin:")) assert.match(e.marketplace ?? "", /^marketplace:/, e.id);
+});
+check("a marketplace is only a marketplace ref on a plugin", "a misplaced or mistyped marketplace would emit a ref kitctl rejects, or register a source for nothing", () => {
+  const base = { id: "z", harness: { claude: "enforced" } };
+  assert.deepEqual(validateEntry({ ...base, ref: "plugin:z", kind: "plugin", marketplace: "marketplace:z" }), []);
+  assert.match(validateEntry({ ...base, ref: "skill:z", kind: "skill", marketplace: "marketplace:z" }).join("\n"), /marketplace must be/);
+  assert.match(validateEntry({ ...base, ref: "plugin:z", kind: "plugin", marketplace: "plugin:z" }).join("\n"), /marketplace must be/);
+});
 check("every step's kind may sit at its stage", "a generator at the check stage is the flow error lint exists to catch", () => {
   for (const s of cat.steps.values()) assert.ok(STAGE_KINDS[s.stage].includes(s.kind), s.id);
 });
