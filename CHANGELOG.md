@@ -11,7 +11,6 @@
 - **Survey on Windows**: display paths are `~/…` and `<repo>/…` with `/` on every platform
   (they were absolute, with `\`, so both goldens and the `@AGENTS.md` import check failed).
   The symlink test makes a junction on Windows, which needs no admin rights.
-
 - **Worker agents go through kitctl**: each subagent worker is also a kitctl `agent:`
   primitive (`kit/primitives/agents/<id>.yaml`, with the same `claude.md` / `codex.toml`
   bytes as `agents/`), listed on `gestalt-flow`. With `writer: kitctl`, SETUP.md and

@@ -20,10 +20,12 @@ function budgetOf(budgets) {
   return b;
 }
 
-function loadoutFor(name, description, entries, way, disable, instructions, { agents = [], budget = {} } = {}) {
-  const plugins = [...new Set(entries.filter(e => e.ref.startsWith("plugin:")).map(e => e.ref))].sort();
+function loadoutFor(name, description, entries, way, disable, instructions, { agents = [], budget = {}, gaps = [] } = {}) {
+  const pluginEntries = entries.filter(e => e.ref.startsWith("plugin:"));
+  const plugins = [...new Set(pluginEntries.map(e => e.ref))].sort();
   // kitctl enables a plugin only; Claude Code and Codex find it through the marketplace the loadout also lists.
-  const marketplaces = [...new Set(entries.filter(e => e.ref.startsWith("plugin:") && e.marketplace).map(e => e.marketplace))].sort();
+  const marketplaces = [...new Set(pluginEntries.filter(e => e.marketplace).map(e => e.marketplace))].sort();
+  for (const e of pluginEntries.filter(x => !x.marketplace)) gaps.push(`${e.ref}: its catalog entry names no marketplace, so ${name} enables it without registering where to install it from.`);
   const skills = [...new Set(entries.filter(e => e.ref.startsWith("skill:")).map(e => e.ref))].sort();
   const mcp = {};
   for (const e of entries.filter(x => x.ref.startsWith("mcp:"))) mcp[e.ref.slice(4)] = { primitive: e.ref };
@@ -92,7 +94,7 @@ export function emitKit(way, blocks, profiles = [], agentFiles = {}) {
   const workerOwned = sc => activeEntries(way, sc).filter(e => !leadEntries(way, sc).some(l => l.id === e.id)).map(e => e.ref);
   const baseEntries = [...leadEntries(way, base), ...connectorEntries.filter(c => !isolated.has(c.ref))];
   const baseDisable = [...new Set([...base.active.flatMap(c => way.disable[c] ?? []), ...workerOwned(base), ...isolated])];
-  const flow = loadoutFor("gestalt-flow", `${way.person.name}'s way: what every repo gets.`, baseEntries, way, baseDisable, blocks.base.body, { agents, budget: budgetOf(way.budgets) });
+  const flow = loadoutFor("gestalt-flow", `${way.person.name}'s way: what every repo gets.`, baseEntries, way, baseDisable, blocks.base.body, { agents, budget: budgetOf(way.budgets), gaps });
   withProfiles(flow, blocks.base.body, profiles.map(pr => [pr, pr.blocks.base.body]), { budgets: way.budgets });
   files["loadouts/gestalt-flow.yaml"] = emitYaml(flow, { header: HEADER });
   docs.push(flow);
@@ -106,7 +108,7 @@ export function emitKit(way, blocks, profiles = [], agentFiles = {}) {
     const loadouts = ["gestalt-flow"];
     const profileBlocks = profiles.map(pr => [pr, pr.blocks.contexts.find(b => b.context === ctx)?.body ?? ""]);
     if (added.length || disable.length || block || profileBlocks.some(([, body]) => body)) {
-      const doc = loadoutFor(`gestalt-${ctx}`, `${way.person.name}'s way in ${ctx} repos (${way.contexts[ctx].when}).`, added, way, disable, block?.body);
+      const doc = loadoutFor(`gestalt-${ctx}`, `${way.person.name}'s way in ${ctx} repos (${way.contexts[ctx].when}).`, added, way, disable, block?.body, { gaps });
       withProfiles(doc, block?.body ?? "", profileBlocks);
       files[`loadouts/gestalt-${ctx}.yaml`] = emitYaml(doc, { header: HEADER });
       docs.push(doc);

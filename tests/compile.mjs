@@ -103,6 +103,16 @@ check("each loadout lists the marketplace of every plugin it enables", "kitctl w
   }
   assert.ok(checked > 0, "the full fixture enables at least one plugin with a marketplace");
 });
+check("a plugin with no marketplace is named in gaps.md", "a way-local entry may not know its marketplace; enabling it silently would leave the harness unable to install it", () => {
+  const { way, catalog } = readWay(fullPath);
+  const { files: before } = compileWay(way, catalog);
+  const ref = parseYaml(before["kit/loadouts/gestalt-flow.yaml"]).plugins.find(r => catalog.byRef.get(r)?.marketplace);
+  const market = catalog.byRef.get(ref).marketplace;
+  delete catalog.byRef.get(ref).marketplace;
+  const { files } = compileWay(way, catalog);
+  assert.ok(!(parseYaml(files["kit/loadouts/gestalt-flow.yaml"]).marketplaces ?? []).includes(market), market);
+  assert.match(files["kit/gaps.md"], new RegExp(`${ref}: its catalog entry names no marketplace`));
+});
 check("a subagent worker is a kitctl agent primitive, carried by gestalt-flow", "kitctl writes every native file, agent files included; Gestalt's own copies must be the same bytes", () => {
   const { files } = compile(fullPath);
   const prim = parseYaml(files["kit/primitives/agents/tracker.yaml"]);
